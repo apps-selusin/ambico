@@ -38,7 +38,7 @@ from
 	left join pegawai e on e.pegawai_id = b.pegawai_id
 where
 	a.tgl between '".$_POST["start"]."' and '".$_POST["end"]."'
-"; //echo $query;
+"; echo $query;
 $rs = Conn()->Execute($query);
 while (!$rs->EOF) {
 	$mkeg_nama = $rs->fields["keg_nama"];
@@ -56,5 +56,5 @@ while (!$rs->EOF) {
 	Conn()->Execute($query);
 
 }
-header("location: r_lapgjbrngansmry.php");
+//header("location: r_lapgjbrngansmry.php");
 ?>
