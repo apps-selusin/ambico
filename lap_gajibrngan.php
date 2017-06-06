@@ -16,48 +16,8 @@ else {
 }*/
 
 $msql = "delete from t_gjbrngan";
-//$conn->Execute($msql);
 Conn()->Execute($msql);
 
-$query = "
-	select
-		b.*
-		, c.pegawai_nama
-		, d.keg_nama
-	from
-		t_keg_detail a
-		left join 
-			(
-			select
-				a.*
-				, 
-				case when c.tarif_acuan = 0 then (
-					a.hasil * c.tarif1
-				)
-				else (
-					a.hasil * (case when a.hasil <= c.tarif_acuan then c.tarif1 else c.tarif2 end)
-				)
-				end
-				/ sum(case when not isnull(b.scan_masuk) and not isnull(b.scan_keluar) then 1 else 0 end)
-				as upah_peg
-			from
-				t_keg_master a
-				left join t_keg_detail b on a.kegm_id = b.kegm_id
-				left join t_kegiatan c on a.keg_id = c.keg_id
-			
-			) b on a.kegm_id = b.kegm_id
-		left join pegawai c on a.pegawai_id = c.pegawai_id
-		left join t_kegiatan d on b.keg_id = d.keg_id
-	where
-		not isnull(a.scan_masuk)
-		and not isnull(a.scan_keluar)
-		and b.tgl between '".$_POST["start"]."' and '".$_POST["end"]."'
-	order by
-		c.pegawai_nama
-	"; 
-$query = "
-select b.* , c.pegawai_nama , d.keg_nama from t_keg_detail a left join ( select a.* , case when c.tarif_acuan = 0 then ( a.hasil * c.tarif1 ) else ( a.hasil * (case when a.hasil <= c.tarif_acuan then c.tarif1 else c.tarif2 end) ) end / sum(case when not isnull(b.scan_masuk) and not isnull(b.scan_keluar) then 1 else 0 end) as upah_peg from t_keg_master a left join t_keg_detail b on a.kegm_id = b.kegm_id left join t_kegiatan c on a.keg_id = c.keg_id where not isnull(b.scan_masuk) and not isnull(b.scan_keluar) and a.tgl between '".$_POST["start"]."' and '".$_POST["end"]."') b on a.kegm_id = b.kegm_id left join pegawai c on a.pegawai_id = c.pegawai_id left join t_kegiatan d on b.keg_id = d.keg_id where not isnull(a.scan_masuk) and not isnull(a.scan_keluar) and b.tgl between '".$_POST["start"]."' and '".$_POST["end"]."' order by c.pegawai_nama
-"; 
 $query = "
 select
 	a.*
@@ -78,10 +38,10 @@ from
 	left join pegawai e on e.pegawai_id = b.pegawai_id
 where
 	a.tgl between '".$_POST["start"]."' and '".$_POST["end"]."'
-";
-//echo $query;
+"; //echo $query;
 $rs = Conn()->Execute($query);
 while (!$rs->EOF) {
+	$mkeg_nama = $rs->fields["keg_nama"];
 	$mpegawai_nama = $rs->fields["pegawai_nama"];
 	$mupah_peg = 0;
 	
@@ -91,11 +51,10 @@ while (!$rs->EOF) {
 	}
 	
 	$query = "
-		insert into t_gjbrngan values (null, '".$mpegawai_nama."', ".$mupah_peg.", '".$_POST["start"]."', '".$_POST["end"]."')
+		insert into t_gjbrngan values (null, '".$mkeg_nama."', '".$mpegawai_nama."', ".$mupah_peg.", '".$_POST["start"]."', '".$_POST["end"]."')
 		";
 	Conn()->Execute($query);
 
 }
-//$rs->Close();
 header("location: r_lapgjbrngansmry.php");
 ?>

@@ -119,7 +119,7 @@ while (!$rs->EOF) {
 				$kode_pengecualian = f_carikodepengecualian($mpegawai_id, $rs->fields["tgl"], $conn);
 
 				if (!$data_valid and $kode_pengecualian == null) {
-					echo $rs->fields["tgl"]." - ".f_harilibur($rs->fields["tgl"], $conn);
+					//echo $rs->fields["tgl"]." - ".f_harilibur($rs->fields["tgl"], $conn);
 					// tidak ada data pengecualian
 					
 					// check hari libur

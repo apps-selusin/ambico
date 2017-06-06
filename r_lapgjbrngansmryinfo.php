@@ -10,10 +10,11 @@ class crr_lapgjbrngan extends crTableBase {
 	var $ShowGroupHeaderAsRow = FALSE;
 	var $ShowCompactSummaryFooter = TRUE;
 	var $gjbrngan_id;
+	var $end;
+	var $keg_nama;
 	var $nama;
 	var $upah;
 	var $start;
-	var $end;
 
 	//
 	// Table class constructor
@@ -35,6 +36,29 @@ class crr_lapgjbrngan extends crTableBase {
 		$this->gjbrngan_id->DateFilter = "";
 		$this->gjbrngan_id->SqlSelect = "";
 		$this->gjbrngan_id->SqlOrderBy = "";
+
+		// end
+		$this->end = new crField('r_lapgjbrngan', 'r_lapgjbrngan', 'x_end', 'end', '`end`', 133, EWR_DATATYPE_DATE, 0);
+		$this->end->Sortable = TRUE; // Allow sort
+		$this->end->FldDefaultErrMsg = str_replace("%s", $GLOBALS["EWR_DATE_FORMAT"], $ReportLanguage->Phrase("IncorrectDate"));
+		$this->fields['end'] = &$this->end;
+		$this->end->DateFilter = "";
+		$this->end->SqlSelect = "";
+		$this->end->SqlOrderBy = "";
+
+		// keg_nama
+		$this->keg_nama = new crField('r_lapgjbrngan', 'r_lapgjbrngan', 'x_keg_nama', 'keg_nama', '`keg_nama`', 200, EWR_DATATYPE_STRING, -1);
+		$this->keg_nama->Sortable = TRUE; // Allow sort
+		$this->keg_nama->GroupingFieldId = 1;
+		$this->keg_nama->ShowGroupHeaderAsRow = $this->ShowGroupHeaderAsRow;
+		$this->keg_nama->ShowCompactSummaryFooter = $this->ShowCompactSummaryFooter;
+		$this->fields['keg_nama'] = &$this->keg_nama;
+		$this->keg_nama->DateFilter = "";
+		$this->keg_nama->SqlSelect = "";
+		$this->keg_nama->SqlOrderBy = "";
+		$this->keg_nama->FldGroupByType = "";
+		$this->keg_nama->FldGroupInt = "0";
+		$this->keg_nama->FldGroupSql = "";
 
 		// nama
 		$this->nama = new crField('r_lapgjbrngan', 'r_lapgjbrngan', 'x_nama', 'nama', '`nama`', 200, EWR_DATATYPE_STRING, -1);
@@ -61,15 +85,6 @@ class crr_lapgjbrngan extends crTableBase {
 		$this->start->DateFilter = "";
 		$this->start->SqlSelect = "";
 		$this->start->SqlOrderBy = "";
-
-		// end
-		$this->end = new crField('r_lapgjbrngan', 'r_lapgjbrngan', 'x_end', 'end', '`end`', 133, EWR_DATATYPE_DATE, 0);
-		$this->end->Sortable = TRUE; // Allow sort
-		$this->end->FldDefaultErrMsg = str_replace("%s", $GLOBALS["EWR_DATE_FORMAT"], $ReportLanguage->Phrase("IncorrectDate"));
-		$this->fields['end'] = &$this->end;
-		$this->end->DateFilter = "";
-		$this->end->SqlSelect = "";
-		$this->end->SqlOrderBy = "";
 	}
 
 	// Set Field Visibility
@@ -217,7 +232,7 @@ class crr_lapgjbrngan extends crTableBase {
 	var $_SqlOrderBy = "";
 
 	function getSqlOrderBy() {
-		return ($this->_SqlOrderBy <> "") ? $this->_SqlOrderBy : "";
+		return ($this->_SqlOrderBy <> "") ? $this->_SqlOrderBy : "`keg_nama` ASC";
 	}
 
 	function SqlOrderBy() { // For backward compatibility
@@ -234,7 +249,7 @@ class crr_lapgjbrngan extends crTableBase {
 	var $_SqlFirstGroupField = "";
 
 	function getSqlFirstGroupField() {
-		return ($this->_SqlFirstGroupField <> "") ? $this->_SqlFirstGroupField : "";
+		return ($this->_SqlFirstGroupField <> "") ? $this->_SqlFirstGroupField : "`keg_nama`";
 	}
 
 	function SqlFirstGroupField() { // For backward compatibility
@@ -264,7 +279,7 @@ class crr_lapgjbrngan extends crTableBase {
 	var $_SqlOrderByGroup = "";
 
 	function getSqlOrderByGroup() {
-		return ($this->_SqlOrderByGroup <> "") ? $this->_SqlOrderByGroup : "";
+		return ($this->_SqlOrderByGroup <> "") ? $this->_SqlOrderByGroup : "`keg_nama` ASC";
 	}
 
 	function SqlOrderByGroup() { // For backward compatibility
