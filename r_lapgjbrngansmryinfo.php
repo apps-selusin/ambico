@@ -63,10 +63,16 @@ class crr_lapgjbrngan extends crTableBase {
 		// nama
 		$this->nama = new crField('r_lapgjbrngan', 'r_lapgjbrngan', 'x_nama', 'nama', '`nama`', 200, EWR_DATATYPE_STRING, -1);
 		$this->nama->Sortable = TRUE; // Allow sort
+		$this->nama->GroupingFieldId = 2;
+		$this->nama->ShowGroupHeaderAsRow = $this->ShowGroupHeaderAsRow;
+		$this->nama->ShowCompactSummaryFooter = $this->ShowCompactSummaryFooter;
 		$this->fields['nama'] = &$this->nama;
 		$this->nama->DateFilter = "";
 		$this->nama->SqlSelect = "";
 		$this->nama->SqlOrderBy = "";
+		$this->nama->FldGroupByType = "";
+		$this->nama->FldGroupInt = "0";
+		$this->nama->FldGroupSql = "";
 
 		// upah
 		$this->upah = new crField('r_lapgjbrngan', 'r_lapgjbrngan', 'x_upah', 'upah', '`upah`', 4, EWR_DATATYPE_NUMBER, -1);
@@ -232,7 +238,7 @@ class crr_lapgjbrngan extends crTableBase {
 	var $_SqlOrderBy = "";
 
 	function getSqlOrderBy() {
-		return ($this->_SqlOrderBy <> "") ? $this->_SqlOrderBy : "`keg_nama` ASC";
+		return ($this->_SqlOrderBy <> "") ? $this->_SqlOrderBy : "`keg_nama` ASC, `nama` ASC";
 	}
 
 	function SqlOrderBy() { // For backward compatibility

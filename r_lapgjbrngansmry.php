@@ -537,15 +537,14 @@ class crr_lapgjbrngan_summary extends crr_lapgjbrngan {
 		global $ReportLanguage;
 
 		// Set field visibility for detail fields
-		$this->nama->SetVisibility();
 		$this->upah->SetVisibility();
 
 		// Aggregate variables
 		// 1st dimension = no of groups (level 0 used for grand total)
 		// 2nd dimension = no of fields
 
-		$nDtls = 3;
-		$nGrps = 2;
+		$nDtls = 2;
+		$nGrps = 3;
 		$this->Val = &ewr_InitArray($nDtls, 0);
 		$this->Cnt = &ewr_Init2DArray($nGrps, $nDtls, 0);
 		$this->Smry = &ewr_Init2DArray($nGrps, $nDtls, 0);
@@ -557,7 +556,7 @@ class crr_lapgjbrngan_summary extends crr_lapgjbrngan {
 		$this->GrandMx = &ewr_InitArray($nDtls, NULL);
 
 		// Set up array if accumulation required: array(Accum, SkipNullOrZero)
-		$this->Col = array(array(FALSE, FALSE), array(FALSE,FALSE), array(TRUE,FALSE));
+		$this->Col = array(array(FALSE, FALSE), array(TRUE,FALSE));
 
 		// Set up groups per page dynamically
 		$this->SetUpDisplayGrps();
@@ -655,11 +654,19 @@ class crr_lapgjbrngan_summary extends crr_lapgjbrngan {
 		$cnt = 0;
 		foreach ($this->DetailRows as $row) {
 			$wrkkeg_nama = $row["keg_nama"];
+			$wrknama = $row["nama"];
 			if ($lvl >= 1) {
 				$val = $curValue ? $this->keg_nama->CurrentValue : $this->keg_nama->OldValue;
 				$grpval = $curValue ? $this->keg_nama->GroupValue() : $this->keg_nama->GroupOldValue();
 				if (is_null($val) && !is_null($wrkkeg_nama) || !is_null($val) && is_null($wrkkeg_nama) ||
 					$grpval <> $this->keg_nama->getGroupValueBase($wrkkeg_nama))
+				continue;
+			}
+			if ($lvl >= 2) {
+				$val = $curValue ? $this->nama->CurrentValue : $this->nama->OldValue;
+				$grpval = $curValue ? $this->nama->GroupValue() : $this->nama->GroupOldValue();
+				if (is_null($val) && !is_null($wrknama) || !is_null($val) && is_null($wrknama) ||
+					$grpval <> $this->nama->getGroupValueBase($wrknama))
 				continue;
 			}
 			$cnt++;
@@ -674,6 +681,10 @@ class crr_lapgjbrngan_summary extends crr_lapgjbrngan {
 				return (is_null($this->keg_nama->CurrentValue) && !is_null($this->keg_nama->OldValue)) ||
 					(!is_null($this->keg_nama->CurrentValue) && is_null($this->keg_nama->OldValue)) ||
 					($this->keg_nama->GroupValue() <> $this->keg_nama->GroupOldValue());
+			case 2:
+				return (is_null($this->nama->CurrentValue) && !is_null($this->nama->OldValue)) ||
+					(!is_null($this->nama->CurrentValue) && is_null($this->nama->OldValue)) ||
+					($this->nama->GroupValue() <> $this->nama->GroupOldValue()) || $this->ChkLvlBreak(1); // Recurse upper level
 		}
 	}
 
@@ -850,8 +861,7 @@ class crr_lapgjbrngan_summary extends crr_lapgjbrngan {
 			$this->nama->setDbValue($rs->fields('nama'));
 			$this->upah->setDbValue($rs->fields('upah'));
 			$this->start->setDbValue($rs->fields('start'));
-			$this->Val[1] = $this->nama->CurrentValue;
-			$this->Val[2] = $this->upah->CurrentValue;
+			$this->Val[1] = $this->upah->CurrentValue;
 		} else {
 			$this->gjbrngan_id->setDbValue("");
 			$this->end->setDbValue("");
@@ -1025,8 +1035,7 @@ class crr_lapgjbrngan_summary extends crr_lapgjbrngan {
 			$rsagg = $conn->Execute($sSql);
 			if ($rsagg) {
 				$this->GrandCnt[1] = $this->TotCount;
-				$this->GrandCnt[2] = $this->TotCount;
-				$this->GrandSmry[2] = $rsagg->fields("sum_upah");
+				$this->GrandSmry[1] = $rsagg->fields("sum_upah");
 				$rsagg->Close();
 				$bGotSummary = TRUE;
 			}
@@ -1057,6 +1066,7 @@ class crr_lapgjbrngan_summary extends crr_lapgjbrngan {
 		if ($this->RowType == EWR_ROWTYPE_TOTAL && !($this->RowTotalType == EWR_ROWTOTAL_GROUP && $this->RowTotalSubType == EWR_ROWTOTAL_HEADER)) { // Summary row
 			ewr_PrependClass($this->RowAttrs["class"], ($this->RowTotalType == EWR_ROWTOTAL_PAGE || $this->RowTotalType == EWR_ROWTOTAL_GRAND) ? "ewRptGrpAggregate" : "ewRptGrpSummary" . $this->RowGroupLevel); // Set up row class
 			if ($this->RowTotalType == EWR_ROWTOTAL_GROUP) $this->RowAttrs["data-group"] = $this->keg_nama->GroupOldValue(); // Set up group attribute
+			if ($this->RowTotalType == EWR_ROWTOTAL_GROUP && $this->RowGroupLevel >= 2) $this->RowAttrs["data-group-2"] = $this->nama->GroupOldValue(); // Set up group attribute 2
 
 			// keg_nama
 			$this->keg_nama->GroupViewValue = $this->keg_nama->GroupOldValue();
@@ -1065,6 +1075,14 @@ class crr_lapgjbrngan_summary extends crr_lapgjbrngan {
 			$this->keg_nama->GroupSummaryOldValue = $this->keg_nama->GroupSummaryValue;
 			$this->keg_nama->GroupSummaryValue = $this->keg_nama->GroupViewValue;
 			$this->keg_nama->GroupSummaryViewValue = ($this->keg_nama->GroupSummaryOldValue <> $this->keg_nama->GroupSummaryValue) ? $this->keg_nama->GroupSummaryValue : "&nbsp;";
+
+			// nama
+			$this->nama->GroupViewValue = $this->nama->GroupOldValue();
+			$this->nama->CellAttrs["class"] = ($this->RowGroupLevel == 2) ? "ewRptGrpSummary2" : "ewRptGrpField2";
+			$this->nama->GroupViewValue = ewr_DisplayGroupValue($this->nama, $this->nama->GroupViewValue);
+			$this->nama->GroupSummaryOldValue = $this->nama->GroupSummaryValue;
+			$this->nama->GroupSummaryValue = $this->nama->GroupViewValue;
+			$this->nama->GroupSummaryViewValue = ($this->nama->GroupSummaryOldValue <> $this->nama->GroupSummaryValue) ? $this->nama->GroupSummaryValue : "&nbsp;";
 
 			// upah
 			$this->upah->SumViewValue = $this->upah->SumValue;
@@ -1083,8 +1101,10 @@ class crr_lapgjbrngan_summary extends crr_lapgjbrngan {
 		} else {
 			if ($this->RowTotalType == EWR_ROWTOTAL_GROUP && $this->RowTotalSubType == EWR_ROWTOTAL_HEADER) {
 			$this->RowAttrs["data-group"] = $this->keg_nama->GroupValue(); // Set up group attribute
+			if ($this->RowGroupLevel >= 2) $this->RowAttrs["data-group-2"] = $this->nama->GroupValue(); // Set up group attribute 2
 			} else {
 			$this->RowAttrs["data-group"] = $this->keg_nama->GroupValue(); // Set up group attribute
+			$this->RowAttrs["data-group-2"] = $this->nama->GroupValue(); // Set up group attribute 2
 			}
 
 			// keg_nama
@@ -1095,8 +1115,11 @@ class crr_lapgjbrngan_summary extends crr_lapgjbrngan {
 				$this->keg_nama->GroupViewValue = "&nbsp;";
 
 			// nama
-			$this->nama->ViewValue = $this->nama->CurrentValue;
-			$this->nama->CellAttrs["class"] = ($this->RecCount % 2 <> 1) ? "ewTableAltRow" : "ewTableRow";
+			$this->nama->GroupViewValue = $this->nama->GroupValue();
+			$this->nama->CellAttrs["class"] = "ewRptGrpField2";
+			$this->nama->GroupViewValue = ewr_DisplayGroupValue($this->nama, $this->nama->GroupViewValue);
+			if ($this->nama->GroupValue() == $this->nama->GroupOldValue() && !$this->ChkLvlBreak(2))
+				$this->nama->GroupViewValue = "&nbsp;";
 
 			// upah
 			$this->upah->ViewValue = $this->upah->CurrentValue;
@@ -1126,6 +1149,15 @@ class crr_lapgjbrngan_summary extends crr_lapgjbrngan {
 			$LinkAttrs = &$this->keg_nama->LinkAttrs;
 			$this->Cell_Rendered($this->keg_nama, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
 
+			// nama
+			$CurrentValue = $this->nama->GroupViewValue;
+			$ViewValue = &$this->nama->GroupViewValue;
+			$ViewAttrs = &$this->nama->ViewAttrs;
+			$CellAttrs = &$this->nama->CellAttrs;
+			$HrefValue = &$this->nama->HrefValue;
+			$LinkAttrs = &$this->nama->LinkAttrs;
+			$this->Cell_Rendered($this->nama, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
+
 			// upah
 			$CurrentValue = $this->upah->SumValue;
 			$ViewValue = &$this->upah->SumViewValue;
@@ -1146,8 +1178,8 @@ class crr_lapgjbrngan_summary extends crr_lapgjbrngan {
 			$this->Cell_Rendered($this->keg_nama, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
 
 			// nama
-			$CurrentValue = $this->nama->CurrentValue;
-			$ViewValue = &$this->nama->ViewValue;
+			$CurrentValue = $this->nama->GroupValue();
+			$ViewValue = &$this->nama->GroupViewValue;
 			$ViewAttrs = &$this->nama->ViewAttrs;
 			$CellAttrs = &$this->nama->CellAttrs;
 			$HrefValue = &$this->nama->HrefValue;
@@ -1175,7 +1207,7 @@ class crr_lapgjbrngan_summary extends crr_lapgjbrngan {
 		$this->SubGrpColumnCount = 0;
 		$this->DtlColumnCount = 0;
 		if ($this->keg_nama->Visible) $this->GrpColumnCount += 1;
-		if ($this->nama->Visible) $this->DtlColumnCount += 1;
+		if ($this->nama->Visible) { $this->GrpColumnCount += 1; $this->SubGrpColumnCount += 1; }
 		if ($this->upah->Visible) $this->DtlColumnCount += 1;
 	}
 
@@ -1637,6 +1669,7 @@ $Page->RecIndex = 0;
 // Get first row
 if ($Page->TotalGrps > 0) {
 	$Page->GetGrpRow(1);
+	$Page->GrpCounter[0] = 1;
 	$Page->GrpCount = 1;
 }
 $Page->GrpIdx = ewr_InitArray($Page->StopGrp - $Page->StartGrp + 1, -1);
@@ -1710,6 +1743,9 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 	<?php } ?>
 <?php } ?>
 <?php if ($Page->nama->Visible) { ?>
+	<?php if ($Page->nama->ShowGroupHeaderAsRow) { ?>
+	<td data-field="nama">&nbsp;</td>
+	<?php } else { ?>
 <?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
 	<td data-field="nama"><div class="r_lapgjbrngan_nama"><span class="ewTableHeaderCaption"><?php echo $Page->nama->FldCaption() ?></span></div></td>
 <?php } else { ?>
@@ -1726,6 +1762,7 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 <?php } ?>
 	</td>
 <?php } ?>
+	<?php } ?>
 <?php } ?>
 <?php if ($Page->upah->Visible) { ?>
 <?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
@@ -1764,7 +1801,7 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 	$rsdtlcnt = ($rs) ? $rs->RecordCount() : 0;
 	if ($rsdtlcnt > 0)
 		$Page->GetRow(1);
-	$Page->GrpIdx[$Page->GrpCount] = $rsdtlcnt;
+	$Page->GrpIdx[$Page->GrpCount] = array(-1);
 	while ($rs && !$rs->EOF) { // Loop detail records
 		$Page->RecCount++;
 		$Page->RecIndex++;
@@ -1806,6 +1843,46 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 		</td>
 	</tr>
 <?php } ?>
+<?php if ($Page->nama->Visible && $Page->ChkLvlBreak(2) && $Page->nama->ShowGroupHeaderAsRow) { ?>
+<?php
+
+		// Render header row
+		$Page->ResetAttrs();
+		$Page->RowType = EWR_ROWTYPE_TOTAL;
+		$Page->RowTotalType = EWR_ROWTOTAL_GROUP;
+		$Page->RowTotalSubType = EWR_ROWTOTAL_HEADER;
+		$Page->RowGroupLevel = 2;
+		$Page->nama->Count = $Page->GetSummaryCount(2);
+		$Page->RenderRow();
+?>
+	<tr<?php echo $Page->RowAttributes(); ?>>
+<?php if ($Page->keg_nama->Visible) { ?>
+		<td data-field="keg_nama"<?php echo $Page->keg_nama->CellAttributes(); ?>></td>
+<?php } ?>
+<?php if ($Page->nama->Visible) { ?>
+		<td data-field="nama"<?php echo $Page->nama->CellAttributes(); ?>><span class="ewGroupToggle icon-collapse"></span></td>
+<?php } ?>
+		<td data-field="nama" colspan="<?php echo ($Page->GrpColumnCount + $Page->DtlColumnCount - 2) ?>"<?php echo $Page->nama->CellAttributes() ?>>
+<?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
+		<span class="ewSummaryCaption r_lapgjbrngan_nama"><span class="ewTableHeaderCaption"><?php echo $Page->nama->FldCaption() ?></span></span>
+<?php } else { ?>
+	<?php if ($Page->SortUrl($Page->nama) == "") { ?>
+		<span class="ewSummaryCaption r_lapgjbrngan_nama">
+			<span class="ewTableHeaderCaption"><?php echo $Page->nama->FldCaption() ?></span>
+		</span>
+	<?php } else { ?>
+		<span class="ewTableHeaderBtn ewPointer ewSummaryCaption r_lapgjbrngan_nama" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->nama) ?>',2);">
+			<span class="ewTableHeaderCaption"><?php echo $Page->nama->FldCaption() ?></span>
+			<span class="ewTableHeaderSort"><?php if ($Page->nama->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($Page->nama->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span>
+		</span>
+	<?php } ?>
+<?php } ?>
+		<?php echo $ReportLanguage->Phrase("SummaryColon") ?>
+<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_r_lapgjbrngan_nama"<?php echo $Page->nama->ViewAttributes() ?>><?php echo $Page->nama->GroupViewValue ?></span>
+		<span class="ewSummaryCount">(<span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptCnt") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><?php echo ewr_FormatNumber($Page->nama->Count,0,-2,-2,-2) ?></span>)</span>
+		</td>
+	</tr>
+<?php } ?>
 <?php
 
 		// Render detail row
@@ -1823,12 +1900,16 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 	<?php } ?>
 <?php } ?>
 <?php if ($Page->nama->Visible) { ?>
-		<td data-field="nama"<?php echo $Page->nama->CellAttributes() ?>>
-<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->RecCount ?>_r_lapgjbrngan_nama"<?php echo $Page->nama->ViewAttributes() ?>><?php echo $Page->nama->ListViewValue() ?></span></td>
+	<?php if ($Page->nama->ShowGroupHeaderAsRow) { ?>
+		<td data-field="nama"<?php echo $Page->nama->CellAttributes(); ?>>&nbsp;</td>
+	<?php } else { ?>
+		<td data-field="nama"<?php echo $Page->nama->CellAttributes(); ?>>
+<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_r_lapgjbrngan_nama"<?php echo $Page->nama->ViewAttributes() ?>><?php echo $Page->nama->GroupViewValue ?></span></td>
+	<?php } ?>
 <?php } ?>
 <?php if ($Page->upah->Visible) { ?>
 		<td data-field="upah"<?php echo $Page->upah->CellAttributes() ?>>
-<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->RecCount ?>_r_lapgjbrngan_upah"<?php echo $Page->upah->ViewAttributes() ?>><?php echo $Page->upah->ListViewValue() ?></span></td>
+<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->RecCount ?>_r_lapgjbrngan_upah"<?php echo $Page->upah->ViewAttributes() ?>><?php echo $Page->upah->ListViewValue() ?></span></td>
 <?php } ?>
 	</tr>
 <?php
@@ -1842,6 +1923,84 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 		// Show Footers
 ?>
 <?php
+		if ($Page->ChkLvlBreak(2)) {
+			$cnt = count(@$Page->GrpIdx[$Page->GrpCount]);
+			$Page->GrpIdx[$Page->GrpCount][$cnt] = $Page->RecCount;
+		}
+		if ($Page->ChkLvlBreak(2) && $Page->nama->Visible) {
+?>
+<?php
+			$Page->keg_nama->Count = $Page->GetSummaryCount(1, FALSE);
+			$Page->nama->Count = $Page->GetSummaryCount(2, FALSE);
+			$Page->upah->Count = $Page->Cnt[2][1];
+			$Page->upah->SumValue = $Page->Smry[2][1]; // Load SUM
+			$Page->ResetAttrs();
+			$Page->RowType = EWR_ROWTYPE_TOTAL;
+			$Page->RowTotalType = EWR_ROWTOTAL_GROUP;
+			$Page->RowTotalSubType = EWR_ROWTOTAL_FOOTER;
+			$Page->RowGroupLevel = 2;
+			$Page->RenderRow();
+?>
+<?php if ($Page->nama->ShowCompactSummaryFooter) { ?>
+	<tr<?php echo $Page->RowAttributes(); ?>>
+<?php if ($Page->keg_nama->Visible) { ?>
+		<td data-field="keg_nama"<?php echo $Page->keg_nama->CellAttributes() ?>>
+	<?php if ($Page->keg_nama->ShowGroupHeaderAsRow) { ?>
+		&nbsp;
+	<?php } elseif ($Page->RowGroupLevel <> 1) { ?>
+		&nbsp;
+	<?php } else { ?>
+		<span class="ewSummaryCount"><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptCnt") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><?php echo ewr_FormatNumber($Page->keg_nama->Count,0,-2,-2,-2) ?></span></span>
+	<?php } ?>
+		</td>
+<?php } ?>
+<?php if ($Page->nama->Visible) { ?>
+		<td data-field="nama"<?php echo $Page->nama->CellAttributes() ?>>
+	<?php if ($Page->nama->ShowGroupHeaderAsRow) { ?>
+		&nbsp;
+	<?php } elseif ($Page->RowGroupLevel <> 2) { ?>
+		&nbsp;
+	<?php } else { ?>
+		<span class="ewSummaryCount"><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptCnt") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><?php echo ewr_FormatNumber($Page->nama->Count,0,-2,-2,-2) ?></span></span>
+	<?php } ?>
+		</td>
+<?php } ?>
+<?php if ($Page->upah->Visible) { ?>
+		<td data-field="upah"<?php echo $Page->nama->CellAttributes() ?>><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptSum") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><span data-class="tpgs<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_r_lapgjbrngan_upah"<?php echo $Page->upah->ViewAttributes() ?>><?php echo $Page->upah->SumViewValue ?></span></span></td>
+<?php } ?>
+	</tr>
+<?php } else { ?>
+	<tr<?php echo $Page->RowAttributes(); ?>>
+<?php if ($Page->keg_nama->Visible) { ?>
+		<td data-field="keg_nama"<?php echo $Page->keg_nama->CellAttributes() ?>>&nbsp;</td>
+<?php } ?>
+<?php if ($Page->SubGrpColumnCount + $Page->DtlColumnCount > 0) { ?>
+		<td colspan="<?php echo ($Page->SubGrpColumnCount + $Page->DtlColumnCount) ?>"<?php echo $Page->upah->CellAttributes() ?>><?php echo str_replace(array("%v", "%c"), array($Page->nama->GroupViewValue, $Page->nama->FldCaption()), $ReportLanguage->Phrase("RptSumHead")) ?> <span class="ewDirLtr">(<?php echo ewr_FormatNumber($Page->Cnt[2][0],0,-2,-2,-2) ?><?php echo $ReportLanguage->Phrase("RptDtlRec") ?>)</span></td>
+<?php } ?>
+	</tr>
+	<tr<?php echo $Page->RowAttributes(); ?>>
+<?php if ($Page->keg_nama->Visible) { ?>
+		<td data-field="keg_nama"<?php echo $Page->keg_nama->CellAttributes() ?>>&nbsp;</td>
+<?php } ?>
+<?php if ($Page->GrpColumnCount > 0) { ?>
+		<td colspan="<?php echo ($Page->GrpColumnCount - 1) ?>"<?php echo $Page->nama->CellAttributes() ?>><?php echo $ReportLanguage->Phrase("RptSum") ?></td>
+<?php } ?>
+<?php if ($Page->upah->Visible) { ?>
+		<td data-field="upah"<?php echo $Page->upah->CellAttributes() ?>>
+<span data-class="tpgs<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_r_lapgjbrngan_upah"<?php echo $Page->upah->ViewAttributes() ?>><?php echo $Page->upah->SumViewValue ?></span></td>
+<?php } ?>
+	</tr>
+<?php } ?>
+<?php
+
+			// Reset level 2 summary
+			$Page->ResetLevelSummary(2);
+		} // End show footer check
+		if ($Page->ChkLvlBreak(2)) {
+			$Page->GrpCounter[0]++;
+		}
+?>
+<?php
 	} // End detail records loop
 ?>
 <?php
@@ -1849,8 +2008,9 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 ?>
 <?php
 			$Page->keg_nama->Count = $Page->GetSummaryCount(1, FALSE);
-			$Page->upah->Count = $Page->Cnt[1][2];
-			$Page->upah->SumValue = $Page->Smry[1][2]; // Load SUM
+			$Page->nama->Count = $Page->GetSummaryCount(2, FALSE);
+			$Page->upah->Count = $Page->Cnt[1][1];
+			$Page->upah->SumValue = $Page->Smry[1][1]; // Load SUM
 			$Page->ResetAttrs();
 			$Page->RowType = EWR_ROWTYPE_TOTAL;
 			$Page->RowTotalType = EWR_ROWTOTAL_GROUP;
@@ -1872,7 +2032,15 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 		</td>
 <?php } ?>
 <?php if ($Page->nama->Visible) { ?>
-		<td data-field="nama"<?php echo $Page->keg_nama->CellAttributes() ?>></td>
+		<td data-field="nama"<?php echo $Page->keg_nama->CellAttributes() ?>>
+	<?php if ($Page->nama->ShowGroupHeaderAsRow) { ?>
+		&nbsp;
+	<?php } elseif ($Page->RowGroupLevel <> 2) { ?>
+		&nbsp;
+	<?php } else { ?>
+		<span class="ewSummaryCount"><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptCnt") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><?php echo ewr_FormatNumber($Page->nama->Count,0,-2,-2,-2) ?></span></span>
+	<?php } ?>
+		</td>
 <?php } ?>
 <?php if ($Page->upah->Visible) { ?>
 		<td data-field="upah"<?php echo $Page->keg_nama->CellAttributes() ?>><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptSum") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><span data-class="tpgs<?php echo $Page->GrpCount ?>_r_lapgjbrngan_upah"<?php echo $Page->upah->ViewAttributes() ?>><?php echo $Page->upah->SumViewValue ?></span></span></td>
@@ -1887,9 +2055,6 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 	<tr<?php echo $Page->RowAttributes(); ?>>
 <?php if ($Page->GrpColumnCount > 0) { ?>
 		<td colspan="<?php echo ($Page->GrpColumnCount - 0) ?>"<?php echo $Page->keg_nama->CellAttributes() ?>><?php echo $ReportLanguage->Phrase("RptSum") ?></td>
-<?php } ?>
-<?php if ($Page->nama->Visible) { ?>
-		<td data-field="nama"<?php echo $Page->keg_nama->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
 <?php if ($Page->upah->Visible) { ?>
 		<td data-field="upah"<?php echo $Page->upah->CellAttributes() ?>>
@@ -1916,6 +2081,7 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 	if ($Page->ShowHeader)
 		$Page->Page_Breaking($Page->ShowHeader, $Page->PageBreakContent);
 	$Page->GrpCount++;
+	$Page->GrpCounter[0] = 1;
 
 	// Handle EOF
 	if (!$rsgrp || $rsgrp->EOF)
@@ -1926,8 +2092,8 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 </tbody>
 <tfoot>
 <?php
-	$Page->upah->Count = $Page->GrandCnt[2];
-	$Page->upah->SumValue = $Page->GrandSmry[2]; // Load SUM
+	$Page->upah->Count = $Page->GrandCnt[1];
+	$Page->upah->SumValue = $Page->GrandSmry[1]; // Load SUM
 	$Page->ResetAttrs();
 	$Page->RowType = EWR_ROWTYPE_TOTAL;
 	$Page->RowTotalType = EWR_ROWTOTAL_GRAND;
@@ -1941,9 +2107,6 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 <?php if ($Page->GrpColumnCount > 0) { ?>
 		<td colspan="<?php echo $Page->GrpColumnCount ?>" class="ewRptGrpAggregate">&nbsp;</td>
 <?php } ?>
-<?php if ($Page->nama->Visible) { ?>
-		<td data-field="nama"<?php echo $Page->nama->CellAttributes() ?>></td>
-<?php } ?>
 <?php if ($Page->upah->Visible) { ?>
 		<td data-field="upah"<?php echo $Page->upah->CellAttributes() ?>><?php echo $ReportLanguage->Phrase("RptSum") ?>=<span data-class="tpts_r_lapgjbrngan_upah"<?php echo $Page->upah->ViewAttributes() ?>><?php echo $Page->upah->SumViewValue ?></span></td>
 <?php } ?>
@@ -1953,9 +2116,6 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 	<tr<?php echo $Page->RowAttributes() ?>>
 <?php if ($Page->GrpColumnCount > 0) { ?>
 		<td colspan="<?php echo $Page->GrpColumnCount ?>" class="ewRptGrpAggregate"><?php echo $ReportLanguage->Phrase("RptSum") ?></td>
-<?php } ?>
-<?php if ($Page->nama->Visible) { ?>
-		<td data-field="nama"<?php echo $Page->nama->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
 <?php if ($Page->upah->Visible) { ?>
 		<td data-field="upah"<?php echo $Page->upah->CellAttributes() ?>>
