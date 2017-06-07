@@ -24,11 +24,11 @@ select
     , b.*
     , c.*
     ,
-    (case when (c.tarif_acuan = 0) then 
+    f_pembulatan(round((case when (c.tarif_acuan = 0) then 
 		(a.hasil * c.tarif1)
 	else
 		case when (a.hasil <= c.tarif_acuan) then c.tarif1 else c.tarif2 end * a.hasil
-	end) / d.pembagi as upah_peg
+	end) / d.pembagi)) as upah_peg
 	, e.pegawai_nama
 from
 	t_keg_master a
