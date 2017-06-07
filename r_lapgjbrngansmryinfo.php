@@ -15,6 +15,7 @@ class crr_lapgjbrngan extends crTableBase {
 	var $nama;
 	var $upah;
 	var $start;
+	var $kegm_id;
 
 	//
 	// Table class constructor
@@ -49,7 +50,7 @@ class crr_lapgjbrngan extends crTableBase {
 		// keg_nama
 		$this->keg_nama = new crField('r_lapgjbrngan', 'r_lapgjbrngan', 'x_keg_nama', 'keg_nama', '`keg_nama`', 200, EWR_DATATYPE_STRING, -1);
 		$this->keg_nama->Sortable = TRUE; // Allow sort
-		$this->keg_nama->GroupingFieldId = 1;
+		$this->keg_nama->GroupingFieldId = 2;
 		$this->keg_nama->ShowGroupHeaderAsRow = $this->ShowGroupHeaderAsRow;
 		$this->keg_nama->ShowCompactSummaryFooter = $this->ShowCompactSummaryFooter;
 		$this->fields['keg_nama'] = &$this->keg_nama;
@@ -63,7 +64,7 @@ class crr_lapgjbrngan extends crTableBase {
 		// nama
 		$this->nama = new crField('r_lapgjbrngan', 'r_lapgjbrngan', 'x_nama', 'nama', '`nama`', 200, EWR_DATATYPE_STRING, -1);
 		$this->nama->Sortable = TRUE; // Allow sort
-		$this->nama->GroupingFieldId = 2;
+		$this->nama->GroupingFieldId = 3;
 		$this->nama->ShowGroupHeaderAsRow = $this->ShowGroupHeaderAsRow;
 		$this->nama->ShowCompactSummaryFooter = $this->ShowCompactSummaryFooter;
 		$this->fields['nama'] = &$this->nama;
@@ -91,6 +92,21 @@ class crr_lapgjbrngan extends crTableBase {
 		$this->start->DateFilter = "";
 		$this->start->SqlSelect = "";
 		$this->start->SqlOrderBy = "";
+
+		// kegm_id
+		$this->kegm_id = new crField('r_lapgjbrngan', 'r_lapgjbrngan', 'x_kegm_id', 'kegm_id', '`kegm_id`', 3, EWR_DATATYPE_NUMBER, -1);
+		$this->kegm_id->Sortable = TRUE; // Allow sort
+		$this->kegm_id->GroupingFieldId = 1;
+		$this->kegm_id->ShowGroupHeaderAsRow = $this->ShowGroupHeaderAsRow;
+		$this->kegm_id->ShowCompactSummaryFooter = $this->ShowCompactSummaryFooter;
+		$this->kegm_id->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectInteger");
+		$this->fields['kegm_id'] = &$this->kegm_id;
+		$this->kegm_id->DateFilter = "";
+		$this->kegm_id->SqlSelect = "";
+		$this->kegm_id->SqlOrderBy = "";
+		$this->kegm_id->FldGroupByType = "";
+		$this->kegm_id->FldGroupInt = "0";
+		$this->kegm_id->FldGroupSql = "";
 	}
 
 	// Set Field Visibility
@@ -238,7 +254,7 @@ class crr_lapgjbrngan extends crTableBase {
 	var $_SqlOrderBy = "";
 
 	function getSqlOrderBy() {
-		return ($this->_SqlOrderBy <> "") ? $this->_SqlOrderBy : "`keg_nama` ASC, `nama` ASC";
+		return ($this->_SqlOrderBy <> "") ? $this->_SqlOrderBy : "`kegm_id` ASC, `keg_nama` ASC, `nama` ASC";
 	}
 
 	function SqlOrderBy() { // For backward compatibility
@@ -255,7 +271,7 @@ class crr_lapgjbrngan extends crTableBase {
 	var $_SqlFirstGroupField = "";
 
 	function getSqlFirstGroupField() {
-		return ($this->_SqlFirstGroupField <> "") ? $this->_SqlFirstGroupField : "`keg_nama`";
+		return ($this->_SqlFirstGroupField <> "") ? $this->_SqlFirstGroupField : "`kegm_id`";
 	}
 
 	function SqlFirstGroupField() { // For backward compatibility
@@ -285,7 +301,7 @@ class crr_lapgjbrngan extends crTableBase {
 	var $_SqlOrderByGroup = "";
 
 	function getSqlOrderByGroup() {
-		return ($this->_SqlOrderByGroup <> "") ? $this->_SqlOrderByGroup : "`keg_nama` ASC";
+		return ($this->_SqlOrderByGroup <> "") ? $this->_SqlOrderByGroup : "`kegm_id` ASC";
 	}
 
 	function SqlOrderByGroup() { // For backward compatibility

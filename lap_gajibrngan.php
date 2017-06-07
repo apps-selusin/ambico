@@ -41,6 +41,7 @@ where
 "; //echo $query;
 $rs = Conn()->Execute($query);
 while (!$rs->EOF) {
+	$mkegm_id = $rs->fields["kegm_id"];
 	$mkeg_nama = $rs->fields["keg_nama"];
 	$mpegawai_nama = $rs->fields["pegawai_nama"];
 	$mupah_peg = 0;
@@ -51,7 +52,7 @@ while (!$rs->EOF) {
 	}
 	
 	$query = "
-		insert into t_gjbrngan values (null, '".$mkeg_nama."', '".$mpegawai_nama."', ".$mupah_peg.", '".$_POST["start"]."', '".$_POST["end"]."')
+		insert into t_gjbrngan values (null, ".$mkegm_id.", '".$mkeg_nama."', '".$mpegawai_nama."', ".$mupah_peg.", '".$_POST["start"]."', '".$_POST["end"]."')
 		";
 	Conn()->Execute($query);
 
