@@ -543,11 +543,8 @@ class crr_keg_hasil_crosstab extends crr_keg_hasil {
 		$this->Sort = $this->GetSort($this->GenOptions);
 
 		// Popup values and selections
-		$this->tgl->SelectionList = "";
-		$this->tgl->DefaultSelectionList = "";
-		$this->tgl->ValueList = "";
-
 		// Check if search command
+
 		$this->SearchCommand = (@$_GET["cmd"] == "search");
 
 		// Load default filter values
@@ -603,7 +600,7 @@ class crr_keg_hasil_crosstab extends crr_keg_hasil {
 		$this->StartGrp = 1;
 
 		// Show header
-		$this->ShowHeader = TRUE;
+		$this->ShowHeader = ($this->TotalGrps > 0);
 
 		// Set up start position if not export all
 		if ($this->ExportAll && $this->Export <> "")
@@ -642,8 +639,8 @@ class crr_keg_hasil_crosstab extends crr_keg_hasil {
 		$rs = NULL;
 
 		// Set up column attributes
-		$this->tgl->ViewAttrs["style"] = "";
-		$this->tgl->CellAttrs["style"] = "vertical-align: top;";
+		$this->hasil->ViewAttrs["style"] = "";
+		$this->hasil->CellAttrs["style"] = "text-align: right; vertical-align: top;";
 		$this->SetupFieldCount();
 	}
 
@@ -655,23 +652,16 @@ class crr_keg_hasil_crosstab extends crr_keg_hasil {
 		// Reset summary values
 		$this->ResetLevelSummary(0);
 
-		// Set up column search values
-		for ($i = 1; $i <= $this->ColCount; $i++) {
-			$wrkValue = $this->Col[$i]->Value;
-			$wrkCaption = $this->Col[$i]->Caption;
-			$this->tgl->ValueList[$wrkValue] = $wrkCaption;
-		}
-
 		// Get active columns
-		if (!is_array($this->tgl->SelectionList)) {
+		if (!is_array($this->hasil->SelectionList)) {
 			$this->ColSpan = $this->ColCount;
 		} else {
 			$this->ColSpan = 0;
 			for ($i = 1; $i <= $this->ColCount; $i++) {
 				$bSelected = FALSE;
-				$cntsel = count($this->tgl->SelectionList);
+				$cntsel = count($this->hasil->SelectionList);
 				for ($j = 0; $j < $cntsel; $j++) {
-					if (ewr_CompareValue($this->tgl->SelectionList[$j], $this->Col[$i]->Value, $this->tgl->FldType)) {
+					if (ewr_CompareValue($this->hasil->SelectionList[$j], $this->Col[$i]->Value, $this->hasil->FldType)) {
 						$this->ColSpan++;
 						$bSelected = TRUE;
 						break;
@@ -734,9 +724,8 @@ class crr_keg_hasil_crosstab extends crr_keg_hasil {
 		if (!$rs->EOF) {
 			if ($opt <> 1)
 				$this->keg_nama->setDbValue($rs->fields('keg_nama'));
-			$this->hasil->setDbValue($rs->fields('hasil'));
 			$this->pegawai_nama->setDbValue($rs->fields('pegawai_nama'));
-			$cntbase = 3;
+			$cntbase = 2;
 			$cnt = count($this->SummaryFields);
 			for ($is = 0; $is < $cnt; $is++) {
 				$smry = &$this->SummaryFields[$is];
@@ -753,7 +742,6 @@ class crr_keg_hasil_crosstab extends crr_keg_hasil {
 			}
 		} else {
 			$this->keg_nama->setDbValue("");
-			$this->hasil->setDbValue("");
 			$this->pegawai_nama->setDbValue("");
 		}
 	}
@@ -766,13 +754,9 @@ class crr_keg_hasil_crosstab extends crr_keg_hasil {
 					(!is_null($this->keg_nama->CurrentValue) && is_null($this->keg_nama->OldValue)) ||
 					($this->keg_nama->GroupValue() <> $this->keg_nama->GroupOldValue());
 			case 2:
-				return (is_null($this->hasil->CurrentValue) && !is_null($this->hasil->OldValue)) ||
-					(!is_null($this->hasil->CurrentValue) && is_null($this->hasil->OldValue)) ||
-					($this->hasil->GroupValue() <> $this->hasil->GroupOldValue()) || $this->ChkLvlBreak(1); // Recurse upper level
-			case 3:
 				return (is_null($this->pegawai_nama->CurrentValue) && !is_null($this->pegawai_nama->OldValue)) ||
 					(!is_null($this->pegawai_nama->CurrentValue) && is_null($this->pegawai_nama->OldValue)) ||
-					($this->pegawai_nama->GroupValue() <> $this->pegawai_nama->GroupOldValue()) || $this->ChkLvlBreak(2); // Recurse upper level
+					($this->pegawai_nama->GroupValue() <> $this->pegawai_nama->GroupOldValue()) || $this->ChkLvlBreak(1); // Recurse upper level
 		}
 	}
 
@@ -919,21 +903,11 @@ class crr_keg_hasil_crosstab extends crr_keg_hasil {
 		} elseif (@$_GET["cmd"] <> "") {
 			$sCmd = $_GET["cmd"];
 			if (strtolower($sCmd) == "reset") {
-				$_SESSION["sel_r_keg_hasil_tgl"] = "";
-				$_SESSION["rf_r_keg_hasil_tgl"] = "";
-				$_SESSION["rt_r_keg_hasil_tgl"] = "";
 				$this->ResetPager();
 			}
 		}
 
 		// Load selection criteria to array
-		if (is_array(@$_SESSION["sel_r_keg_hasil_tgl"])) {
-			$this->tgl->SelectionList = @$_SESSION["sel_r_keg_hasil_tgl"];
-			$this->tgl->RangeFrom = @$_SESSION["rf_r_keg_hasil_tgl"];
-			$this->tgl->RangeTo = @$_SESSION["rt_r_keg_hasil_tgl"];
-		} elseif (@$_SESSION["sel_r_keg_hasil_tgl"] == EWR_INIT_VALUE) { // Select all
-			$this->tgl->SelectionList = "";
-		}
 	}
 
 	// Reset pager
@@ -1063,15 +1037,9 @@ class crr_keg_hasil_crosstab extends crr_keg_hasil {
 			$this->keg_nama->GroupViewValue = $this->keg_nama->GroupOldValue();
 			$this->keg_nama->CellAttrs["class"] = ($this->RowGroupLevel == 1) ? "ewRptGrpSummary1" : "ewRptGrpField1";
 
-			// hasil
-			$this->hasil->GroupViewValue = $this->hasil->GroupOldValue();
-			$this->hasil->GroupViewValue = ewr_FormatNumber($this->hasil->GroupViewValue, 0, -2, -2, -2);
-			$this->hasil->CellAttrs["class"] = ($this->RowGroupLevel == 2) ? "ewRptGrpSummary2" : "ewRptGrpField2";
-			$this->hasil->CellAttrs["style"] = "text-align:right;";
-
 			// pegawai_nama
 			$this->pegawai_nama->GroupViewValue = $this->pegawai_nama->GroupOldValue();
-			$this->pegawai_nama->CellAttrs["class"] = ($this->RowGroupLevel == 3) ? "ewRptGrpSummary3" : "ewRptGrpField3";
+			$this->pegawai_nama->CellAttrs["class"] = ($this->RowGroupLevel == 2) ? "ewRptGrpSummary2" : "ewRptGrpField2";
 
 			// Set up summary values
 			$smry = &$this->SummaryFields[0];
@@ -1086,9 +1054,6 @@ class crr_keg_hasil_crosstab extends crr_keg_hasil {
 			// keg_nama
 			$this->keg_nama->HrefValue = "";
 
-			// hasil
-			$this->hasil->HrefValue = "";
-
 			// pegawai_nama
 			$this->pegawai_nama->HrefValue = "";
 		} else {
@@ -1099,18 +1064,10 @@ class crr_keg_hasil_crosstab extends crr_keg_hasil {
 			if ($this->keg_nama->GroupValue() == $this->keg_nama->GroupOldValue() && !$this->ChkLvlBreak(1))
 				$this->keg_nama->GroupViewValue = "&nbsp;";
 
-			// hasil
-			$this->hasil->GroupViewValue = $this->hasil->GroupValue();
-			$this->hasil->GroupViewValue = ewr_FormatNumber($this->hasil->GroupViewValue, 0, -2, -2, -2);
-			$this->hasil->CellAttrs["class"] = "ewRptGrpField2";
-			$this->hasil->CellAttrs["style"] = "text-align:right;";
-			if ($this->hasil->GroupValue() == $this->hasil->GroupOldValue() && !$this->ChkLvlBreak(2))
-				$this->hasil->GroupViewValue = "&nbsp;";
-
 			// pegawai_nama
 			$this->pegawai_nama->GroupViewValue = $this->pegawai_nama->GroupValue();
-			$this->pegawai_nama->CellAttrs["class"] = "ewRptGrpField3";
-			if ($this->pegawai_nama->GroupValue() == $this->pegawai_nama->GroupOldValue() && !$this->ChkLvlBreak(3))
+			$this->pegawai_nama->CellAttrs["class"] = "ewRptGrpField2";
+			if ($this->pegawai_nama->GroupValue() == $this->pegawai_nama->GroupOldValue() && !$this->ChkLvlBreak(2))
 				$this->pegawai_nama->GroupViewValue = "&nbsp;";
 
 			// Set up summary values
@@ -1125,9 +1082,6 @@ class crr_keg_hasil_crosstab extends crr_keg_hasil {
 
 			// keg_nama
 			$this->keg_nama->HrefValue = "";
-
-			// hasil
-			$this->hasil->HrefValue = "";
 
 			// pegawai_nama
 			$this->pegawai_nama->HrefValue = "";
@@ -1146,18 +1100,8 @@ class crr_keg_hasil_crosstab extends crr_keg_hasil {
 			$LinkAttrs = &$this->keg_nama->LinkAttrs;
 			$this->Cell_Rendered($this->keg_nama, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
 
-			// hasil
-			$this->CurrentIndex = 1; // Current index
-			$CurrentValue = $this->hasil->GroupOldValue();
-			$ViewValue = &$this->hasil->GroupViewValue;
-			$ViewAttrs = &$this->hasil->ViewAttrs;
-			$CellAttrs = &$this->hasil->CellAttrs;
-			$HrefValue = &$this->hasil->HrefValue;
-			$LinkAttrs = &$this->hasil->LinkAttrs;
-			$this->Cell_Rendered($this->hasil, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
-
 			// pegawai_nama
-			$this->CurrentIndex = 2; // Current index
+			$this->CurrentIndex = 1; // Current index
 			$CurrentValue = $this->pegawai_nama->GroupOldValue();
 			$ViewValue = &$this->pegawai_nama->GroupViewValue;
 			$ViewAttrs = &$this->pegawai_nama->ViewAttrs;
@@ -1191,18 +1135,8 @@ class crr_keg_hasil_crosstab extends crr_keg_hasil {
 			$LinkAttrs = &$this->keg_nama->LinkAttrs;
 			$this->Cell_Rendered($this->keg_nama, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
 
-			// hasil
-			$this->CurrentIndex = 1; // Group index
-			$CurrentValue = $this->hasil->GroupValue();
-			$ViewValue = &$this->hasil->GroupViewValue;
-			$ViewAttrs = &$this->hasil->ViewAttrs;
-			$CellAttrs = &$this->hasil->CellAttrs;
-			$HrefValue = &$this->hasil->HrefValue;
-			$LinkAttrs = &$this->hasil->LinkAttrs;
-			$this->Cell_Rendered($this->hasil, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
-
 			// pegawai_nama
-			$this->CurrentIndex = 2; // Group index
+			$this->CurrentIndex = 1; // Group index
 			$CurrentValue = $this->pegawai_nama->GroupValue();
 			$ViewValue = &$this->pegawai_nama->GroupViewValue;
 			$ViewAttrs = &$this->pegawai_nama->ViewAttrs;
@@ -1235,7 +1169,6 @@ class crr_keg_hasil_crosstab extends crr_keg_hasil {
 	function SetupFieldCount() {
 		$this->GrpColumnCount = 0;
 		if ($this->keg_nama->Visible) $this->GrpColumnCount += 1;
-		if ($this->hasil->Visible) $this->GrpColumnCount += 1;
 		if ($this->pegawai_nama->Visible) $this->GrpColumnCount += 1;
 	}
 
@@ -1273,10 +1206,6 @@ class crr_keg_hasil_crosstab extends crr_keg_hasil {
 
 		// Reset extended filter if filter changed
 		if ($bPostBack) {
-
-			// Clear extended filter for field tgl
-			if ($this->ClearExtFilter == 'r_keg_hasil_tgl')
-				$this->SetSessionFilterValues('', '=', 'AND', '', '=', 'tgl');
 
 		// Reset search command
 		} elseif (@$_GET["cmd"] == "reset") {
@@ -1336,12 +1265,6 @@ class crr_keg_hasil_crosstab extends crr_keg_hasil {
 
 		// Setup filter
 		if ($bSetupFilter) {
-
-			// Field tgl
-			$sWrk = "";
-			$this->BuildExtendedFilter($this->tgl, $sWrk);
-			ewr_LoadSelectionFromFilter($this->tgl, $sWrk, $this->tgl->SelectionList);
-			$_SESSION['sel_r_keg_hasil_tgl'] = ($this->tgl->SelectionList == "") ? EWR_INIT_VALUE : $this->tgl->SelectionList;
 		}
 
 		// Field keg_nama
@@ -1679,17 +1602,9 @@ class crr_keg_hasil_crosstab extends crr_keg_hasil {
 		// Field tgl
 		$this->SetDefaultExtFilter($this->tgl, "BETWEEN", NULL, 'AND', "=", NULL);
 		if (!$this->SearchCommand) $this->ApplyDefaultExtFilter($this->tgl);
-		$sWrk = "";
-		$this->BuildExtendedFilter($this->tgl, $sWrk, TRUE);
-		ewr_LoadSelectionFromFilter($this->tgl, $sWrk, $this->tgl->DefaultSelectionList);
-		if (!$this->SearchCommand) $this->tgl->SelectionList = $this->tgl->DefaultSelectionList;
 		/**
 		* Set up default values for popup filters
 		*/
-
-		// Field tgl
-		// $this->tgl->DefaultSelectionList = array("val1", "val2");
-
 	}
 
 	// Check if filter applied
@@ -1699,20 +1614,12 @@ class crr_keg_hasil_crosstab extends crr_keg_hasil {
 		if ($this->TextFilterApplied($this->tgl))
 			return TRUE;
 
-		// Check tgl popup filter
-		if (!ewr_MatchedArray($this->tgl->DefaultSelectionList, $this->tgl->SelectionList))
-			return TRUE;
-
 		// Check keg_nama extended filter
 		if ($this->NonTextFilterApplied($this->keg_nama))
 			return TRUE;
 
 		// Check pegawai_nama extended filter
 		if ($this->NonTextFilterApplied($this->pegawai_nama))
-			return TRUE;
-
-		// Check tgl popup filter
-		if (!ewr_MatchedArray($this->tgl->DefaultSelectionList, $this->tgl->SelectionList))
 			return TRUE;
 		return FALSE;
 	}
@@ -1728,8 +1635,6 @@ class crr_keg_hasil_crosstab extends crr_keg_hasil {
 		$sExtWrk = "";
 		$sWrk = "";
 		$this->BuildExtendedFilter($this->tgl, $sExtWrk);
-		if (is_array($this->tgl->SelectionList))
-			$sWrk = ewr_JoinArray($this->tgl->SelectionList, ", ", EWR_DATATYPE_DATE, 0, $this->DBID);
 		$sFilter = "";
 		if ($sExtWrk <> "")
 			$sFilter .= "<span class=\"ewFilterValue\">$sExtWrk</span>";
@@ -1792,13 +1697,6 @@ class crr_keg_hasil_crosstab extends crr_keg_hasil {
 				"\"sv2_tgl\":\"" . ewr_JsEncode2($this->tgl->SearchValue2) . "\"," .
 				"\"so2_tgl\":\"" . ewr_JsEncode2($this->tgl->SearchOperator2) . "\"";
 		}
-		if ($sWrk == "") {
-			$sWrk = ($this->tgl->SelectionList <> EWR_INIT_VALUE) ? $this->tgl->SelectionList : "";
-			if (is_array($sWrk))
-				$sWrk = implode("||", $sWrk);
-			if ($sWrk <> "")
-				$sWrk = "\"sel_tgl\":\"" . ewr_JsEncode2($sWrk) . "\"";
-		}
 		if ($sWrk <> "") {
 			if ($sFilterList <> "") $sFilterList .= ",";
 			$sFilterList .= $sWrk;
@@ -1858,18 +1756,8 @@ class crr_keg_hasil_crosstab extends crr_keg_hasil {
 			$this->SetSessionFilterValues(@$filter["sv_tgl"], @$filter["so_tgl"], @$filter["sc_tgl"], @$filter["sv2_tgl"], @$filter["so2_tgl"], "tgl");
 			$bRestoreFilter = TRUE;
 		}
-		if (array_key_exists("sel_tgl", $filter)) {
-			$sWrk = $filter["sel_tgl"];
-			$sWrk = explode("||", $sWrk);
-			$this->tgl->SelectionList = $sWrk;
-			$_SESSION["sel_r_keg_hasil_tgl"] = $sWrk;
-			$this->SetSessionFilterValues("", "=", "AND", "", "=", "tgl"); // Clear extended filter
-			$bRestoreFilter = TRUE;
-		}
 		if (!$bRestoreFilter) { // Clear filter
 			$this->SetSessionFilterValues("", "=", "AND", "", "=", "tgl");
-			$this->tgl->SelectionList = "";
-			$_SESSION["sel_r_keg_hasil_tgl"] = "";
 		}
 
 		// Field keg_nama
@@ -1905,16 +1793,6 @@ class crr_keg_hasil_crosstab extends crr_keg_hasil {
 		$sWrk = "";
 		if ($this->DrillDown)
 			return "";
-		if (!$this->ExtendedFilterExist($this->tgl)) {
-			if (is_array($this->tgl->SelectionList)) {
-				$sFilter = ewr_FilterSQL($this->tgl, "`tgl`", EWR_DATATYPE_DATE, $this->DBID);
-
-				// Call Page Filtering event
-				$this->Page_Filtering($this->tgl, $sFilter, "popup");
-				$this->tgl->CurrentFilter = $sFilter;
-				ewr_AddFilter($sWrk, $sFilter);
-			}
-		}
 		return $sWrk;
 	}
 
@@ -1937,7 +1815,6 @@ class crr_keg_hasil_crosstab extends crr_keg_hasil {
 			$this->setOrderBy("");
 			$this->setStartGroup(1);
 			$this->keg_nama->setSort("");
-			$this->hasil->setSort("");
 			$this->pegawai_nama->setSort("");
 
 		// Check for an Order parameter
@@ -1945,7 +1822,6 @@ class crr_keg_hasil_crosstab extends crr_keg_hasil {
 			$this->CurrentOrder = $orderBy;
 			$this->CurrentOrderType = $orderType;
 			$this->UpdateSort($this->keg_nama, $bCtrl); // keg_nama
-			$this->UpdateSort($this->hasil, $bCtrl); // hasil
 			$this->UpdateSort($this->pegawai_nama, $bCtrl); // pegawai_nama
 			$sSortSql = $this->SortSql();
 			$this->setOrderBy($sSortSql);
@@ -2319,10 +2195,6 @@ fr_keg_hasilcrosstab.Lists["sv_pegawai_nama"] = {"LinkField":"sv_pegawai_nama","
 </script>
 <?php } ?>
 <?php if ($Page->Export == "" && !$Page->DrillDown) { ?>
-<script type="text/javascript">
-<?php $jsdb = ewr_GetJsDb($Page->tgl, $Page->tgl->FldType); ?>
-ewr_CreatePopup("r_keg_hasil_tgl", <?php echo $jsdb ?>); // Popup filters
-</script>
 <?php } ?>
 <?php if ($Page->Export == "") { ?>
 <!-- container (begin) -->
@@ -2549,10 +2421,7 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 <?php } ?>
 		<td class="ewRptColHeader" colspan="<?php echo @$Page->ColSpan ?>">
 			<div class="ewTableHeaderBtn">
-				<span class="ewTableHeaderCaption"><?php echo $Page->tgl->FldCaption() ?></span>
-<?php if ($Page->Export == "" && !$Page->DrillDown) { ?>
-				<a class="ewTableHeaderPopup" title="<?php echo $ReportLanguage->Phrase("Filter"); ?>" onclick="ewr_ShowPopup.call(this, event, 'r_keg_hasil_tgl', true, '<?php echo $Page->tgl->RangeFrom ?>', '<?php echo $Page->tgl->RangeTo ?>');" name="x_tgl" id="x_tgl"><span class="icon-filter"></span></a>
-<?php } ?>
+				<span class="ewTableHeaderCaption"><?php echo $Page->hasil->FldCaption() ?></span>
 			</div>
 		</td>
 	</tr>
@@ -2572,26 +2441,6 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 		<div class="ewTableHeaderBtn ewPointer r_keg_hasil_keg_nama" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->keg_nama) ?>',2);">
 			<span class="ewTableHeaderCaption"><?php echo $Page->keg_nama->FldCaption() ?></span>
 			<span class="ewTableHeaderSort"><?php if ($Page->keg_nama->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($Page->keg_nama->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span>
-		</div>
-<?php } ?>
-	</td>
-<?php } ?>
-<?php } ?>
-<?php if ($Page->hasil->Visible) { ?>
-<?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
-	<td data-field="hasil">
-		<div class="r_keg_hasil_hasil" style="text-align: right;"><span class="ewTableHeaderCaption"><?php echo $Page->hasil->FldCaption() ?></span></div>
-	</td>
-<?php } else { ?>
-	<td data-field="hasil">
-<?php if ($Page->SortUrl($Page->hasil) == "") { ?>
-		<div class="ewTableHeaderBtn r_keg_hasil_hasil" style="text-align: right;">
-			<span class="ewTableHeaderCaption"><?php echo $Page->hasil->FldCaption() ?></span>			
-		</div>
-<?php } else { ?>
-		<div class="ewTableHeaderBtn ewPointer r_keg_hasil_hasil" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->hasil) ?>',2);" style="text-align: right;">
-			<span class="ewTableHeaderCaption"><?php echo $Page->hasil->FldCaption() ?></span>
-			<span class="ewTableHeaderSort"><?php if ($Page->hasil->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($Page->hasil->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span>
 		</div>
 <?php } ?>
 	</td>
@@ -2623,15 +2472,15 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 	for ($iy = 1; $iy < $cntval; $iy++) {
 		if ($Page->Col[$iy]->Visible) {
 			$Page->SummaryCurrentValue[$iy-1] = $Page->Col[$iy]->Caption;
-			$Page->SummaryViewValue[$iy-1] = ewr_FormatDateTime($Page->SummaryCurrentValue[$iy-1], 0);
+			$Page->SummaryViewValue[$iy-1] = ewr_FormatNumber($Page->SummaryCurrentValue[$iy-1], 0, -2, -2, -2);
 ?>
-		<td class="ewTableHeader"<?php echo $Page->tgl->CellAttributes() ?>><div<?php echo $Page->tgl->ViewAttributes() ?>><?php echo $Page->SummaryViewValue[$iy-1]; ?></div></td>
+		<td class="ewTableHeader"<?php echo $Page->hasil->CellAttributes() ?>><div<?php echo $Page->hasil->ViewAttributes() ?>><?php echo $Page->SummaryViewValue[$iy-1]; ?></div></td>
 <?php
 		}
 	}
 ?>
 <!-- Dynamic columns end -->
-		<td class="ewTableHeader"<?php echo $Page->tgl->CellAttributes() ?>><div<?php echo $Page->tgl->ViewAttributes() ?>><?php echo $Page->RenderSummaryCaptions() ?></div></td>
+		<td class="ewTableHeader"<?php echo $Page->hasil->CellAttributes() ?>><div<?php echo $Page->hasil->ViewAttributes() ?>><?php echo $Page->RenderSummaryCaptions() ?></div></td>
 	</tr>
 </thead>
 <tbody>
@@ -2666,11 +2515,6 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 		<td data-field="keg_nama"<?php echo $Page->keg_nama->CellAttributes(); ?>>
 <span data-class="tpx<?php echo $Page->GrpCount ?>_r_keg_hasil_keg_nama"<?php echo $Page->keg_nama->ViewAttributes() ?>><?php echo $Page->keg_nama->GroupViewValue ?></span></td>
 <?php } ?>
-<?php if ($Page->hasil->Visible) { ?>
-		<!-- hasil -->
-		<td data-field="hasil"<?php echo $Page->hasil->CellAttributes(); ?>>
-<span data-class="tpx<?php echo $Page->GrpCount ?>_r_keg_hasil_hasil"<?php echo $Page->hasil->ViewAttributes() ?>><?php echo $Page->hasil->GroupViewValue ?></span></td>
-<?php } ?>
 <?php if ($Page->pegawai_nama->Visible) { ?>
 		<!-- pegawai_nama -->
 		<td data-field="pegawai_nama"<?php echo $Page->pegawai_nama->CellAttributes(); ?>>
@@ -2699,43 +2543,6 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 
 		// Get next record
 		$Page->GetRow(2);
-?>
-<?php
-
-		// Process summary level 2
-		if ($Page->ChkLvlBreak(2) && $Page->hasil->Visible) {
-			$Page->ResetAttrs();
-			$Page->RowType = EWR_ROWTYPE_TOTAL;
-			$Page->RowTotalType = EWR_ROWTOTAL_GROUP;
-			$Page->RowTotalSubType = EWR_ROWTOTAL_FOOTER;
-			$Page->RowGroupLevel = 2;
-			$Page->RenderRow();
-?>
-	<!-- Summary hasil (level 2) -->
-	<tr<?php echo $Page->RowAttributes(); ?>>
-		<td data-field="keg_nama"<?php echo $Page->keg_nama->CellAttributes() ?>>&nbsp;</td>
-		<td colspan="<?php echo ($Page->GrpColumnCount - 1) ?>"<?php echo $Page->hasil->CellAttributes() ?>><?php echo str_replace(array("%v", "%c"), array($Page->hasil->GroupViewValue, $Page->hasil->FldCaption()), $ReportLanguage->Phrase("CtbSumHead")) ?></td>
-<!-- Dynamic columns begin -->
-<?php
-	$cntcol = count($Page->SummaryViewValue);
-	for ($iy = 1; $iy <= $cntcol; $iy++) {
-		$bColShow = ($iy <= $Page->ColCount) ? $Page->Col[$iy]->Visible : TRUE;
-		$sColDesc = ($iy <= $Page->ColCount) ? $Page->Col[$iy]->Caption : $ReportLanguage->Phrase("Summary");
-		if ($bColShow) {
-?>
-		<!-- <?php echo $sColDesc; ?> -->
-		<td<?php echo $Page->SummaryCellAttributes($iy-1) ?>><?php echo $Page->RenderSummaryFields($iy-1) ?></td>
-<?php
-		}
-	}
-?>
-<!-- Dynamic columns end -->
-	</tr>
-<?php
-
-			// Reset level 2 summary
-			$Page->ResetLevelSummary(2);
-		}
 ?>
 <?php
 	} // End detail records loop
@@ -2825,7 +2632,7 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 <!-- Dynamic columns end -->
 	</tr>
 </tfoot>
-<?php } elseif (!$Page->ShowHeader && TRUE) { // No header displayed ?>
+<?php } elseif (!$Page->ShowHeader && FALSE) { // No header displayed ?>
 <?php if ($Page->Export <> "pdf") { ?>
 <?php if ($Page->Export == "word" || $Page->Export == "excel") { ?>
 <div class="ewGrid"<?php echo $Page->ReportTableStyle ?>>
@@ -2845,7 +2652,7 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 <?php } ?>
 <table class="<?php echo $Page->ReportTableClass ?>">
 <?php } ?>
-<?php if ($Page->TotalGrps > 0 || TRUE) { // Show footer ?>
+<?php if ($Page->TotalGrps > 0 || FALSE) { // Show footer ?>
 </table>
 <?php if ($Page->Export <> "pdf") { ?>
 </div>
