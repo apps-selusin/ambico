@@ -3392,7 +3392,7 @@
         <phrase id="fldcaption" value="Upah" />
       </field>
       <field id="header_">
-        <phrase id="fldcaption" value="header " />
+        <phrase id="fldcaption" value="Hasil" />
       </field>
     </table>
   </project>
