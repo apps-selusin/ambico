@@ -1367,7 +1367,7 @@ function tgl_indo_header($tgl) {
 }
 
 function pembulatan($uang) {
-	$puluhan = substr($uang, -2); //$ratusan = substr($uang, -3);
+	$puluhan = substr(intval($uang), -2); //$ratusan = substr($uang, -3);
 	if($puluhan == 50) { //if($ratusan<500)
 		$akhir = $uang; // - $puluhan; //$akhir = $uang - $ratusan;
 	}
