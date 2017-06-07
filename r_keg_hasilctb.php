@@ -709,14 +709,14 @@ class crr_keg_hasil_crosstab extends crr_keg_hasil {
 		if ($opt == 1) { // Get first group
 
 	//		$rsgrp->MoveFirst(); // NOTE: no need to move position
-			$this->kegm_id->setDbValue(""); // Init first value
+			$this->keg_nama->setDbValue(""); // Init first value
 		} else { // Get next group
 			$rsgrp->MoveNext();
 		}
 		if (!$rsgrp->EOF) {
-			$this->kegm_id->setDbValue($rsgrp->fields[0]);
+			$this->keg_nama->setDbValue($rsgrp->fields[0]);
 		} else {
-			$this->kegm_id->setDbValue("");
+			$this->keg_nama->setDbValue("");
 		}
 	}
 
@@ -733,10 +733,9 @@ class crr_keg_hasil_crosstab extends crr_keg_hasil {
 		}
 		if (!$rs->EOF) {
 			if ($opt <> 1)
-				$this->kegm_id->setDbValue($rs->fields('kegm_id'));
-			$this->keg_nama->setDbValue($rs->fields('keg_nama'));
+				$this->keg_nama->setDbValue($rs->fields('keg_nama'));
 			$this->pegawai_nama->setDbValue($rs->fields('pegawai_nama'));
-			$cntbase = 3;
+			$cntbase = 2;
 			$cnt = count($this->SummaryFields);
 			for ($is = 0; $is < $cnt; $is++) {
 				$smry = &$this->SummaryFields[$is];
@@ -752,7 +751,6 @@ class crr_keg_hasil_crosstab extends crr_keg_hasil {
 				$cntbase += ($smry->SummaryType == "AVG") ? 2*($cntval-1) : ($cntval-1);
 			}
 		} else {
-			$this->kegm_id->setDbValue("");
 			$this->keg_nama->setDbValue("");
 			$this->pegawai_nama->setDbValue("");
 		}
@@ -762,17 +760,13 @@ class crr_keg_hasil_crosstab extends crr_keg_hasil {
 	function ChkLvlBreak($lvl) {
 		switch ($lvl) {
 			case 1:
-				return (is_null($this->kegm_id->CurrentValue) && !is_null($this->kegm_id->OldValue)) ||
-					(!is_null($this->kegm_id->CurrentValue) && is_null($this->kegm_id->OldValue)) ||
-					($this->kegm_id->GroupValue() <> $this->kegm_id->GroupOldValue());
-			case 2:
 				return (is_null($this->keg_nama->CurrentValue) && !is_null($this->keg_nama->OldValue)) ||
 					(!is_null($this->keg_nama->CurrentValue) && is_null($this->keg_nama->OldValue)) ||
-					($this->keg_nama->GroupValue() <> $this->keg_nama->GroupOldValue()) || $this->ChkLvlBreak(1); // Recurse upper level
-			case 3:
+					($this->keg_nama->GroupValue() <> $this->keg_nama->GroupOldValue());
+			case 2:
 				return (is_null($this->pegawai_nama->CurrentValue) && !is_null($this->pegawai_nama->OldValue)) ||
 					(!is_null($this->pegawai_nama->CurrentValue) && is_null($this->pegawai_nama->OldValue)) ||
-					($this->pegawai_nama->GroupValue() <> $this->pegawai_nama->GroupOldValue()) || $this->ChkLvlBreak(2); // Recurse upper level
+					($this->pegawai_nama->GroupValue() <> $this->pegawai_nama->GroupOldValue()) || $this->ChkLvlBreak(1); // Recurse upper level
 		}
 	}
 
@@ -1059,17 +1053,13 @@ class crr_keg_hasil_crosstab extends crr_keg_hasil {
 
 		if ($this->RowType == EWR_ROWTYPE_TOTAL) { // Summary row
 
-			// kegm_id
-			$this->kegm_id->GroupViewValue = $this->kegm_id->GroupOldValue();
-			$this->kegm_id->CellAttrs["class"] = ($this->RowGroupLevel == 1) ? "ewRptGrpSummary1" : "ewRptGrpField1";
-
 			// keg_nama
 			$this->keg_nama->GroupViewValue = $this->keg_nama->GroupOldValue();
-			$this->keg_nama->CellAttrs["class"] = ($this->RowGroupLevel == 2) ? "ewRptGrpSummary2" : "ewRptGrpField2";
+			$this->keg_nama->CellAttrs["class"] = ($this->RowGroupLevel == 1) ? "ewRptGrpSummary1" : "ewRptGrpField1";
 
 			// pegawai_nama
 			$this->pegawai_nama->GroupViewValue = $this->pegawai_nama->GroupOldValue();
-			$this->pegawai_nama->CellAttrs["class"] = ($this->RowGroupLevel == 3) ? "ewRptGrpSummary3" : "ewRptGrpField3";
+			$this->pegawai_nama->CellAttrs["class"] = ($this->RowGroupLevel == 2) ? "ewRptGrpSummary2" : "ewRptGrpField2";
 
 			// Set up summary values
 			$smry = &$this->SummaryFields[0];
@@ -1081,9 +1071,6 @@ class crr_keg_hasil_crosstab extends crr_keg_hasil {
 				$this->SummaryCellAttrs[$i]["class"] = ($this->RowTotalType == EWR_ROWTOTAL_GROUP) ? "ewRptGrpSummary" . $this->RowGroupLevel : "";
 			}
 
-			// kegm_id
-			$this->kegm_id->HrefValue = "";
-
 			// keg_nama
 			$this->keg_nama->HrefValue = "";
 
@@ -1091,22 +1078,16 @@ class crr_keg_hasil_crosstab extends crr_keg_hasil {
 			$this->pegawai_nama->HrefValue = "";
 		} else {
 
-			// kegm_id
-			$this->kegm_id->GroupViewValue = $this->kegm_id->GroupValue();
-			$this->kegm_id->CellAttrs["class"] = "ewRptGrpField1";
-			if ($this->kegm_id->GroupValue() == $this->kegm_id->GroupOldValue() && !$this->ChkLvlBreak(1))
-				$this->kegm_id->GroupViewValue = "&nbsp;";
-
 			// keg_nama
 			$this->keg_nama->GroupViewValue = $this->keg_nama->GroupValue();
-			$this->keg_nama->CellAttrs["class"] = "ewRptGrpField2";
-			if ($this->keg_nama->GroupValue() == $this->keg_nama->GroupOldValue() && !$this->ChkLvlBreak(2))
+			$this->keg_nama->CellAttrs["class"] = "ewRptGrpField1";
+			if ($this->keg_nama->GroupValue() == $this->keg_nama->GroupOldValue() && !$this->ChkLvlBreak(1))
 				$this->keg_nama->GroupViewValue = "&nbsp;";
 
 			// pegawai_nama
 			$this->pegawai_nama->GroupViewValue = $this->pegawai_nama->GroupValue();
-			$this->pegawai_nama->CellAttrs["class"] = "ewRptGrpField3";
-			if ($this->pegawai_nama->GroupValue() == $this->pegawai_nama->GroupOldValue() && !$this->ChkLvlBreak(3))
+			$this->pegawai_nama->CellAttrs["class"] = "ewRptGrpField2";
+			if ($this->pegawai_nama->GroupValue() == $this->pegawai_nama->GroupOldValue() && !$this->ChkLvlBreak(2))
 				$this->pegawai_nama->GroupViewValue = "&nbsp;";
 
 			// Set up summary values
@@ -1119,9 +1100,6 @@ class crr_keg_hasil_crosstab extends crr_keg_hasil {
 				$this->SummaryCellAttrs[$i]["class"] = ($this->RecCount % 2 <> 1) ? "ewTableAltRow" : "ewTableRow";
 			}
 
-			// kegm_id
-			$this->kegm_id->HrefValue = "";
-
 			// keg_nama
 			$this->keg_nama->HrefValue = "";
 
@@ -1132,18 +1110,8 @@ class crr_keg_hasil_crosstab extends crr_keg_hasil {
 		// Call Cell_Rendered event
 		if ($this->RowType == EWR_ROWTYPE_TOTAL) { // Summary row
 
-			// kegm_id
-			$this->CurrentIndex = 0; // Current index
-			$CurrentValue = $this->kegm_id->GroupOldValue();
-			$ViewValue = &$this->kegm_id->GroupViewValue;
-			$ViewAttrs = &$this->kegm_id->ViewAttrs;
-			$CellAttrs = &$this->kegm_id->CellAttrs;
-			$HrefValue = &$this->kegm_id->HrefValue;
-			$LinkAttrs = &$this->kegm_id->LinkAttrs;
-			$this->Cell_Rendered($this->kegm_id, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
-
 			// keg_nama
-			$this->CurrentIndex = 1; // Current index
+			$this->CurrentIndex = 0; // Current index
 			$CurrentValue = $this->keg_nama->GroupOldValue();
 			$ViewValue = &$this->keg_nama->GroupViewValue;
 			$ViewAttrs = &$this->keg_nama->ViewAttrs;
@@ -1153,7 +1121,7 @@ class crr_keg_hasil_crosstab extends crr_keg_hasil {
 			$this->Cell_Rendered($this->keg_nama, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
 
 			// pegawai_nama
-			$this->CurrentIndex = 2; // Current index
+			$this->CurrentIndex = 1; // Current index
 			$CurrentValue = $this->pegawai_nama->GroupOldValue();
 			$ViewValue = &$this->pegawai_nama->GroupViewValue;
 			$ViewAttrs = &$this->pegawai_nama->ViewAttrs;
@@ -1177,18 +1145,8 @@ class crr_keg_hasil_crosstab extends crr_keg_hasil {
 			}
 		} else {
 
-			// kegm_id
-			$this->CurrentIndex = 0; // Group index
-			$CurrentValue = $this->kegm_id->GroupValue();
-			$ViewValue = &$this->kegm_id->GroupViewValue;
-			$ViewAttrs = &$this->kegm_id->ViewAttrs;
-			$CellAttrs = &$this->kegm_id->CellAttrs;
-			$HrefValue = &$this->kegm_id->HrefValue;
-			$LinkAttrs = &$this->kegm_id->LinkAttrs;
-			$this->Cell_Rendered($this->kegm_id, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
-
 			// keg_nama
-			$this->CurrentIndex = 1; // Group index
+			$this->CurrentIndex = 0; // Group index
 			$CurrentValue = $this->keg_nama->GroupValue();
 			$ViewValue = &$this->keg_nama->GroupViewValue;
 			$ViewAttrs = &$this->keg_nama->ViewAttrs;
@@ -1198,7 +1156,7 @@ class crr_keg_hasil_crosstab extends crr_keg_hasil {
 			$this->Cell_Rendered($this->keg_nama, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
 
 			// pegawai_nama
-			$this->CurrentIndex = 2; // Group index
+			$this->CurrentIndex = 1; // Group index
 			$CurrentValue = $this->pegawai_nama->GroupValue();
 			$ViewValue = &$this->pegawai_nama->GroupViewValue;
 			$ViewAttrs = &$this->pegawai_nama->ViewAttrs;
@@ -1230,7 +1188,6 @@ class crr_keg_hasil_crosstab extends crr_keg_hasil {
 	// Setup field count
 	function SetupFieldCount() {
 		$this->GrpColumnCount = 0;
-		if ($this->kegm_id->Visible) $this->GrpColumnCount += 1;
 		if ($this->keg_nama->Visible) $this->GrpColumnCount += 1;
 		if ($this->pegawai_nama->Visible) $this->GrpColumnCount += 1;
 	}
@@ -1932,7 +1889,6 @@ class crr_keg_hasil_crosstab extends crr_keg_hasil {
 		if ($bResetSort) {
 			$this->setOrderBy("");
 			$this->setStartGroup(1);
-			$this->kegm_id->setSort("");
 			$this->keg_nama->setSort("");
 			$this->pegawai_nama->setSort("");
 
@@ -1940,7 +1896,6 @@ class crr_keg_hasil_crosstab extends crr_keg_hasil {
 		} elseif ($orderBy <> "") {
 			$this->CurrentOrder = $orderBy;
 			$this->CurrentOrderType = $orderType;
-			$this->UpdateSort($this->kegm_id, $bCtrl); // kegm_id
 			$this->UpdateSort($this->keg_nama, $bCtrl); // keg_nama
 			$this->UpdateSort($this->pegawai_nama, $bCtrl); // pegawai_nama
 			$sSortSql = $this->SortSql();
@@ -2553,26 +2508,6 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 		</td>
 	</tr>
 	<tr class="ewTableHeader">
-<?php if ($Page->kegm_id->Visible) { ?>
-<?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
-	<td data-field="kegm_id">
-		<div class="r_keg_hasil_kegm_id"><span class="ewTableHeaderCaption"><?php echo $Page->kegm_id->FldCaption() ?></span></div>
-	</td>
-<?php } else { ?>
-	<td data-field="kegm_id">
-<?php if ($Page->SortUrl($Page->kegm_id) == "") { ?>
-		<div class="ewTableHeaderBtn r_keg_hasil_kegm_id">
-			<span class="ewTableHeaderCaption"><?php echo $Page->kegm_id->FldCaption() ?></span>			
-		</div>
-<?php } else { ?>
-		<div class="ewTableHeaderBtn ewPointer r_keg_hasil_kegm_id" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->kegm_id) ?>',2);">
-			<span class="ewTableHeaderCaption"><?php echo $Page->kegm_id->FldCaption() ?></span>
-			<span class="ewTableHeaderSort"><?php if ($Page->kegm_id->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($Page->kegm_id->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span>
-		</div>
-<?php } ?>
-	</td>
-<?php } ?>
-<?php } ?>
 <?php if ($Page->keg_nama->Visible) { ?>
 <?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
 	<td data-field="keg_nama">
@@ -2637,7 +2572,7 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 	}
 
 	// Build detail SQL
-	$sWhere = ewr_DetailFilterSQL($Page->kegm_id, $Page->getSqlFirstGroupField(), $Page->kegm_id->GroupValue(), $Page->DBID);
+	$sWhere = ewr_DetailFilterSQL($Page->keg_nama, $Page->getSqlFirstGroupField(), $Page->keg_nama->GroupValue(), $Page->DBID);
 	if ($Page->PageFirstGroupFilter <> "") $Page->PageFirstGroupFilter .= " OR ";
 	$Page->PageFirstGroupFilter .= $sWhere;
 	if ($Page->Filter != "")
@@ -2657,11 +2592,6 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 		$Page->RenderRow();
 ?>
 	<tr<?php echo $Page->RowAttributes(); ?>>
-<?php if ($Page->kegm_id->Visible) { ?>
-		<!-- kegm_id -->
-		<td data-field="kegm_id"<?php echo $Page->kegm_id->CellAttributes(); ?>>
-<span data-class="tpx<?php echo $Page->GrpCount ?>_r_keg_hasil_kegm_id"<?php echo $Page->kegm_id->ViewAttributes() ?>><?php echo $Page->kegm_id->GroupViewValue ?></span></td>
-<?php } ?>
 <?php if ($Page->keg_nama->Visible) { ?>
 		<!-- keg_nama -->
 		<td data-field="keg_nama"<?php echo $Page->keg_nama->CellAttributes(); ?>>
@@ -2697,49 +2627,12 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 		$Page->GetRow(2);
 ?>
 <?php
-
-		// Process summary level 2
-		if ($Page->ChkLvlBreak(2) && $Page->keg_nama->Visible) {
-			$Page->ResetAttrs();
-			$Page->RowType = EWR_ROWTYPE_TOTAL;
-			$Page->RowTotalType = EWR_ROWTOTAL_GROUP;
-			$Page->RowTotalSubType = EWR_ROWTOTAL_FOOTER;
-			$Page->RowGroupLevel = 2;
-			$Page->RenderRow();
-?>
-	<!-- Summary keg_nama (level 2) -->
-	<tr<?php echo $Page->RowAttributes(); ?>>
-		<td data-field="kegm_id"<?php echo $Page->kegm_id->CellAttributes() ?>>&nbsp;</td>
-		<td colspan="<?php echo ($Page->GrpColumnCount - 1) ?>"<?php echo $Page->keg_nama->CellAttributes() ?>><?php echo str_replace(array("%v", "%c"), array($Page->keg_nama->GroupViewValue, $Page->keg_nama->FldCaption()), $ReportLanguage->Phrase("CtbSumHead")) ?></td>
-<!-- Dynamic columns begin -->
-<?php
-	$cntcol = count($Page->SummaryViewValue);
-	for ($iy = 1; $iy <= $cntcol; $iy++) {
-		$bColShow = ($iy <= $Page->ColCount) ? $Page->Col[$iy]->Visible : TRUE;
-		$sColDesc = ($iy <= $Page->ColCount) ? $Page->Col[$iy]->Caption : $ReportLanguage->Phrase("Summary");
-		if ($bColShow) {
-?>
-		<!-- <?php echo $sColDesc; ?> -->
-		<td<?php echo $Page->SummaryCellAttributes($iy-1) ?>><?php echo $Page->RenderSummaryFields($iy-1) ?></td>
-<?php
-		}
-	}
-?>
-<!-- Dynamic columns end -->
-	</tr>
-<?php
-
-			// Reset level 2 summary
-			$Page->ResetLevelSummary(2);
-		}
-?>
-<?php
 	} // End detail records loop
 ?>
 <?php
 
 		// Process summary level 1
-		if ($Page->ChkLvlBreak(1) && $Page->kegm_id->Visible) {
+		if ($Page->ChkLvlBreak(1) && $Page->keg_nama->Visible) {
 			$Page->ResetAttrs();
 			$Page->RowType = EWR_ROWTYPE_TOTAL;
 			$Page->RowTotalType = EWR_ROWTOTAL_GROUP;
@@ -2747,9 +2640,9 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 			$Page->RowGroupLevel = 1;
 			$Page->RenderRow();
 ?>
-	<!-- Summary kegm_id (level 1) -->
+	<!-- Summary keg_nama (level 1) -->
 	<tr<?php echo $Page->RowAttributes(); ?>>
-		<td colspan="<?php echo ($Page->GrpColumnCount - 0) ?>"<?php echo $Page->kegm_id->CellAttributes() ?>><?php echo str_replace(array("%v", "%c"), array($Page->kegm_id->GroupViewValue, $Page->kegm_id->FldCaption()), $ReportLanguage->Phrase("CtbSumHead")) ?></td>
+		<td colspan="<?php echo ($Page->GrpColumnCount - 0) ?>"<?php echo $Page->keg_nama->CellAttributes() ?>><?php echo str_replace(array("%v", "%c"), array($Page->keg_nama->GroupViewValue, $Page->keg_nama->FldCaption()), $ReportLanguage->Phrase("CtbSumHead")) ?></td>
 <!-- Dynamic columns begin -->
 <?php
 	$cntcol = count($Page->SummaryViewValue);

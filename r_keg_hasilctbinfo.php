@@ -37,7 +37,6 @@ class crr_keg_hasil extends crTableCrosstab {
 		// kegm_id
 		$this->kegm_id = new crField('r_keg_hasil', 'r_keg_hasil', 'x_kegm_id', 'kegm_id', '`kegm_id`', 3, EWR_DATATYPE_NUMBER, -1);
 		$this->kegm_id->Sortable = TRUE; // Allow sort
-		$this->kegm_id->GroupingFieldId = 1;
 		$this->kegm_id->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectInteger");
 		$this->fields['kegm_id'] = &$this->kegm_id;
 		$this->kegm_id->DateFilter = "";
@@ -91,6 +90,14 @@ class crr_keg_hasil extends crTableCrosstab {
 		ewr_RegisterFilter($this->tgl, "@@Future", $ReportLanguage->Phrase("Future"), "ewr_IsFuture");
 		ewr_RegisterFilter($this->tgl, "@@Past", $ReportLanguage->Phrase("Past"), "ewr_IsPast");
 		ewr_RegisterFilter($this->tgl, "@@Future", $ReportLanguage->Phrase("Future"), "ewr_IsFuture");
+		ewr_RegisterFilter($this->tgl, "@@Past", $ReportLanguage->Phrase("Past"), "ewr_IsPast");
+		ewr_RegisterFilter($this->tgl, "@@Future", $ReportLanguage->Phrase("Future"), "ewr_IsFuture");
+		ewr_RegisterFilter($this->tgl, "@@Last30Days", $ReportLanguage->Phrase("Last30Days"), "ewr_IsLast30Days");
+		ewr_RegisterFilter($this->tgl, "@@Last14Days", $ReportLanguage->Phrase("Last14Days"), "ewr_IsLast14Days");
+		ewr_RegisterFilter($this->tgl, "@@Last7Days", $ReportLanguage->Phrase("Last7Days"), "ewr_IsLast7Days");
+		ewr_RegisterFilter($this->tgl, "@@Next7Days", $ReportLanguage->Phrase("Next7Days"), "ewr_IsNext7Days");
+		ewr_RegisterFilter($this->tgl, "@@Next14Days", $ReportLanguage->Phrase("Next14Days"), "ewr_IsNext14Days");
+		ewr_RegisterFilter($this->tgl, "@@Next30Days", $ReportLanguage->Phrase("Next30Days"), "ewr_IsNext30Days");
 		ewr_RegisterFilter($this->tgl, "@@Last30Days", $ReportLanguage->Phrase("Last30Days"), "ewr_IsLast30Days");
 		ewr_RegisterFilter($this->tgl, "@@Last14Days", $ReportLanguage->Phrase("Last14Days"), "ewr_IsLast14Days");
 		ewr_RegisterFilter($this->tgl, "@@Last7Days", $ReportLanguage->Phrase("Last7Days"), "ewr_IsLast7Days");
@@ -226,6 +233,12 @@ class crr_keg_hasil extends crTableCrosstab {
 		ewr_RegisterFilter($this->tgl, "@@Yesterday", $ReportLanguage->Phrase("Yesterday"), "ewr_IsYesterday");
 		ewr_RegisterFilter($this->tgl, "@@Today", $ReportLanguage->Phrase("Today"), "ewr_IsToday");
 		ewr_RegisterFilter($this->tgl, "@@Tomorrow", $ReportLanguage->Phrase("Tomorrow"), "ewr_IsTomorrow");
+		ewr_RegisterFilter($this->tgl, "@@Yesterday", $ReportLanguage->Phrase("Yesterday"), "ewr_IsYesterday");
+		ewr_RegisterFilter($this->tgl, "@@Today", $ReportLanguage->Phrase("Today"), "ewr_IsToday");
+		ewr_RegisterFilter($this->tgl, "@@Tomorrow", $ReportLanguage->Phrase("Tomorrow"), "ewr_IsTomorrow");
+		ewr_RegisterFilter($this->tgl, "@@LastMonth", $ReportLanguage->Phrase("LastMonth"), "ewr_IsLastMonth");
+		ewr_RegisterFilter($this->tgl, "@@ThisMonth", $ReportLanguage->Phrase("ThisMonth"), "ewr_IsThisMonth");
+		ewr_RegisterFilter($this->tgl, "@@NextMonth", $ReportLanguage->Phrase("NextMonth"), "ewr_IsNextMonth");
 		ewr_RegisterFilter($this->tgl, "@@LastMonth", $ReportLanguage->Phrase("LastMonth"), "ewr_IsLastMonth");
 		ewr_RegisterFilter($this->tgl, "@@ThisMonth", $ReportLanguage->Phrase("ThisMonth"), "ewr_IsThisMonth");
 		ewr_RegisterFilter($this->tgl, "@@NextMonth", $ReportLanguage->Phrase("NextMonth"), "ewr_IsNextMonth");
@@ -346,6 +359,14 @@ class crr_keg_hasil extends crTableCrosstab {
 		ewr_RegisterFilter($this->tgl, "@@ThisWeek", $ReportLanguage->Phrase("ThisWeek"), "ewr_IsThisWeek");
 		ewr_RegisterFilter($this->tgl, "@@NextWeek", $ReportLanguage->Phrase("NextWeek"), "ewr_IsNextWeek");
 		ewr_RegisterFilter($this->tgl, "@@NextTwoWeeks", $ReportLanguage->Phrase("NextTwoWeeks"), "ewr_IsNext2Weeks");
+		ewr_RegisterFilter($this->tgl, "@@LastTwoWeeks", $ReportLanguage->Phrase("LastTwoWeeks"), "ewr_IsLast2Weeks");
+		ewr_RegisterFilter($this->tgl, "@@LastWeek", $ReportLanguage->Phrase("LastWeek"), "ewr_IsLastWeek");
+		ewr_RegisterFilter($this->tgl, "@@ThisWeek", $ReportLanguage->Phrase("ThisWeek"), "ewr_IsThisWeek");
+		ewr_RegisterFilter($this->tgl, "@@NextWeek", $ReportLanguage->Phrase("NextWeek"), "ewr_IsNextWeek");
+		ewr_RegisterFilter($this->tgl, "@@NextTwoWeeks", $ReportLanguage->Phrase("NextTwoWeeks"), "ewr_IsNext2Weeks");
+		ewr_RegisterFilter($this->tgl, "@@LastYear", $ReportLanguage->Phrase("LastYear"), "ewr_IsLastYear");
+		ewr_RegisterFilter($this->tgl, "@@ThisYear", $ReportLanguage->Phrase("ThisYear"), "ewr_IsThisYear");
+		ewr_RegisterFilter($this->tgl, "@@NextYear", $ReportLanguage->Phrase("NextYear"), "ewr_IsNextYear");
 		ewr_RegisterFilter($this->tgl, "@@LastYear", $ReportLanguage->Phrase("LastYear"), "ewr_IsLastYear");
 		ewr_RegisterFilter($this->tgl, "@@ThisYear", $ReportLanguage->Phrase("ThisYear"), "ewr_IsThisYear");
 		ewr_RegisterFilter($this->tgl, "@@NextYear", $ReportLanguage->Phrase("NextYear"), "ewr_IsNextYear");
@@ -422,7 +443,7 @@ class crr_keg_hasil extends crTableCrosstab {
 		// keg_nama
 		$this->keg_nama = new crField('r_keg_hasil', 'r_keg_hasil', 'x_keg_nama', 'keg_nama', '`keg_nama`', 200, EWR_DATATYPE_STRING, -1);
 		$this->keg_nama->Sortable = TRUE; // Allow sort
-		$this->keg_nama->GroupingFieldId = 2;
+		$this->keg_nama->GroupingFieldId = 1;
 		$this->fields['keg_nama'] = &$this->keg_nama;
 		$this->keg_nama->DateFilter = "";
 		$this->keg_nama->SqlSelect = "";
@@ -475,7 +496,7 @@ class crr_keg_hasil extends crTableCrosstab {
 		// pegawai_nama
 		$this->pegawai_nama = new crField('r_keg_hasil', 'r_keg_hasil', 'x_pegawai_nama', 'pegawai_nama', '`pegawai_nama`', 200, EWR_DATATYPE_STRING, -1);
 		$this->pegawai_nama->Sortable = TRUE; // Allow sort
-		$this->pegawai_nama->GroupingFieldId = 3;
+		$this->pegawai_nama->GroupingFieldId = 2;
 		$this->fields['pegawai_nama'] = &$this->pegawai_nama;
 		$this->pegawai_nama->DateFilter = "";
 		$this->pegawai_nama->SqlSelect = "";
@@ -631,7 +652,7 @@ class crr_keg_hasil extends crTableCrosstab {
 	var $_SqlSelect = "";
 
 	function getSqlSelect() {
-		return ($this->_SqlSelect <> "") ? $this->_SqlSelect : "SELECT `kegm_id`, `keg_nama`, `pegawai_nama`, <DistinctColumnFields> FROM " . $this->getSqlFrom();
+		return ($this->_SqlSelect <> "") ? $this->_SqlSelect : "SELECT `keg_nama`, `pegawai_nama`, <DistinctColumnFields> FROM " . $this->getSqlFrom();
 	}
 
 	function SqlSelect() { // For backward compatibility
@@ -662,7 +683,7 @@ class crr_keg_hasil extends crTableCrosstab {
 	var $_SqlGroupBy = "";
 
 	function getSqlGroupBy() {
-		return ($this->_SqlGroupBy <> "") ? $this->_SqlGroupBy : "`kegm_id`, `keg_nama`, `pegawai_nama`";
+		return ($this->_SqlGroupBy <> "") ? $this->_SqlGroupBy : "`keg_nama`, `pegawai_nama`";
 	}
 
 	function SqlGroupBy() { // For backward compatibility
@@ -692,7 +713,7 @@ class crr_keg_hasil extends crTableCrosstab {
 	var $_SqlOrderBy = "";
 
 	function getSqlOrderBy() {
-		return ($this->_SqlOrderBy <> "") ? $this->_SqlOrderBy : "`kegm_id` ASC, `keg_nama` ASC, `pegawai_nama` ASC";
+		return ($this->_SqlOrderBy <> "") ? $this->_SqlOrderBy : "`keg_nama` ASC, `pegawai_nama` ASC";
 	}
 
 	function SqlOrderBy() { // For backward compatibility
@@ -773,7 +794,7 @@ class crr_keg_hasil extends crTableCrosstab {
 			exit();
 		}
 */
-		$this->Col = &ewr_Init2DArray($this->ColCount+1, 4, NULL);
+		$this->Col = &ewr_Init2DArray($this->ColCount+1, 3, NULL);
 		$colcnt = 0;
 		while (!$rscol->EOF) {
 			if (is_null($rscol->fields[0])) {
@@ -795,7 +816,7 @@ class crr_keg_hasil extends crTableCrosstab {
 		// 1st dimension = no of groups (level 0 used for grand total)
 		// 2nd dimension = no of distinct values
 
-		$nGrps = 3;
+		$nGrps = 2;
 		$this->SummaryFields[0] = new crSummaryField('x_upah_peg', 'upah_peg', '`upah_peg`', 'SUM');
 		$this->SummaryFields[0]->SummaryCaption = $ReportLanguage->Phrase("RptSum");
 		$this->SummaryFields[0]->SummaryVal = &ewr_InitArray($this->ColCount+1, NULL);
@@ -826,7 +847,7 @@ class crr_keg_hasil extends crTableCrosstab {
 	var $_SqlFirstGroupField = "";
 
 	function getSqlFirstGroupField() {
-		return ($this->_SqlFirstGroupField <> "") ? $this->_SqlFirstGroupField : "`kegm_id`";
+		return ($this->_SqlFirstGroupField <> "") ? $this->_SqlFirstGroupField : "`keg_nama`";
 	}
 
 	function SqlFirstGroupField() { // For backward compatibility
@@ -856,7 +877,7 @@ class crr_keg_hasil extends crTableCrosstab {
 	var $_SqlOrderByGroup = "";
 
 	function getSqlOrderByGroup() {
-		return ($this->_SqlOrderByGroup <> "") ? $this->_SqlOrderByGroup : "`kegm_id` ASC";
+		return ($this->_SqlOrderByGroup <> "") ? $this->_SqlOrderByGroup : "`keg_nama` ASC";
 	}
 
 	function SqlOrderByGroup() { // For backward compatibility
