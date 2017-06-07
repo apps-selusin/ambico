@@ -1,66 +1,60 @@
 <?php
 
 // Global variable for table object
-$r_jdw_krj_def = NULL;
+$r_keg_hasil = NULL;
 
 //
-// Table class for r_jdw_krj_def
+// Table class for r_keg_hasil
 //
-class crr_jdw_krj_def extends crTableBase {
-	var $ShowGroupHeaderAsRow = FALSE;
-	var $ShowCompactSummaryFooter = TRUE;
-	var $pembagian2_nama;
-	var $pegawai_nip;
-	var $pegawai_nama;
+class crr_keg_hasil extends crTableCrosstab {
+	var $kegm_id;
+	var $keg_id;
 	var $tgl;
-	var $hk_def;
-	var $jk_kd;
-	var $pegawai_id;
-	var $jk_id;
-	var $scan_masuk;
-	var $scan_keluar;
-	var $pembagian2_id;
-	var $pegawai_pin;
-	var $lapgroup_nama;
+	var $shift;
+	var $hasil;
+	var $kegd_id;
+	var $keg_nama;
+	var $tarif_acuan;
+	var $tarif1;
+	var $tarif2;
+	var $keg_ket;
+	var $pembagi;
+	var $pegawai_nama;
+	var $upah_peg;
 
 	//
 	// Table class constructor
 	//
 	function __construct() {
 		global $ReportLanguage, $gsLanguage;
-		$this->TableVar = 'r_jdw_krj_def';
-		$this->TableName = 'r_jdw_krj_def';
+		$this->TableVar = 'r_keg_hasil';
+		$this->TableName = 'r_keg_hasil';
 		$this->TableType = 'REPORT';
 		$this->DBID = 'DB';
 		$this->ExportAll = FALSE;
 		$this->ExportPageBreakCount = 0;
 
-		// pembagian2_nama
-		$this->pembagian2_nama = new crField('r_jdw_krj_def', 'r_jdw_krj_def', 'x_pembagian2_nama', 'pembagian2_nama', '`pembagian2_nama`', 200, EWR_DATATYPE_STRING, -1);
-		$this->pembagian2_nama->Sortable = TRUE; // Allow sort
-		$this->fields['pembagian2_nama'] = &$this->pembagian2_nama;
-		$this->pembagian2_nama->DateFilter = "";
-		$this->pembagian2_nama->SqlSelect = "";
-		$this->pembagian2_nama->SqlOrderBy = "";
+		// kegm_id
+		$this->kegm_id = new crField('r_keg_hasil', 'r_keg_hasil', 'x_kegm_id', 'kegm_id', '`kegm_id`', 3, EWR_DATATYPE_NUMBER, -1);
+		$this->kegm_id->Sortable = TRUE; // Allow sort
+		$this->kegm_id->GroupingFieldId = 1;
+		$this->kegm_id->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectInteger");
+		$this->fields['kegm_id'] = &$this->kegm_id;
+		$this->kegm_id->DateFilter = "";
+		$this->kegm_id->SqlSelect = "";
+		$this->kegm_id->SqlOrderBy = "";
 
-		// pegawai_nip
-		$this->pegawai_nip = new crField('r_jdw_krj_def', 'r_jdw_krj_def', 'x_pegawai_nip', 'pegawai_nip', '`pegawai_nip`', 200, EWR_DATATYPE_STRING, -1);
-		$this->pegawai_nip->Sortable = TRUE; // Allow sort
-		$this->fields['pegawai_nip'] = &$this->pegawai_nip;
-		$this->pegawai_nip->DateFilter = "";
-		$this->pegawai_nip->SqlSelect = "";
-		$this->pegawai_nip->SqlOrderBy = "";
-
-		// pegawai_nama
-		$this->pegawai_nama = new crField('r_jdw_krj_def', 'r_jdw_krj_def', 'x_pegawai_nama', 'pegawai_nama', '`pegawai_nama`', 200, EWR_DATATYPE_STRING, -1);
-		$this->pegawai_nama->Sortable = TRUE; // Allow sort
-		$this->fields['pegawai_nama'] = &$this->pegawai_nama;
-		$this->pegawai_nama->DateFilter = "";
-		$this->pegawai_nama->SqlSelect = "";
-		$this->pegawai_nama->SqlOrderBy = "";
+		// keg_id
+		$this->keg_id = new crField('r_keg_hasil', 'r_keg_hasil', 'x_keg_id', 'keg_id', '`keg_id`', 3, EWR_DATATYPE_NUMBER, -1);
+		$this->keg_id->Sortable = TRUE; // Allow sort
+		$this->keg_id->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectInteger");
+		$this->fields['keg_id'] = &$this->keg_id;
+		$this->keg_id->DateFilter = "";
+		$this->keg_id->SqlSelect = "";
+		$this->keg_id->SqlOrderBy = "";
 
 		// tgl
-		$this->tgl = new crField('r_jdw_krj_def', 'r_jdw_krj_def', 'x_tgl', 'tgl', '`tgl`', 133, EWR_DATATYPE_DATE, -1);
+		$this->tgl = new crField('r_keg_hasil', 'r_keg_hasil', 'x_tgl', 'tgl', '`tgl`', 133, EWR_DATATYPE_DATE, 0);
 		$this->tgl->Sortable = TRUE; // Allow sort
 		$this->tgl->FldDefaultErrMsg = str_replace("%s", $GLOBALS["EWR_DATE_FORMAT"], $ReportLanguage->Phrase("IncorrectDate"));
 		$this->fields['tgl'] = &$this->tgl;
@@ -354,83 +348,103 @@ class crr_jdw_krj_def extends crTableBase {
 		ewr_RegisterFilter($this->tgl, "@@ThisYear", $ReportLanguage->Phrase("ThisYear"), "ewr_IsThisYear");
 		ewr_RegisterFilter($this->tgl, "@@NextYear", $ReportLanguage->Phrase("NextYear"), "ewr_IsNextYear");
 
-		// hk_def
-		$this->hk_def = new crField('r_jdw_krj_def', 'r_jdw_krj_def', 'x_hk_def', 'hk_def', '`hk_def`', 16, EWR_DATATYPE_NUMBER, -1);
-		$this->hk_def->Sortable = TRUE; // Allow sort
-		$this->hk_def->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectInteger");
-		$this->fields['hk_def'] = &$this->hk_def;
-		$this->hk_def->DateFilter = "";
-		$this->hk_def->SqlSelect = "";
-		$this->hk_def->SqlOrderBy = "";
+		// shift
+		$this->shift = new crField('r_keg_hasil', 'r_keg_hasil', 'x_shift', 'shift', '`shift`', 16, EWR_DATATYPE_NUMBER, -1);
+		$this->shift->Sortable = TRUE; // Allow sort
+		$this->shift->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectInteger");
+		$this->fields['shift'] = &$this->shift;
+		$this->shift->DateFilter = "";
+		$this->shift->SqlSelect = "";
+		$this->shift->SqlOrderBy = "";
 
-		// jk_kd
-		$this->jk_kd = new crField('r_jdw_krj_def', 'r_jdw_krj_def', 'x_jk_kd', 'jk_kd', '`jk_kd`', 200, EWR_DATATYPE_STRING, -1);
-		$this->jk_kd->Sortable = TRUE; // Allow sort
-		$this->fields['jk_kd'] = &$this->jk_kd;
-		$this->jk_kd->DateFilter = "";
-		$this->jk_kd->SqlSelect = "";
-		$this->jk_kd->SqlOrderBy = "";
+		// hasil
+		$this->hasil = new crField('r_keg_hasil', 'r_keg_hasil', 'x_hasil', 'hasil', '`hasil`', 3, EWR_DATATYPE_NUMBER, -1);
+		$this->hasil->Sortable = TRUE; // Allow sort
+		$this->hasil->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectInteger");
+		$this->fields['hasil'] = &$this->hasil;
+		$this->hasil->DateFilter = "";
+		$this->hasil->SqlSelect = "";
+		$this->hasil->SqlOrderBy = "";
 
-		// pegawai_id
-		$this->pegawai_id = new crField('r_jdw_krj_def', 'r_jdw_krj_def', 'x_pegawai_id', 'pegawai_id', '`pegawai_id`', 3, EWR_DATATYPE_NUMBER, -1);
-		$this->pegawai_id->Sortable = TRUE; // Allow sort
-		$this->pegawai_id->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectInteger");
-		$this->fields['pegawai_id'] = &$this->pegawai_id;
-		$this->pegawai_id->DateFilter = "";
-		$this->pegawai_id->SqlSelect = "";
-		$this->pegawai_id->SqlOrderBy = "";
+		// kegd_id
+		$this->kegd_id = new crField('r_keg_hasil', 'r_keg_hasil', 'x_kegd_id', 'kegd_id', '`kegd_id`', 3, EWR_DATATYPE_NUMBER, -1);
+		$this->kegd_id->Sortable = TRUE; // Allow sort
+		$this->kegd_id->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectInteger");
+		$this->fields['kegd_id'] = &$this->kegd_id;
+		$this->kegd_id->DateFilter = "";
+		$this->kegd_id->SqlSelect = "";
+		$this->kegd_id->SqlOrderBy = "";
 
-		// jk_id
-		$this->jk_id = new crField('r_jdw_krj_def', 'r_jdw_krj_def', 'x_jk_id', 'jk_id', '`jk_id`', 3, EWR_DATATYPE_NUMBER, -1);
-		$this->jk_id->Sortable = TRUE; // Allow sort
-		$this->jk_id->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectInteger");
-		$this->fields['jk_id'] = &$this->jk_id;
-		$this->jk_id->DateFilter = "";
-		$this->jk_id->SqlSelect = "";
-		$this->jk_id->SqlOrderBy = "";
+		// keg_nama
+		$this->keg_nama = new crField('r_keg_hasil', 'r_keg_hasil', 'x_keg_nama', 'keg_nama', '`keg_nama`', 200, EWR_DATATYPE_STRING, -1);
+		$this->keg_nama->Sortable = TRUE; // Allow sort
+		$this->keg_nama->GroupingFieldId = 2;
+		$this->fields['keg_nama'] = &$this->keg_nama;
+		$this->keg_nama->DateFilter = "";
+		$this->keg_nama->SqlSelect = "";
+		$this->keg_nama->SqlOrderBy = "";
 
-		// scan_masuk
-		$this->scan_masuk = new crField('r_jdw_krj_def', 'r_jdw_krj_def', 'x_scan_masuk', 'scan_masuk', '`scan_masuk`', 135, EWR_DATATYPE_DATE, 0);
-		$this->scan_masuk->Sortable = TRUE; // Allow sort
-		$this->scan_masuk->FldDefaultErrMsg = str_replace("%s", $GLOBALS["EWR_DATE_FORMAT"], $ReportLanguage->Phrase("IncorrectDate"));
-		$this->fields['scan_masuk'] = &$this->scan_masuk;
-		$this->scan_masuk->DateFilter = "";
-		$this->scan_masuk->SqlSelect = "";
-		$this->scan_masuk->SqlOrderBy = "";
+		// tarif_acuan
+		$this->tarif_acuan = new crField('r_keg_hasil', 'r_keg_hasil', 'x_tarif_acuan', 'tarif_acuan', '`tarif_acuan`', 3, EWR_DATATYPE_NUMBER, -1);
+		$this->tarif_acuan->Sortable = TRUE; // Allow sort
+		$this->tarif_acuan->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectInteger");
+		$this->fields['tarif_acuan'] = &$this->tarif_acuan;
+		$this->tarif_acuan->DateFilter = "";
+		$this->tarif_acuan->SqlSelect = "";
+		$this->tarif_acuan->SqlOrderBy = "";
 
-		// scan_keluar
-		$this->scan_keluar = new crField('r_jdw_krj_def', 'r_jdw_krj_def', 'x_scan_keluar', 'scan_keluar', '`scan_keluar`', 135, EWR_DATATYPE_DATE, 0);
-		$this->scan_keluar->Sortable = TRUE; // Allow sort
-		$this->scan_keluar->FldDefaultErrMsg = str_replace("%s", $GLOBALS["EWR_DATE_FORMAT"], $ReportLanguage->Phrase("IncorrectDate"));
-		$this->fields['scan_keluar'] = &$this->scan_keluar;
-		$this->scan_keluar->DateFilter = "";
-		$this->scan_keluar->SqlSelect = "";
-		$this->scan_keluar->SqlOrderBy = "";
+		// tarif1
+		$this->tarif1 = new crField('r_keg_hasil', 'r_keg_hasil', 'x_tarif1', 'tarif1', '`tarif1`', 4, EWR_DATATYPE_NUMBER, -1);
+		$this->tarif1->Sortable = TRUE; // Allow sort
+		$this->tarif1->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectFloat");
+		$this->fields['tarif1'] = &$this->tarif1;
+		$this->tarif1->DateFilter = "";
+		$this->tarif1->SqlSelect = "";
+		$this->tarif1->SqlOrderBy = "";
 
-		// pembagian2_id
-		$this->pembagian2_id = new crField('r_jdw_krj_def', 'r_jdw_krj_def', 'x_pembagian2_id', 'pembagian2_id', '`pembagian2_id`', 3, EWR_DATATYPE_NUMBER, -1);
-		$this->pembagian2_id->Sortable = TRUE; // Allow sort
-		$this->pembagian2_id->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectInteger");
-		$this->fields['pembagian2_id'] = &$this->pembagian2_id;
-		$this->pembagian2_id->DateFilter = "";
-		$this->pembagian2_id->SqlSelect = "";
-		$this->pembagian2_id->SqlOrderBy = "";
+		// tarif2
+		$this->tarif2 = new crField('r_keg_hasil', 'r_keg_hasil', 'x_tarif2', 'tarif2', '`tarif2`', 4, EWR_DATATYPE_NUMBER, -1);
+		$this->tarif2->Sortable = TRUE; // Allow sort
+		$this->tarif2->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectFloat");
+		$this->fields['tarif2'] = &$this->tarif2;
+		$this->tarif2->DateFilter = "";
+		$this->tarif2->SqlSelect = "";
+		$this->tarif2->SqlOrderBy = "";
 
-		// pegawai_pin
-		$this->pegawai_pin = new crField('r_jdw_krj_def', 'r_jdw_krj_def', 'x_pegawai_pin', 'pegawai_pin', '`pegawai_pin`', 200, EWR_DATATYPE_STRING, -1);
-		$this->pegawai_pin->Sortable = TRUE; // Allow sort
-		$this->fields['pegawai_pin'] = &$this->pegawai_pin;
-		$this->pegawai_pin->DateFilter = "";
-		$this->pegawai_pin->SqlSelect = "";
-		$this->pegawai_pin->SqlOrderBy = "";
+		// keg_ket
+		$this->keg_ket = new crField('r_keg_hasil', 'r_keg_hasil', 'x_keg_ket', 'keg_ket', '`keg_ket`', 200, EWR_DATATYPE_STRING, -1);
+		$this->keg_ket->Sortable = TRUE; // Allow sort
+		$this->fields['keg_ket'] = &$this->keg_ket;
+		$this->keg_ket->DateFilter = "";
+		$this->keg_ket->SqlSelect = "";
+		$this->keg_ket->SqlOrderBy = "";
 
-		// lapgroup_nama
-		$this->lapgroup_nama = new crField('r_jdw_krj_def', 'r_jdw_krj_def', 'x_lapgroup_nama', 'lapgroup_nama', '`lapgroup_nama`', 200, EWR_DATATYPE_STRING, -1);
-		$this->lapgroup_nama->Sortable = TRUE; // Allow sort
-		$this->fields['lapgroup_nama'] = &$this->lapgroup_nama;
-		$this->lapgroup_nama->DateFilter = "";
-		$this->lapgroup_nama->SqlSelect = "";
-		$this->lapgroup_nama->SqlOrderBy = "";
+		// pembagi
+		$this->pembagi = new crField('r_keg_hasil', 'r_keg_hasil', 'x_pembagi', 'pembagi', '`pembagi`', 131, EWR_DATATYPE_NUMBER, -1);
+		$this->pembagi->Sortable = TRUE; // Allow sort
+		$this->pembagi->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectFloat");
+		$this->fields['pembagi'] = &$this->pembagi;
+		$this->pembagi->DateFilter = "";
+		$this->pembagi->SqlSelect = "";
+		$this->pembagi->SqlOrderBy = "";
+
+		// pegawai_nama
+		$this->pegawai_nama = new crField('r_keg_hasil', 'r_keg_hasil', 'x_pegawai_nama', 'pegawai_nama', '`pegawai_nama`', 200, EWR_DATATYPE_STRING, -1);
+		$this->pegawai_nama->Sortable = TRUE; // Allow sort
+		$this->pegawai_nama->GroupingFieldId = 3;
+		$this->fields['pegawai_nama'] = &$this->pegawai_nama;
+		$this->pegawai_nama->DateFilter = "";
+		$this->pegawai_nama->SqlSelect = "";
+		$this->pegawai_nama->SqlOrderBy = "";
+
+		// upah_peg
+		$this->upah_peg = new crField('r_keg_hasil', 'r_keg_hasil', 'x_upah_peg', 'upah_peg', '`upah_peg`', 5, EWR_DATATYPE_NUMBER, -1);
+		$this->upah_peg->Sortable = TRUE; // Allow sort
+		$this->upah_peg->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectFloat");
+		$this->fields['upah_peg'] = &$this->upah_peg;
+		$this->upah_peg->DateFilter = "";
+		$this->upah_peg->SqlSelect = "";
+		$this->upah_peg->SqlOrderBy = "";
 	}
 
 	// Set Field Visibility
@@ -497,12 +511,68 @@ class crr_jdw_krj_def extends crTableBase {
 	}
 
 	// Table level SQL
-	// From
+	// Column field
 
+	var $ColumnField = "";
+
+	function getColumnField() {
+		return ($this->ColumnField <> "") ? $this->ColumnField : "`tgl`";
+	}
+
+	function setColumnField($v) {
+		$this->ColumnField = $v;
+	}
+
+	// Column date type
+	var $ColumnDateType = "";
+
+	function getColumnDateType() {
+		return ($this->ColumnDateType <> "") ? $this->ColumnDateType : "d";
+	}
+
+	function setColumnDateType($v) {
+		$this->ColumnDateType = $v;
+	}
+
+	// Column captions
+	var $ColumnCaptions = "";
+
+	function getColumnCaptions() {
+		global $ReportLanguage;
+		return ($this->ColumnCaptions <> "") ? $this->ColumnCaptions : "";
+	}
+
+	function setColumnCaptions($v) {
+		$this->ColumnCaptions = $v;
+	}
+
+	// Column names
+	var $ColumnNames = "";
+
+	function getColumnNames() {
+		return ($this->ColumnNames <> "") ? $this->ColumnNames : "";
+	}
+
+	function setColumnNames($v) {
+		$this->ColumnNames = $v;
+	}
+
+	// Column values
+	var $ColumnValues = "";
+
+	function getColumnValues() {
+		return ($this->ColumnValues <> "") ? $this->ColumnValues : "";
+	}
+
+	function setColumnValues($v) {
+		$this->ColumnValues = $v;
+	}
+
+	// From
 	var $_SqlFrom = "";
 
 	function getSqlFrom() {
-		return ($this->_SqlFrom <> "") ? $this->_SqlFrom : "`v_jdw_krj_def`";
+		return ($this->_SqlFrom <> "") ? $this->_SqlFrom : "`v_keg_hasil`";
 	}
 
 	function SqlFrom() { // For backward compatibility
@@ -517,7 +587,7 @@ class crr_jdw_krj_def extends crTableBase {
 	var $_SqlSelect = "";
 
 	function getSqlSelect() {
-		return ($this->_SqlSelect <> "") ? $this->_SqlSelect : "SELECT * FROM " . $this->getSqlFrom();
+		return ($this->_SqlSelect <> "") ? $this->_SqlSelect : "SELECT `kegm_id`, `keg_nama`, `pegawai_nama`, <DistinctColumnFields> FROM " . $this->getSqlFrom();
 	}
 
 	function SqlSelect() { // For backward compatibility
@@ -548,7 +618,7 @@ class crr_jdw_krj_def extends crTableBase {
 	var $_SqlGroupBy = "";
 
 	function getSqlGroupBy() {
-		return ($this->_SqlGroupBy <> "") ? $this->_SqlGroupBy : "";
+		return ($this->_SqlGroupBy <> "") ? $this->_SqlGroupBy : "`kegm_id`, `keg_nama`, `pegawai_nama`";
 	}
 
 	function SqlGroupBy() { // For backward compatibility
@@ -578,7 +648,7 @@ class crr_jdw_krj_def extends crTableBase {
 	var $_SqlOrderBy = "";
 
 	function getSqlOrderBy() {
-		return ($this->_SqlOrderBy <> "") ? $this->_SqlOrderBy : "";
+		return ($this->_SqlOrderBy <> "") ? $this->_SqlOrderBy : "`kegm_id` ASC, `keg_nama` ASC, `pegawai_nama` ASC";
 	}
 
 	function SqlOrderBy() { // For backward compatibility
@@ -589,13 +659,130 @@ class crr_jdw_krj_def extends crTableBase {
 		$this->_SqlOrderBy = $v;
 	}
 
+	// Select Distinct
+	var $_SqlDistinctSelect = "";
+
+	function getSqlDistinctSelect() {
+		return ($this->_SqlDistinctSelect <> "") ? $this->_SqlDistinctSelect : "SELECT DISTINCT DATE_FORMAT(`tgl`,'%Y-%m-%d') FROM `v_keg_hasil`";
+	}
+
+	function SqlDistinctSelect() { // For backward compatibility
+		return $this->getSqlDistinctSelect();
+	}
+
+	function setSqlDistinctSelect($v) {
+		$this->_SqlDistinctSelect = $v;
+	}
+
+	// Distinct Where
+	var $_SqlDistinctWhere = "";
+
+	function getSqlDistinctWhere() {
+		$sWhere = ($this->_SqlDistinctWhere <> "") ? $this->_SqlDistinctWhere : "";
+		return $sWhere;
+	}
+
+	function SqlDistinctWhere() { // For backward compatibility
+		return $this->getSqlDistinctWhere();
+	}
+
+	function setSqlDistinctWhere($v) {
+		$this->_SqlDistinctWhere = $v;
+	}
+
+	// Distinct Order By
+	var $_SqlDistinctOrderBy = "";
+
+	function getSqlDistinctOrderBy() {
+		return ($this->_SqlDistinctOrderBy <> "") ? $this->_SqlDistinctOrderBy : "DATE_FORMAT(`tgl`,'%Y-%m-%d') ASC";
+	}
+
+	function SqlDistinctOrderBy() { // For backward compatibility
+		return $this->getSqlDistinctOrderBy();
+	}
+
+	function setSqlDistinctOrderBy($v) {
+		$this->_SqlDistinctOrderBy = $v;
+	}
+	var $ColCount;
+	var $Col;
+	var $DistinctColumnFields = "";
+
+	// Load column values
+	function LoadColumnValues($filter = "") {
+		global $ReportLanguage;
+		$conn = &$this->Connection();
+
+		// Build SQL
+		$sSql = ewr_BuildReportSql($this->getSqlDistinctSelect(), $this->getSqlDistinctWhere(), "", "", $this->getSqlDistinctOrderBy(), $filter, "");
+
+		// Load recordset
+		$rscol = $conn->Execute($sSql);
+
+		// Get distinct column count
+		$this->ColCount = ($rscol) ? $rscol->RecordCount() : 0;
+
+/* Uncomment to show phrase
+		if ($this->ColCount == 0) {
+			if ($rscol) $rscol->Close();
+			echo "<p>" . $ReportLanguage->Phrase("NoDistinctColVals") . $sSql . "</p>";
+			exit();
+		}
+*/
+		$this->Col = &ewr_Init2DArray($this->ColCount+1, 4, NULL);
+		$colcnt = 0;
+		while (!$rscol->EOF) {
+			if (is_null($rscol->fields[0])) {
+				$wrkValue = EWR_NULL_VALUE;
+				$wrkCaption = $ReportLanguage->Phrase("NullLabel");
+			} elseif ($rscol->fields[0] == "") {
+				$wrkValue = EWR_EMPTY_VALUE;
+				$wrkCaption = $ReportLanguage->Phrase("EmptyLabel");
+			} else {
+				$wrkValue = $rscol->fields[0];
+				$wrkCaption = $rscol->fields[0];
+			}
+			$colcnt++;
+			$this->Col[$colcnt] = new crCrosstabColumn($wrkValue, $wrkCaption, TRUE);
+			$rscol->MoveNext();
+		}
+		$rscol->Close();
+
+		// 1st dimension = no of groups (level 0 used for grand total)
+		// 2nd dimension = no of distinct values
+
+		$nGrps = 3;
+		$this->SummaryFields[0] = new crSummaryField('x_upah_peg', 'upah_peg', '`upah_peg`', 'SUM');
+		$this->SummaryFields[0]->SummaryCaption = $ReportLanguage->Phrase("RptSum");
+		$this->SummaryFields[0]->SummaryVal = &ewr_InitArray($this->ColCount+1, NULL);
+		$this->SummaryFields[0]->SummaryValCnt = &ewr_InitArray($this->ColCount+1, NULL);
+		$this->SummaryFields[0]->SummaryCnt = &ewr_Init2DArray($this->ColCount+1, $nGrps+1, NULL);
+		$this->SummaryFields[0]->SummarySmry = &ewr_Init2DArray($this->ColCount+1, $nGrps+1, NULL);
+		$this->SummaryFields[0]->SummarySmryCnt = &ewr_Init2DArray($this->ColCount+1, $nGrps+1, NULL);
+		$this->SummaryFields[0]->SummaryInitValue = 0;
+
+		// Update crosstab sql
+		$sSqlFlds = "";
+		$cnt = count($this->SummaryFields);
+		for ($is = 0; $is < $cnt; $is++) {
+			$smry = &$this->SummaryFields[$is];
+			for ($colcnt = 1; $colcnt <= $this->ColCount; $colcnt++) {
+				$sFld = ewr_CrossTabField($smry->SummaryType, $smry->FldExpression, $this->getColumnField(), $this->getColumnDateType(), $this->Col[$colcnt]->Value, "'", "C" . $is . $colcnt, $this->DBID);
+				if ($sSqlFlds <> "")
+					$sSqlFlds .= ", ";
+				$sSqlFlds .= $sFld;
+			}
+		}
+		$this->DistinctColumnFields = $sSqlFlds;
+	}
+
 	// Table Level Group SQL
 	// First Group Field
 
 	var $_SqlFirstGroupField = "";
 
 	function getSqlFirstGroupField() {
-		return ($this->_SqlFirstGroupField <> "") ? $this->_SqlFirstGroupField : "";
+		return ($this->_SqlFirstGroupField <> "") ? $this->_SqlFirstGroupField : "`kegm_id`";
 	}
 
 	function SqlFirstGroupField() { // For backward compatibility
@@ -625,7 +812,7 @@ class crr_jdw_krj_def extends crTableBase {
 	var $_SqlOrderByGroup = "";
 
 	function getSqlOrderByGroup() {
-		return ($this->_SqlOrderByGroup <> "") ? $this->_SqlOrderByGroup : "";
+		return ($this->_SqlOrderByGroup <> "") ? $this->_SqlOrderByGroup : "`kegm_id` ASC";
 	}
 
 	function SqlOrderByGroup() { // For backward compatibility
@@ -640,7 +827,7 @@ class crr_jdw_krj_def extends crTableBase {
 	var $_SqlSelectAgg = "";
 
 	function getSqlSelectAgg() {
-		return ($this->_SqlSelectAgg <> "") ? $this->_SqlSelectAgg : "SELECT * FROM " . $this->getSqlFrom();
+		return ($this->_SqlSelectAgg <> "") ? $this->_SqlSelectAgg : "SELECT <DistinctColumnFields> FROM " . $this->getSqlFrom();
 	}
 
 	function SqlSelectAgg() { // For backward compatibility
@@ -651,49 +838,19 @@ class crr_jdw_krj_def extends crTableBase {
 		$this->_SqlSelectAgg = $v;
 	}
 
-	// Aggregate Prefix
-	var $_SqlAggPfx = "";
+	// Group By Aggregate
+	var $_SqlGroupByAgg = "";
 
-	function getSqlAggPfx() {
-		return ($this->_SqlAggPfx <> "") ? $this->_SqlAggPfx : "";
+	function getSqlGroupByAgg() {
+		return ($this->_SqlGroupByAgg <> "") ? $this->_SqlGroupByAgg : "";
 	}
 
-	function SqlAggPfx() { // For backward compatibility
-		return $this->getSqlAggPfx();
+	function SqlGroupByAgg() { // For backward compatibility
+		return $this->getSqlGroupByAgg();
 	}
 
-	function setSqlAggPfx($v) {
-		$this->_SqlAggPfx = $v;
-	}
-
-	// Aggregate Suffix
-	var $_SqlAggSfx = "";
-
-	function getSqlAggSfx() {
-		return ($this->_SqlAggSfx <> "") ? $this->_SqlAggSfx : "";
-	}
-
-	function SqlAggSfx() { // For backward compatibility
-		return $this->getSqlAggSfx();
-	}
-
-	function setSqlAggSfx($v) {
-		$this->_SqlAggSfx = $v;
-	}
-
-	// Select Count
-	var $_SqlSelectCount = "";
-
-	function getSqlSelectCount() {
-		return ($this->_SqlSelectCount <> "") ? $this->_SqlSelectCount : "SELECT COUNT(*) FROM " . $this->getSqlFrom();
-	}
-
-	function SqlSelectCount() { // For backward compatibility
-		return $this->getSqlSelectCount();
-	}
-
-	function setSqlSelectCount($v) {
-		$this->_SqlSelectCount = $v;
+	function setSqlGroupByAgg($v) {
+		$this->_SqlGroupByAgg = $v;
 	}
 
 	// Sort URL
@@ -715,24 +872,24 @@ class crr_jdw_krj_def extends crTableBase {
 	function SetupLookupFilters($fld) {
 		global $gsLanguage;
 		switch ($fld->FldVar) {
-		case "x_pegawai_nip":
+		case "x_keg_nama":
 			$sSqlWrk = "";
-		$sSqlWrk = "SELECT DISTINCT `pegawai_nip`, `pegawai_nip` AS `DispFld`, '' AS `DispFld2`, '' AS `DispFld3`, '' AS `DispFld4` FROM `v_jdw_krj_def`";
-		$sWhereWrk = "{filter}";
-		$this->pegawai_nip->LookupFilters = array("dx1" => '`pegawai_nip`');
-			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "DB", "f0" => '`pegawai_nip` = {filter_value}', "t0" => "200", "fn0" => "", "dlm" => ewr_Encrypt($fld->FldDelimiter));
+		$sSqlWrk = "SELECT DISTINCT `keg_nama`, `keg_nama` AS `DispFld`, '' AS `DispFld2`, '' AS `DispFld3`, '' AS `DispFld4` FROM `v_keg_hasil`";
+		$sWhereWrk = "";
+		$this->keg_nama->LookupFilters = array();
+			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "DB", "f0" => '`keg_nama` = {filter_value}', "t0" => "200", "fn0" => "", "dlm" => ewr_Encrypt($fld->FldDelimiter));
 			$sSqlWrk = "";
-		$this->Lookup_Selecting($this->pegawai_nip, $sWhereWrk); // Call Lookup selecting
+		$this->Lookup_Selecting($this->keg_nama, $sWhereWrk); // Call Lookup selecting
 		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-		$sSqlWrk .= " ORDER BY `pegawai_nip` ASC";
+		$sSqlWrk .= " ORDER BY `keg_nama` ASC";
 			if ($sSqlWrk <> "")
 				$fld->LookupFilters["s"] .= $sSqlWrk;
 			break;
 		case "x_pegawai_nama":
 			$sSqlWrk = "";
-		$sSqlWrk = "SELECT DISTINCT `pegawai_nama`, `pegawai_nama` AS `DispFld`, '' AS `DispFld2`, '' AS `DispFld3`, '' AS `DispFld4` FROM `v_jdw_krj_def`";
-		$sWhereWrk = "{filter}";
-		$this->pegawai_nama->LookupFilters = array("dx1" => '`pegawai_nama`');
+		$sSqlWrk = "SELECT DISTINCT `pegawai_nama`, `pegawai_nama` AS `DispFld`, '' AS `DispFld2`, '' AS `DispFld3`, '' AS `DispFld4` FROM `v_keg_hasil`";
+		$sWhereWrk = "";
+		$this->pegawai_nama->LookupFilters = array();
 			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "DB", "f0" => '`pegawai_nama` = {filter_value}', "t0" => "200", "fn0" => "", "dlm" => ewr_Encrypt($fld->FldDelimiter));
 			$sSqlWrk = "";
 		$this->Lookup_Selecting($this->pegawai_nama, $sWhereWrk); // Call Lookup selecting

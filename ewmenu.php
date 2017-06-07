@@ -29,6 +29,7 @@ $RootMenu->AddMenuItem(10083, "mi_gen_rekon__php", $Language->MenuPhrase("10083"
 $RootMenu->AddMenuItem(10229, "mi_lap_gaji2__php", $Language->MenuPhrase("10229", "MenuText"), "lap_gaji2_.php", 10077, "", AllowListMenu('{9712DCF3-D9FD-406D-93E5-FEA5020667C8}lap_gaji2_.php'), FALSE, TRUE);
 $RootMenu->AddMenuItem(10228, "mi_lap_gaji__php", $Language->MenuPhrase("10228", "MenuText"), "lap_gaji_.php", 10077, "", AllowListMenu('{9712DCF3-D9FD-406D-93E5-FEA5020667C8}lap_gaji_.php'), FALSE, TRUE);
 $RootMenu->AddMenuItem(10413, "mi_lap_gaji3__php", $Language->MenuPhrase("10413", "MenuText"), "lap_gaji3_.php", 10077, "", AllowListMenu('{9712DCF3-D9FD-406D-93E5-FEA5020667C8}lap_gaji3_.php'), FALSE, TRUE);
+$RootMenu->AddMenuItem(10106, "mri_r5fkeg5fhasil", $Language->MenuPhrase("10106", "MenuText"), "r_keg_hasilctb.php", 10077, "{6A79AFFA-AA3A-4CBB-8572-5F6C56B1E5B1}", AllowListMenu('{6A79AFFA-AA3A-4CBB-8572-5F6C56B1E5B1}r_keg_hasil'), FALSE, FALSE);
 $RootMenu->AddMenuItem(10417, "mi_lap_lembur__php", $Language->MenuPhrase("10417", "MenuText"), "lap_lembur_.php", 10077, "", AllowListMenu('{9712DCF3-D9FD-406D-93E5-FEA5020667C8}lap_lembur_.php'), FALSE, TRUE);
 $RootMenu->AddMenuItem(10419, "mi_lap_lemburh__php", $Language->MenuPhrase("10419", "MenuText"), "lap_lemburh_.php", 10077, "", AllowListMenu('{9712DCF3-D9FD-406D-93E5-FEA5020667C8}lap_lemburh_.php'), FALSE, TRUE);
 $RootMenu->AddMenuItem(-2, "mi_changepwd", $Language->Phrase("ChangePwd"), "changepwd.php", -1, "", IsLoggedIn() && !IsSysAdmin());

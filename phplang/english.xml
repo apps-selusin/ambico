@@ -586,11 +586,11 @@
     <menu id="10421">
       <phrase id="menutext" value="t laplemburh" />
     </menu>
-    <menu id="10418">
-      <phrase id="menutext" value="t laplembur" />
-    </menu>
     <menu id="77">
       <phrase id="menutext" value="Home" />
+    </menu>
+    <menu id="10418">
+      <phrase id="menutext" value="t laplembur" />
     </menu>
     <menu id="78">
       <phrase id="menutext" value="Setup" />
@@ -640,9 +640,6 @@
     <menu id="10230">
       <phrase id="menutext" value="Pengecualian" />
     </menu>
-    <menu id="10416">
-      <phrase id="menutext" value="v rekon brngan" />
-    </menu>
     <menu id="10411">
       <phrase id="menutext" value="Input" />
     </menu>
@@ -654,6 +651,9 @@
     </menu>
     <menu id="10227">
       <phrase id="menutext" value="Generate Jadwal Kerja" />
+    </menu>
+    <menu id="10416">
+      <phrase id="menutext" value="v rekon brngan" />
     </menu>
     <menu id="10077">
       <phrase id="menutext" value="Laporan" />
@@ -676,14 +676,38 @@
     <menu id="10413">
       <phrase id="menutext" value="Gaji (Borongan)" />
     </menu>
+    <menu id="10106">
+      <phrase id="menutext" value="Hasil Kegiatan" />
+    </menu>
     <menu id="10417">
       <phrase id="menutext" value="Lembur (Bulanan)" />
     </menu>
     <menu id="10419">
       <phrase id="menutext" value="Lembur (Harian)" />
     </menu>
+    <menu id="10101">
+      <phrase id="menutext" value="Lembur (Bulanan)" />
+    </menu>
+    <menu id="10103">
+      <phrase id="menutext" value="Lembur (Harian)" />
+    </menu>
+    <menu id="10099">
+      <phrase id="menutext" value="Rekonsiliasi (Borongan)" />
+    </menu>
+    <menu id="10097">
+      <phrase id="menutext" value="Gaji (Borongan)" />
+    </menu>
+    <menu id="10095">
+      <phrase id="menutext" value="Rekonsiliasi (Borongan)" />
+    </menu>
     <menu id="10414">
       <phrase id="menutext" value="v lapgjhrn" />
+    </menu>
+    <menu id="10087">
+      <phrase id="menutext" value="Gaji (Bulanan)" />
+    </menu>
+    <menu id="10085">
+      <phrase id="menutext" value="Gaji (Harian)" />
     </menu>
     <menu id="10415">
       <phrase id="menutext" value="t gjbrngan" />
@@ -889,23 +913,23 @@
     <menu id="76">
       <phrase id="menutext" value="audittrail" />
     </menu>
+    <menu id="10102">
+      <phrase id="menutext" value="t laplemburh" />
+    </menu>
+    <menu id="10104">
+      <phrase id="menutext" value="v keg hasil" />
+    </menu>
+    <menu id="10105">
+      <phrase id="menutext" value="v keg pembagi" />
+    </menu>
     <menu id="10100">
       <phrase id="menutext" value="t laplembur" />
-    </menu>
-    <menu id="10101">
-      <phrase id="menutext" value="Lembur" />
     </menu>
     <menu id="10098">
       <phrase id="menutext" value="v rekon brngan" />
     </menu>
-    <menu id="10099">
-      <phrase id="menutext" value="Rekonsiliasi (Borongan)" />
-    </menu>
     <menu id="10096">
       <phrase id="menutext" value="t gjbrngan" />
-    </menu>
-    <menu id="10097">
-      <phrase id="menutext" value="Gaji (Borongan)" />
     </menu>
     <menu id="10088">
       <phrase id="menutext" value="v jdw krj brngan" />
@@ -928,20 +952,11 @@
     <menu id="10094">
       <phrase id="menutext" value="t kegiatan" />
     </menu>
-    <menu id="10095">
-      <phrase id="menutext" value="Rekonsiliasi (Borongan)" />
-    </menu>
     <menu id="10086">
       <phrase id="menutext" value="t gjbln" />
     </menu>
-    <menu id="10087">
-      <phrase id="menutext" value="Gaji (Bulanan)" />
-    </menu>
     <menu id="10084">
       <phrase id="menutext" value="t gjhrn" />
-    </menu>
-    <menu id="10085">
-      <phrase id="menutext" value="Gaji (Harian)" />
     </menu>
     <menu id="10081">
       <phrase id="menutext" value="t pengecualian" />

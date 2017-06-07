@@ -356,6 +356,15 @@
     <menu id="103">
       <phrase id="menutext" value="Lembur (Harian)" />
     </menu>
+    <menu id="104">
+      <phrase id="menutext" value="v keg hasil" />
+    </menu>
+    <menu id="105">
+      <phrase id="menutext" value="v keg pembagi" />
+    </menu>
+    <menu id="106">
+      <phrase id="menutext" value="Hasil Kegiatan" />
+    </menu>
     <menu id="100">
       <phrase id="menutext" value="t laplembur" />
     </menu>
@@ -3279,6 +3288,105 @@
       </field>
       <field id="end">
         <phrase id="fldcaption" value="end" />
+      </field>
+    </table>
+    <table id="v_keg_pembagi">
+      <phrase id="tblcaption" value="v keg pembagi" />
+      <field id="kegm_id">
+        <phrase id="fldcaption" value="kegm id" />
+      </field>
+      <field id="pembagi">
+        <phrase id="fldcaption" value="pembagi" />
+      </field>
+    </table>
+    <table id="v_keg_hasil">
+      <phrase id="tblcaption" value="v keg hasil" />
+      <field id="kegm_id">
+        <phrase id="fldcaption" value="kegm id" />
+      </field>
+      <field id="keg_id">
+        <phrase id="fldcaption" value="keg id" />
+      </field>
+      <field id="tgl">
+        <phrase id="fldcaption" value="tgl" />
+      </field>
+      <field id="shift">
+        <phrase id="fldcaption" value="shift" />
+      </field>
+      <field id="hasil">
+        <phrase id="fldcaption" value="hasil" />
+      </field>
+      <field id="kegd_id">
+        <phrase id="fldcaption" value="kegd id" />
+      </field>
+      <field id="keg_nama">
+        <phrase id="fldcaption" value="keg nama" />
+      </field>
+      <field id="tarif_acuan">
+        <phrase id="fldcaption" value="tarif acuan" />
+      </field>
+      <field id="tarif1">
+        <phrase id="fldcaption" value="tarif 1" />
+      </field>
+      <field id="tarif2">
+        <phrase id="fldcaption" value="tarif 2" />
+      </field>
+      <field id="keg_ket">
+        <phrase id="fldcaption" value="keg ket" />
+      </field>
+      <field id="pembagi">
+        <phrase id="fldcaption" value="pembagi" />
+      </field>
+      <field id="pegawai_nama">
+        <phrase id="fldcaption" value="pegawai nama" />
+      </field>
+      <field id="upah_peg">
+        <phrase id="fldcaption" value="upah peg" />
+      </field>
+    </table>
+    <table id="r_keg_hasil">
+      <phrase id="tblcaption" value="Hasil Kegiatan" />
+      <field id="kegm_id">
+        <phrase id="fldcaption" value="ID" />
+      </field>
+      <field id="keg_id">
+        <phrase id="fldcaption" value="keg id" />
+      </field>
+      <field id="tgl">
+        <phrase id="fldcaption" value="Tgl." />
+      </field>
+      <field id="shift">
+        <phrase id="fldcaption" value="shift" />
+      </field>
+      <field id="hasil">
+        <phrase id="fldcaption" value="hasil" />
+      </field>
+      <field id="kegd_id">
+        <phrase id="fldcaption" value="kegd id" />
+      </field>
+      <field id="keg_nama">
+        <phrase id="fldcaption" value="Kegiatan" />
+      </field>
+      <field id="tarif_acuan">
+        <phrase id="fldcaption" value="tarif acuan" />
+      </field>
+      <field id="tarif1">
+        <phrase id="fldcaption" value="tarif 1" />
+      </field>
+      <field id="tarif2">
+        <phrase id="fldcaption" value="tarif 2" />
+      </field>
+      <field id="keg_ket">
+        <phrase id="fldcaption" value="keg ket" />
+      </field>
+      <field id="pembagi">
+        <phrase id="fldcaption" value="pembagi" />
+      </field>
+      <field id="pegawai_nama">
+        <phrase id="fldcaption" value="Nama" />
+      </field>
+      <field id="upah_peg">
+        <phrase id="fldcaption" value="Upah" />
       </field>
     </table>
   </project>
