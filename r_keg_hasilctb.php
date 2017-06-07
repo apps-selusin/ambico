@@ -639,8 +639,8 @@ class crr_keg_hasil_crosstab extends crr_keg_hasil {
 		$rs = NULL;
 
 		// Set up column attributes
-		$this->hasil->ViewAttrs["style"] = "";
-		$this->hasil->CellAttrs["style"] = "text-align: right; vertical-align: top;";
+		$this->header_->ViewAttrs["style"] = "";
+		$this->header_->CellAttrs["style"] = "vertical-align: top;";
 		$this->SetupFieldCount();
 	}
 
@@ -653,15 +653,15 @@ class crr_keg_hasil_crosstab extends crr_keg_hasil {
 		$this->ResetLevelSummary(0);
 
 		// Get active columns
-		if (!is_array($this->hasil->SelectionList)) {
+		if (!is_array($this->header_->SelectionList)) {
 			$this->ColSpan = $this->ColCount;
 		} else {
 			$this->ColSpan = 0;
 			for ($i = 1; $i <= $this->ColCount; $i++) {
 				$bSelected = FALSE;
-				$cntsel = count($this->hasil->SelectionList);
+				$cntsel = count($this->header_->SelectionList);
 				for ($j = 0; $j < $cntsel; $j++) {
-					if (ewr_CompareValue($this->hasil->SelectionList[$j], $this->Col[$i]->Value, $this->hasil->FldType)) {
+					if (ewr_CompareValue($this->header_->SelectionList[$j], $this->Col[$i]->Value, $this->header_->FldType)) {
 						$this->ColSpan++;
 						$bSelected = TRUE;
 						break;
@@ -2421,7 +2421,7 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 <?php } ?>
 		<td class="ewRptColHeader" colspan="<?php echo @$Page->ColSpan ?>">
 			<div class="ewTableHeaderBtn">
-				<span class="ewTableHeaderCaption"><?php echo $Page->hasil->FldCaption() ?></span>
+				<span class="ewTableHeaderCaption"><?php echo $Page->header_->FldCaption() ?></span>
 			</div>
 		</td>
 	</tr>
@@ -2472,15 +2472,15 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 	for ($iy = 1; $iy < $cntval; $iy++) {
 		if ($Page->Col[$iy]->Visible) {
 			$Page->SummaryCurrentValue[$iy-1] = $Page->Col[$iy]->Caption;
-			$Page->SummaryViewValue[$iy-1] = ewr_FormatNumber($Page->SummaryCurrentValue[$iy-1], 0, -2, -2, -2);
+			$Page->SummaryViewValue[$iy-1] = $Page->SummaryCurrentValue[$iy-1];
 ?>
-		<td class="ewTableHeader"<?php echo $Page->hasil->CellAttributes() ?>><div<?php echo $Page->hasil->ViewAttributes() ?>><?php echo $Page->SummaryViewValue[$iy-1]; ?></div></td>
+		<td class="ewTableHeader"<?php echo $Page->header_->CellAttributes() ?>><div<?php echo $Page->header_->ViewAttributes() ?>><?php echo $Page->SummaryViewValue[$iy-1]; ?></div></td>
 <?php
 		}
 	}
 ?>
 <!-- Dynamic columns end -->
-		<td class="ewTableHeader"<?php echo $Page->hasil->CellAttributes() ?>><div<?php echo $Page->hasil->ViewAttributes() ?>><?php echo $Page->RenderSummaryCaptions() ?></div></td>
+		<td class="ewTableHeader"<?php echo $Page->header_->CellAttributes() ?>><div<?php echo $Page->header_->ViewAttributes() ?>><?php echo $Page->RenderSummaryCaptions() ?></div></td>
 	</tr>
 </thead>
 <tbody>
