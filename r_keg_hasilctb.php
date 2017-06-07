@@ -2194,7 +2194,9 @@ class crr_keg_hasil_crosstab extends crr_keg_hasil {
 
 		// Example:
 		//$header = "your header";
+		//$MyRow = ewr_ExecuteRow("SELECT start, end FROM t_gjbrngan limit 1");
 
+		$header = "Laporan Hasil Kegiatan Borongan<br>Periode ".tgl_indo_header($_GET["sv_tgl"])." s.d. ".tgl_indo_header($_GET["sv2_tgl"])."<br>&nbsp;";
 	}
 
 	// Page Data Rendered event
