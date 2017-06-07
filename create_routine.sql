@@ -111,3 +111,19 @@ declare ada integer;
 select count(*) into ada from t_harilibur where libur_tgl = p_tgl;
 RETURN ada;
 END//
+
+CREATE FUNCTION `f_pembulatan`(p_uang float) RETURNS float
+BEGIN
+	declare uang, akhir varchar(25);
+    declare puluhan int;
+	set uang = cast(p_uang as char);
+	set puluhan = right(uang, 2);
+	if puluhan = 50 or puluhan = 0 then
+		set akhir = uang;
+	elseif puluhan < 50 then
+		set akhir = uang - puluhan;
+	else
+		set akhir = uang - (puluhan - 50);
+ 	end if;
+ 	return 0 + akhir;
+END//
