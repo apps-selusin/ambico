@@ -109,8 +109,8 @@ function tgl_indo_header($tgl) {
 }
 
 function pembulatan($uang) {
-	$puluhan = substr(ceil($uang), -2); //$ratusan = substr($uang, -3);
-	if($puluhan == 50) { //if($ratusan<500)
+	$puluhan = intval(substr($uang, -2)); //$ratusan = substr($uang, -3);
+	if($puluhan == 50 or $puluhan == 0) { //if($ratusan<500)
 		$akhir = $uang; // - $puluhan; //$akhir = $uang - $ratusan;
 	}
 	elseif($puluhan < 50) { //if($ratusan<500)
@@ -130,7 +130,7 @@ function pembulatan($uang) {
  	}
 
  	//echo number_format($akhir, 2, ',', '.');;
- 	return $akhir;
+ 	return number_format($akhir);
 }
 
 //$uang = 133500;
