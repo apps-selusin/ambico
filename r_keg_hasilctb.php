@@ -1045,7 +1045,7 @@ class crr_keg_hasil_crosstab extends crr_keg_hasil {
 			$smry = &$this->SummaryFields[0];
 			$scvcnt = count($smry->SummaryCurrentValue);
 			for ($i = 0; $i < $scvcnt; $i++) {
-				$smry->SummaryViewValue[$i] = ewr_FormatNumber($smry->SummaryCurrentValue[$i], 0, -2, -2, -2);
+				$smry->SummaryViewValue[$i] = pembulatan($smry->SummaryCurrentValue[$i]);
 				$smry->SummaryViewAttrs[$i]["style"] = "";
 				$this->SummaryCellAttrs[$i]["style"] = "text-align: right;";
 				$this->SummaryCellAttrs[$i]["class"] = ($this->RowTotalType == EWR_ROWTOTAL_GROUP) ? "ewRptGrpSummary" . $this->RowGroupLevel : "";
@@ -1074,7 +1074,7 @@ class crr_keg_hasil_crosstab extends crr_keg_hasil {
 			$smry = &$this->SummaryFields[0];
 			$scvcnt = count($smry->SummaryCurrentValue);
 			for ($i = 0; $i < $scvcnt; $i++) {
-				$smry->SummaryViewValue[$i] = ewr_FormatNumber($smry->SummaryCurrentValue[$i], 0, -2, -2, -2);
+				$smry->SummaryViewValue[$i] = pembulatan($smry->SummaryCurrentValue[$i]);
 				$smry->SummaryViewAttrs[$i]["style"] = "";
 				$this->SummaryCellAttrs[$i]["style"] = "text-align: right;";
 				$this->SummaryCellAttrs[$i]["class"] = ($this->RecCount % 2 <> 1) ? "ewTableAltRow" : "ewTableRow";

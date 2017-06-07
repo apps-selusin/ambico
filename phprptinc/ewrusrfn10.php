@@ -107,4 +107,35 @@ function tgl_indo_header($tgl) {
 
 	return $tanggal." ".$bulan." ".$tahun;
 }
+
+function pembulatan($uang) {
+	$puluhan = substr($uang, -2); //$ratusan = substr($uang, -3);
+	if($puluhan == 50) { //if($ratusan<500)
+		$akhir = $uang; // - $puluhan; //$akhir = $uang - $ratusan;
+	}
+	elseif($puluhan < 50) { //if($ratusan<500)
+
+		//       16649 - 49
+		// 16600
+
+		$akhir = $uang - $puluhan; //$akhir = $uang - $ratusan;
+	}
+	else {
+
+		//       16651 - (51 - 50)
+		//       16651 - 1
+		// 16650
+
+		$akhir = $uang - ($puluhan - 50); //$akhir = $uang + (1000-$ratusan);
+ 	}
+
+ 	//echo number_format($akhir, 2, ',', '.');;
+ 	return $akhir;
+}
+
+//$uang = 133500;
+//pembulatan($uang); // hasilnya adalah 134.000,00
+//kalau tanpa pembulatan
+//echo number_format($uang, 2, ',', '.');; // hasilnya 133.500,00
+
 ?>
