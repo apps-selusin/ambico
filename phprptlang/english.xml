@@ -3359,7 +3359,7 @@
         <phrase id="fldcaption" value="shift" />
       </field>
       <field id="hasil">
-        <phrase id="fldcaption" value="hasil" />
+        <phrase id="fldcaption" value="Hasil (Kg)" />
       </field>
       <field id="kegd_id">
         <phrase id="fldcaption" value="kegd id" />
