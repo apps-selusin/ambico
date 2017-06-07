@@ -3389,7 +3389,7 @@
         <phrase id="fldcaption" value="Nama" />
       </field>
       <field id="upah_peg">
-        <phrase id="fldcaption" value="Upah" />
+        <phrase id="fldcaption" value="Terima" />
       </field>
       <field id="header_">
         <phrase id="fldcaption" value="Hasil" />
