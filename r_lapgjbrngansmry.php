@@ -47,11 +47,11 @@ class crr_lapgjbrngan_summary extends crr_lapgjbrngan {
 	var $ReportTableStyle = "";
 
 	// Custom export
-	var $ExportPrintCustom = FALSE;
-	var $ExportExcelCustom = FALSE;
-	var $ExportWordCustom = FALSE;
-	var $ExportPdfCustom = FALSE;
-	var $ExportEmailCustom = FALSE;
+	var $ExportPrintCustom = TRUE;
+	var $ExportExcelCustom = TRUE;
+	var $ExportWordCustom = TRUE;
+	var $ExportPdfCustom = TRUE;
+	var $ExportEmailCustom = TRUE;
 
 	// Message
 	function getMessage() {
@@ -288,6 +288,21 @@ class crr_lapgjbrngan_summary extends crr_lapgjbrngan {
 			$this->Export = strtolower($_GET["export"]);
 		elseif (@$_POST["export"] <> "")
 			$this->Export = strtolower($_POST["export"]);
+
+		// Get custom export parameters
+		if ($this->Export <> "" && @$_GET["custom"] <> "") {
+			$this->CustomExport = $this->Export;
+			$this->Export = "print";
+		}
+		$gsCustomExport = $this->CustomExport;
+
+		// Custom export (post back from ewr_ApplyTemplate), export and terminate page
+		if (@$_POST["customexport"] <> "") {
+			$this->CustomExport = $_POST["customexport"];
+			$this->Export = $this->CustomExport;
+			$this->Page_Terminate();
+			exit();
+		}
 		$gsExport = $this->Export; // Get export parameter, used in header
 		$gsExportFile = $this->TableVar; // Get export file, used in header
 		$gsEmailContentType = @$_POST["contenttype"]; // Get email content type
@@ -320,21 +335,48 @@ class crr_lapgjbrngan_summary extends crr_lapgjbrngan {
 		$exportid = session_id();
 		$ReportTypes = array();
 
+		// Update Export URLs
+		if ($this->ExportPrintCustom)
+			$this->ExportPrintUrl .= "&amp;custom=1";
+
+		//if (defined("EWR_USE_PHPEXCEL"))
+		//	$this->ExportExcelCustom = FALSE;
+
+		if ($this->ExportExcelCustom)
+			$this->ExportExcelUrl .= "&amp;custom=1";
+
+		//if (defined("EWR_USE_PHPWORD"))
+		//	$this->ExportWordCustom = FALSE;
+
+		if ($this->ExportWordCustom)
+			$this->ExportWordUrl .= "&amp;custom=1";
+		if ($this->ExportPdfCustom)
+			$this->ExportPdfUrl .= "&amp;custom=1";
+
 		// Printer friendly
 		$item = &$this->ExportOptions->Add("print");
-		$item->Body = "<a title=\"" . ewr_HtmlEncode($ReportLanguage->Phrase("PrinterFriendly", TRUE)) . "\" data-caption=\"" . ewr_HtmlEncode($ReportLanguage->Phrase("PrinterFriendly", TRUE)) . "\" href=\"" . $this->ExportPrintUrl . "\">" . $ReportLanguage->Phrase("PrinterFriendly") . "</a>";
+		if ($this->ExportPrintCustom)
+			$item->Body = "<a title=\"" . ewr_HtmlEncode($ReportLanguage->Phrase("PrinterFriendly", TRUE)) . "\" data-caption=\"" . ewr_HtmlEncode($ReportLanguage->Phrase("PrinterFriendly", TRUE)) . "\" href=\"javascript:void(0);\" onclick=\"ewr_ExportCharts(this, '" . $this->ExportPrintUrl . "', '" . $exportid . "');\">" . $ReportLanguage->Phrase("PrinterFriendly") . "</a>";
+		else
+			$item->Body = "<a title=\"" . ewr_HtmlEncode($ReportLanguage->Phrase("PrinterFriendly"), TRUE) . "\" data-caption=\"" . ewr_HtmlEncode($ReportLanguage->Phrase("PrinterFriendly", TRUE)) . "\" href=\"" . $this->ExportPrintUrl . "\">" . $ReportLanguage->Phrase("PrinterFriendly") . "</a>";
 		$item->Visible = TRUE;
 		$ReportTypes["print"] = $item->Visible ? $ReportLanguage->Phrase("ReportFormPrint") : "";
 
 		// Export to Excel
 		$item = &$this->ExportOptions->Add("excel");
-		$item->Body = "<a title=\"" . ewr_HtmlEncode($ReportLanguage->Phrase("ExportToExcel", TRUE)) . "\" data-caption=\"" . ewr_HtmlEncode($ReportLanguage->Phrase("ExportToExcel", TRUE)) . "\" href=\"" . $this->ExportExcelUrl . "\">" . $ReportLanguage->Phrase("ExportToExcel") . "</a>";
+		if ($this->ExportExcelCustom)
+			$item->Body = "<a title=\"" . ewr_HtmlEncode($ReportLanguage->Phrase("ExportToExcel", TRUE)) . "\" data-caption=\"" . ewr_HtmlEncode($ReportLanguage->Phrase("ExportToExcel", TRUE)) . "\" href=\"javascript:void(0);\" onclick=\"ewr_ExportCharts(this, '" . $this->ExportExcelUrl . "', '" . $exportid . "');\">" . $ReportLanguage->Phrase("ExportToExcel") . "</a>";
+		else
+			$item->Body = "<a title=\"" . ewr_HtmlEncode($ReportLanguage->Phrase("ExportToExcel", TRUE)) . "\" data-caption=\"" . ewr_HtmlEncode($ReportLanguage->Phrase("ExportToExcel", TRUE)) . "\" href=\"" . $this->ExportExcelUrl . "\">" . $ReportLanguage->Phrase("ExportToExcel") . "</a>";
 		$item->Visible = TRUE;
 		$ReportTypes["excel"] = $item->Visible ? $ReportLanguage->Phrase("ReportFormExcel") : "";
 
 		// Export to Word
 		$item = &$this->ExportOptions->Add("word");
-		$item->Body = "<a title=\"" . ewr_HtmlEncode($ReportLanguage->Phrase("ExportToWord", TRUE)) . "\" data-caption=\"" . ewr_HtmlEncode($ReportLanguage->Phrase("ExportToWord", TRUE)) . "\" href=\"" . $this->ExportWordUrl . "\">" . $ReportLanguage->Phrase("ExportToWord") . "</a>";
+		if ($this->ExportWordCustom)
+			$item->Body = "<a title=\"" . ewr_HtmlEncode($ReportLanguage->Phrase("ExportToWord", TRUE)) . "\" data-caption=\"" . ewr_HtmlEncode($ReportLanguage->Phrase("ExportToWord", TRUE)) . "\" href=\"javascript:void(0);\" onclick=\"ewr_ExportCharts(this, '" . $this->ExportWordUrl . "', '" . $exportid . "');\">" . $ReportLanguage->Phrase("ExportToWord") . "</a>";
+		else
+			$item->Body = "<a title=\"" . ewr_HtmlEncode($ReportLanguage->Phrase("ExportToWord", TRUE)) . "\" data-caption=\"" . ewr_HtmlEncode($ReportLanguage->Phrase("ExportToWord", TRUE)) . "\" href=\"" . $this->ExportWordUrl . "\">" . $ReportLanguage->Phrase("ExportToWord") . "</a>";
 
 		//$item->Visible = TRUE;
 		$item->Visible = TRUE;
@@ -353,6 +395,8 @@ class crr_lapgjbrngan_summary extends crr_lapgjbrngan {
 		// Export to Email
 		$item = &$this->ExportOptions->Add("email");
 		$url = $this->PageUrl() . "export=email";
+		if ($this->ExportEmailCustom)
+			$url .= "&amp;custom=1";
 		$item->Body = "<a title=\"" . ewr_HtmlEncode($ReportLanguage->Phrase("ExportToEmail", TRUE)) . "\" data-caption=\"" . ewr_HtmlEncode($ReportLanguage->Phrase("ExportToEmail", TRUE)) . "\" id=\"emf_r_lapgjbrngan\" href=\"javascript:void(0);\" onclick=\"ewr_EmailDialogShow({lnk:'emf_r_lapgjbrngan',hdr:ewLanguage.Phrase('ExportToEmail'),url:'$url',exportid:'$exportid',el:this});\">" . $ReportLanguage->Phrase("ExportToEmail") . "</a>";
 		$item->Visible = TRUE;
 		$ReportTypes["email"] = $item->Visible ? $ReportLanguage->Phrase("ReportFormEmail") : "";
@@ -399,6 +443,10 @@ class crr_lapgjbrngan_summary extends crr_lapgjbrngan {
 			$this->ReportTableClass = "ewTable";
 		else
 			$this->ReportTableClass = "table ewTable";
+
+		// Hide main table for custom layout
+		if ($this->Export <> "" || $this->UseCustomTemplate)
+			$this->ReportTableStyle = " style=\"display: none;\"";
 	}
 
 	// Set up search options
@@ -434,16 +482,24 @@ class crr_lapgjbrngan_summary extends crr_lapgjbrngan {
 	//
 	function Page_Terminate($url = "") {
 		global $ReportLanguage, $EWR_EXPORT, $gsExportFile;
+		if (@$_POST["customexport"] == "") {
 
 		// Page Unload event
 		$this->Page_Unload();
 
 		// Global Page Unloaded event (in userfn*.php)
 		Page_Unloaded();
+		}
 
 		// Export
 		if ($this->Export <> "" && array_key_exists($this->Export, $EWR_EXPORT)) {
-			$sContent = ob_get_contents();
+			if (@$_POST["data"] <> "") {
+				$sContent = $_POST["data"];
+				$gsExportFile = @$_POST["filename"];
+				if ($gsExportFile == "") $gsExportFile = $this->TableVar;
+			} else {
+				$sContent = ob_get_contents();
+			}
 			if (ob_get_length())
 				ob_end_clean();
 
@@ -1401,6 +1457,50 @@ class crr_lapgjbrngan_summary extends crr_lapgjbrngan {
 			$sAttachmentContent = "";
 		} else {
 			$sEmailMessage .= $sAttachmentContent;
+
+			// Replace images in custom template
+			if (preg_match_all('/<img([^>]*)>/i', $sEmailMessage, $matches, PREG_SET_ORDER)) {
+				foreach ($matches as $match) {
+					if (preg_match('/\s+src\s*=\s*[\'"]([\s\S]*?)[\'"]/i', $match[1], $submatches)) { // Match src='src'
+						$src = $submatches[1];
+
+						// Add embedded temp image if not in gTmpImages
+						if (substr($src,0,4) == "cid:") {
+							$tmpimage = substr($src,4);
+							if (substr($tmpimage,0,3) == "tmp") {
+
+								// Add file extension
+								$addimage = FALSE;
+								if (file_exists(ewr_AppRoot() . EWR_UPLOAD_DEST_PATH . $tmpimage . ".gif")) {
+									$tmpimage .= ".gif";
+									$addimage = TRUE;
+								} elseif (file_exists(ewr_AppRoot() . EWR_UPLOAD_DEST_PATH . $tmpimage . ".jpg")) {
+									$tmpimage .= ".jpg";
+									$addimage = TRUE;
+								} elseif (file_exists(ewr_AppRoot() . EWR_UPLOAD_DEST_PATH . $tmpimage . ".png")) {
+									$tmpimage .= ".png";
+									$addimage = TRUE;
+								}
+
+								// Add to gTmpImages
+								if ($addimage) {
+									foreach ($gTmpImages as $tmpimage2)
+										if ($tmpimage == $tmpimage2)
+											$addimage = FALSE;
+									if ($addimage)
+										$gTmpImages[] = $tmpimage;
+								}
+							}
+
+						// Not embedded image, create temp image
+						} else {
+							$data = @file_get_contents($src);
+							if ($data <> "")
+								$sEmailMessage = str_replace($match[0], "<img src=\"" . ewr_TmpImage($data) . "\">", $sEmailMessage);
+						}
+					}
+				}
+			}
 			$sAttachmentFile = "";
 			$sAttachmentContent = "";
 		}
@@ -1473,6 +1573,16 @@ class crr_lapgjbrngan_summary extends crr_lapgjbrngan {
 		$fileName = @$options["filename"];
 		$responseType = @$options["responsetype"];
 		$saveToFile = "";
+
+		// Replace images in custom template to hyperlinks
+		if (preg_match_all('/<img([^>]*)>/i', $html, $matches, PREG_SET_ORDER)) {
+			foreach ($matches as $match) {
+				if (preg_match('/\s+src\s*=\s*[\'"]([\s\S]*?)[\'"]/i', $match[1], $submatches)) { // Match src='src'
+					$src = $submatches[1];
+					$html = str_replace($match[0], "<a class=\"ewExportLink\" href=\"" . ewr_ConvertFullUrl($src) . "\">" . $src . "</a>", $html);
+				}
+			}
+		}
 		if ($folder <> "" && $fileName <> "" && ($responseType == "json" || $responseType == "file" && EWR_REPORT_SAVE_OUTPUT_ON_SERVER)) {
 		 	ewr_SaveFile(ewr_PathCombine(ewr_AppRoot(), $folder, TRUE), $fileName, $html);
 			$saveToFile = ewr_UploadPathEx(FALSE, $folder) . $fileName;
@@ -1492,6 +1602,16 @@ class crr_lapgjbrngan_summary extends crr_lapgjbrngan {
 		$fileName = @$options["filename"];
 		$responseType = @$options["responsetype"];
 		$saveToFile = "";
+
+		// Replace images in custom template to hyperlinks
+		if (preg_match_all('/<img([^>]*)>/i', $html, $matches, PREG_SET_ORDER)) {
+			foreach ($matches as $match) {
+				if (preg_match('/\s+src\s*=\s*[\'"]([\s\S]*?)[\'"]/i', $match[1], $submatches)) { // Match src='src'
+					$src = $submatches[1];
+					$html = str_replace($match[0], "<a class=\"ewExportLink\" href=\"" . ewr_ConvertFullUrl($src) . "\">" . $src . "</a>", $html);
+				}
+			}
+		}
 		if ($folder <> "" && $fileName <> "" && ($responseType == "json" || $responseType == "file" && EWR_REPORT_SAVE_OUTPUT_ON_SERVER)) {
 		 	ewr_SaveFile(ewr_PathCombine(ewr_AppRoot(), $folder, TRUE), $fileName, $html);
 			$saveToFile = ewr_UploadPathEx(FALSE, $folder) . $fileName;
@@ -1544,8 +1664,6 @@ class crr_lapgjbrngan_summary extends crr_lapgjbrngan {
 	function Page_Load() {
 
 		//echo "Page Load";
-		//Language()->setPhrase("COUNT", "");
-
 		Language()->setPhrase("AggregateEqual", "");
 	}
 
@@ -1654,7 +1772,7 @@ r_lapgjbrngan_summary.Chart_Rendered =
 <?php } ?>
 <?php if ($Page->Export == "" && !$Page->DrillDown) { ?>
 <?php } ?>
-<?php if ($Page->Export == "" && !$Page->DrillDown) { ?>
+<?php if ($Page->Export == "" && !$Page->DrillDown || $Page->Export <> "" && $Page->CustomExport <> "") { ?>
 <script type="text/javascript">
 
 // Write your client script here, no need to add script tags.
@@ -2014,6 +2132,36 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 		$Page->RowType = EWR_ROWTYPE_DETAIL;
 		$Page->RenderRow();
 ?>
+	<tr<?php echo $Page->RowAttributes(); ?>>
+<?php if ($Page->kegm_id->Visible) { ?>
+	<?php if ($Page->kegm_id->ShowGroupHeaderAsRow) { ?>
+		<td data-field="kegm_id"<?php echo $Page->kegm_id->CellAttributes(); ?>>&nbsp;</td>
+	<?php } else { ?>
+		<td data-field="kegm_id"<?php echo $Page->kegm_id->CellAttributes(); ?>>
+<span data-class="tpx<?php echo $Page->GrpCount ?>_r_lapgjbrngan_kegm_id"<?php echo $Page->kegm_id->ViewAttributes() ?>><?php echo $Page->kegm_id->GroupViewValue ?></span></td>
+	<?php } ?>
+<?php } ?>
+<?php if ($Page->keg_nama->Visible) { ?>
+	<?php if ($Page->keg_nama->ShowGroupHeaderAsRow) { ?>
+		<td data-field="keg_nama"<?php echo $Page->keg_nama->CellAttributes(); ?>>&nbsp;</td>
+	<?php } else { ?>
+		<td data-field="keg_nama"<?php echo $Page->keg_nama->CellAttributes(); ?>>
+<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_r_lapgjbrngan_keg_nama"<?php echo $Page->keg_nama->ViewAttributes() ?>><?php echo $Page->keg_nama->GroupViewValue ?></span></td>
+	<?php } ?>
+<?php } ?>
+<?php if ($Page->nama->Visible) { ?>
+	<?php if ($Page->nama->ShowGroupHeaderAsRow) { ?>
+		<td data-field="nama"<?php echo $Page->nama->CellAttributes(); ?>>&nbsp;</td>
+	<?php } else { ?>
+		<td data-field="nama"<?php echo $Page->nama->CellAttributes(); ?>>
+<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->GrpCounter[1] ?>_r_lapgjbrngan_nama"<?php echo $Page->nama->ViewAttributes() ?>><?php echo $Page->nama->GroupViewValue ?></span></td>
+	<?php } ?>
+<?php } ?>
+<?php if ($Page->upah->Visible) { ?>
+		<td data-field="upah"<?php echo $Page->upah->CellAttributes() ?>>
+<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->GrpCounter[1] ?>_<?php echo $Page->RecCount ?>_r_lapgjbrngan_upah"<?php echo $Page->upah->ViewAttributes() ?>><?php echo $Page->upah->ListViewValue() ?></span></td>
+<?php } ?>
+	</tr>
 <?php
 
 		// Accumulate page summary
@@ -2051,7 +2199,7 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 	<?php if ($Page->kegm_id->ShowGroupHeaderAsRow) { ?>
 		&nbsp;
 	<?php } elseif ($Page->RowGroupLevel <> 1) { ?>
-<span<?php echo $Page->kegm_id->ViewAttributes() ?>><?php echo $Page->kegm_id->GroupSummaryViewValue ?></span>
+		&nbsp;
 	<?php } else { ?>
 		<span class="ewSummaryCount"><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptCnt") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><?php echo ewr_FormatNumber($Page->kegm_id->Count,0,-2,-2,-2) ?></span></span>
 	<?php } ?>
@@ -2062,7 +2210,7 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 	<?php if ($Page->keg_nama->ShowGroupHeaderAsRow) { ?>
 		&nbsp;
 	<?php } elseif ($Page->RowGroupLevel <> 2) { ?>
-<span<?php echo $Page->keg_nama->ViewAttributes() ?>><?php echo $Page->keg_nama->GroupSummaryViewValue ?></span>
+		&nbsp;
 	<?php } else { ?>
 		<span class="ewSummaryCount"><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptCnt") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><?php echo ewr_FormatNumber($Page->keg_nama->Count,0,-2,-2,-2) ?></span></span>
 	<?php } ?>
@@ -2073,10 +2221,9 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 	<?php if ($Page->nama->ShowGroupHeaderAsRow) { ?>
 		&nbsp;
 	<?php } elseif ($Page->RowGroupLevel <> 3) { ?>
-<span<?php echo $Page->nama->ViewAttributes() ?>><?php echo $Page->nama->GroupSummaryViewValue ?></span>
+		&nbsp;
 	<?php } else { ?>
-		<span class="ewSummaryCount">
-<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->GrpCounter[1] ?>_r_lapgjbrngan_nama"<?php echo $Page->nama->ViewAttributes() ?>><?php echo $Page->nama->GroupViewValue ?></span>&nbsp;(<span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptCnt") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><?php echo ewr_FormatNumber($Page->nama->Count,0,-2,-2,-2) ?></span>)</span>
+		<span class="ewSummaryCount"><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptCnt") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><?php echo ewr_FormatNumber($Page->nama->Count,0,-2,-2,-2) ?></span></span>
 	<?php } ?>
 		</td>
 <?php } ?>
@@ -2087,12 +2234,10 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 <?php } else { ?>
 	<tr<?php echo $Page->RowAttributes(); ?>>
 <?php if ($Page->kegm_id->Visible) { ?>
-		<td data-field="kegm_id"<?php echo $Page->kegm_id->CellAttributes() ?>>
-<span<?php echo $Page->kegm_id->ViewAttributes() ?>><?php echo $Page->kegm_id->GroupSummaryViewValue ?></span></td>
+		<td data-field="kegm_id"<?php echo $Page->kegm_id->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
 <?php if ($Page->keg_nama->Visible) { ?>
-		<td data-field="keg_nama"<?php echo $Page->keg_nama->CellAttributes() ?>>
-<span<?php echo $Page->keg_nama->ViewAttributes() ?>><?php echo $Page->keg_nama->GroupSummaryViewValue ?></span></td>
+		<td data-field="keg_nama"<?php echo $Page->keg_nama->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
 <?php if ($Page->SubGrpColumnCount + $Page->DtlColumnCount - 1 > 0) { ?>
 		<td colspan="<?php echo ($Page->SubGrpColumnCount + $Page->DtlColumnCount - 1) ?>"<?php echo $Page->upah->CellAttributes() ?>><?php echo str_replace(array("%v", "%c"), array($Page->nama->GroupViewValue, $Page->nama->FldCaption()), $ReportLanguage->Phrase("RptSumHead")) ?> <span class="ewDirLtr">(<?php echo ewr_FormatNumber($Page->Cnt[3][0],0,-2,-2,-2) ?><?php echo $ReportLanguage->Phrase("RptDtlRec") ?>)</span></td>
@@ -2124,6 +2269,95 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 		}
 ?>
 <?php
+		if ($Page->ChkLvlBreak(2) && $Page->keg_nama->Visible) {
+?>
+<?php
+			$Page->kegm_id->Count = $Page->GetSummaryCount(1, FALSE);
+			$Page->keg_nama->Count = $Page->GetSummaryCount(2, FALSE);
+			$Page->nama->Count = $Page->GetSummaryCount(3, FALSE);
+			$Page->upah->Count = $Page->Cnt[2][1];
+			$Page->upah->SumValue = $Page->Smry[2][1]; // Load SUM
+			$Page->ResetAttrs();
+			$Page->RowType = EWR_ROWTYPE_TOTAL;
+			$Page->RowTotalType = EWR_ROWTOTAL_GROUP;
+			$Page->RowTotalSubType = EWR_ROWTOTAL_FOOTER;
+			$Page->RowGroupLevel = 2;
+			$Page->RenderRow();
+?>
+<?php if ($Page->keg_nama->ShowCompactSummaryFooter) { ?>
+	<tr<?php echo $Page->RowAttributes(); ?>>
+<?php if ($Page->kegm_id->Visible) { ?>
+		<td data-field="kegm_id"<?php echo $Page->kegm_id->CellAttributes() ?>>
+	<?php if ($Page->kegm_id->ShowGroupHeaderAsRow) { ?>
+		&nbsp;
+	<?php } elseif ($Page->RowGroupLevel <> 1) { ?>
+		&nbsp;
+	<?php } else { ?>
+		<span class="ewSummaryCount"><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptCnt") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><?php echo ewr_FormatNumber($Page->kegm_id->Count,0,-2,-2,-2) ?></span></span>
+	<?php } ?>
+		</td>
+<?php } ?>
+<?php if ($Page->keg_nama->Visible) { ?>
+		<td data-field="keg_nama"<?php echo $Page->keg_nama->CellAttributes() ?>>
+	<?php if ($Page->keg_nama->ShowGroupHeaderAsRow) { ?>
+		&nbsp;
+	<?php } elseif ($Page->RowGroupLevel <> 2) { ?>
+		&nbsp;
+	<?php } else { ?>
+		<span class="ewSummaryCount"><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptCnt") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><?php echo ewr_FormatNumber($Page->keg_nama->Count,0,-2,-2,-2) ?></span></span>
+	<?php } ?>
+		</td>
+<?php } ?>
+<?php if ($Page->nama->Visible) { ?>
+		<td data-field="nama"<?php echo $Page->keg_nama->CellAttributes() ?>>
+	<?php if ($Page->nama->ShowGroupHeaderAsRow) { ?>
+		&nbsp;
+	<?php } elseif ($Page->RowGroupLevel <> 3) { ?>
+		&nbsp;
+	<?php } else { ?>
+		<span class="ewSummaryCount"><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptCnt") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><?php echo ewr_FormatNumber($Page->nama->Count,0,-2,-2,-2) ?></span></span>
+	<?php } ?>
+		</td>
+<?php } ?>
+<?php if ($Page->upah->Visible) { ?>
+		<td data-field="upah"<?php echo $Page->keg_nama->CellAttributes() ?>><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptSum") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><span data-class="tpgs<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_r_lapgjbrngan_upah"<?php echo $Page->upah->ViewAttributes() ?>><?php echo $Page->upah->SumViewValue ?></span></span></td>
+<?php } ?>
+	</tr>
+<?php } else { ?>
+	<tr<?php echo $Page->RowAttributes(); ?>>
+<?php if ($Page->kegm_id->Visible) { ?>
+		<td data-field="kegm_id"<?php echo $Page->kegm_id->CellAttributes() ?>>&nbsp;</td>
+<?php } ?>
+<?php if ($Page->SubGrpColumnCount + $Page->DtlColumnCount > 0) { ?>
+		<td colspan="<?php echo ($Page->SubGrpColumnCount + $Page->DtlColumnCount) ?>"<?php echo $Page->upah->CellAttributes() ?>><?php echo str_replace(array("%v", "%c"), array($Page->keg_nama->GroupViewValue, $Page->keg_nama->FldCaption()), $ReportLanguage->Phrase("RptSumHead")) ?> <span class="ewDirLtr">(<?php echo ewr_FormatNumber($Page->Cnt[2][0],0,-2,-2,-2) ?><?php echo $ReportLanguage->Phrase("RptDtlRec") ?>)</span></td>
+<?php } ?>
+	</tr>
+	<tr<?php echo $Page->RowAttributes(); ?>>
+<?php if ($Page->kegm_id->Visible) { ?>
+		<td data-field="kegm_id"<?php echo $Page->kegm_id->CellAttributes() ?>>&nbsp;</td>
+<?php } ?>
+<?php if ($Page->GrpColumnCount > 0) { ?>
+		<td colspan="<?php echo ($Page->GrpColumnCount - 1) ?>"<?php echo $Page->keg_nama->CellAttributes() ?>><?php echo $ReportLanguage->Phrase("RptSum") ?></td>
+<?php } ?>
+<?php if ($Page->upah->Visible) { ?>
+		<td data-field="upah"<?php echo $Page->upah->CellAttributes() ?>>
+<span data-class="tpgs<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_r_lapgjbrngan_upah"<?php echo $Page->upah->ViewAttributes() ?>><?php echo $Page->upah->SumViewValue ?></span></td>
+<?php } ?>
+	</tr>
+<?php } ?>
+<?php
+
+			// Reset level 2 summary
+			$Page->ResetLevelSummary(2);
+		} // End show footer check
+		if ($Page->ChkLvlBreak(2)) {
+			$Page->GrpCounter[0]++;
+			if (!$rs->EOF)
+				$Page->GrpIdx[$Page->GrpCount][$Page->GrpCounter[0]] = array(-1);
+			$Page->GrpCounter[1] = 1;
+		}
+?>
+<?php
 	} // End detail records loop
 ?>
 <?php
@@ -2149,7 +2383,7 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 	<?php if ($Page->kegm_id->ShowGroupHeaderAsRow) { ?>
 		&nbsp;
 	<?php } elseif ($Page->RowGroupLevel <> 1) { ?>
-<span<?php echo $Page->kegm_id->ViewAttributes() ?>><?php echo $Page->kegm_id->GroupSummaryViewValue ?></span>
+		&nbsp;
 	<?php } else { ?>
 		<span class="ewSummaryCount"><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptCnt") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><?php echo ewr_FormatNumber($Page->kegm_id->Count,0,-2,-2,-2) ?></span></span>
 	<?php } ?>
@@ -2160,7 +2394,7 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 	<?php if ($Page->keg_nama->ShowGroupHeaderAsRow) { ?>
 		&nbsp;
 	<?php } elseif ($Page->RowGroupLevel <> 2) { ?>
-<span<?php echo $Page->keg_nama->ViewAttributes() ?>><?php echo $Page->keg_nama->GroupSummaryViewValue ?></span>
+		&nbsp;
 	<?php } else { ?>
 		<span class="ewSummaryCount"><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptCnt") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><?php echo ewr_FormatNumber($Page->keg_nama->Count,0,-2,-2,-2) ?></span></span>
 	<?php } ?>
@@ -2171,10 +2405,9 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 	<?php if ($Page->nama->ShowGroupHeaderAsRow) { ?>
 		&nbsp;
 	<?php } elseif ($Page->RowGroupLevel <> 3) { ?>
-<span<?php echo $Page->nama->ViewAttributes() ?>><?php echo $Page->nama->GroupSummaryViewValue ?></span>
+		&nbsp;
 	<?php } else { ?>
-		<span class="ewSummaryCount">
-<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->GrpCounter[1] ?>_r_lapgjbrngan_nama"<?php echo $Page->nama->ViewAttributes() ?>><?php echo $Page->nama->GroupViewValue ?></span>&nbsp;(<span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptCnt") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><?php echo ewr_FormatNumber($Page->nama->Count,0,-2,-2,-2) ?></span>)</span>
+		<span class="ewSummaryCount"><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptCnt") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><?php echo ewr_FormatNumber($Page->nama->Count,0,-2,-2,-2) ?></span></span>
 	<?php } ?>
 		</td>
 <?php } ?>
@@ -2301,6 +2534,66 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 <?php if ($Page->Export <> "pdf") { ?>
 </div>
 <?php } ?>
+<?php if ($Page->Export <> "" || $Page->UseCustomTemplate) { ?>
+<div id="tpd_r_lapgjbrngansummary"></div>
+<script id="tpm_r_lapgjbrngansummary" type="text/html">
+<div id="ct_r_lapgjbrngan_summary"><table class="ewTable ewExportTable">
+	<tr>
+		<th>Kegiatan</th>
+		<th>Nama</th>
+		<th>Upah</th>
+	</tr>
+<?php
+$cnt = count($Page->GrpIdx) - 1;
+for ($i = 1; $i <= $cnt; $i++) {
+?>
+<?php
+$cnt1 = count($Page->GrpIdx[$i]) - 1;
+for ($i1 = 1; $i1 <= $cnt1; $i1++) {
+?>
+	<tr>
+		<td colspan="3">{{include tmpl="#tpx<?php echo $i ?>_<?php echo $i1 ?>_r_lapgjbrngan_keg_nama"/}}</td>
+	</tr>
+<?php
+$cnt2 = count($Page->GrpIdx[$i][$i1]) - 1;
+for ($i2 = 1; $i2 <= $cnt2; $i2++) {
+?>
+	<tr>
+		<td>&nbsp;</td>
+		<td>{{include tmpl="#tpx<?php echo $i ?>_<?php echo $i1 ?>_<?php echo $i2 ?>_r_lapgjbrngan_nama"/}}</td>
+		<td>{{include tmpl="#tpgs<?php echo $i ?>_<?php echo $i1 ?>_<?php echo $i2 ?>_r_lapgjbrngan_upah"/}}</td>
+	</tr>
+<?php
+}
+?>
+	<tr>
+		<td colspan="2">Sub Total</td>
+		<td>{{include tmpl="#tpgs<?php echo $i ?>_<?php echo $i1 ?>_r_lapgjbrngan_upah"/}}</td>
+	</tr>
+	<tr>
+		<td colspan="3">&nbsp;</td>
+	</tr>
+<?php
+}
+?>
+<?php
+if ($r_lapgjbrngan->ExportPageBreakCount > 0) {
+if ($i % $r_lapgjbrngan->ExportPageBreakCount == 0 && $i < $cnt) {
+?>
+{{include tmpl="#tpb<?php echo $i ?>_r_lapgjbrngan"/}}
+<?php
+}
+}
+}
+?>
+	<tr>
+		<td colspan="2">Total</td>
+		<td>{{include tmpl="#tpts_r_lapgjbrngan_upah"/}}</td>
+	</tr>
+</table>
+</div>
+</script>
+<?php } ?>
 <!-- Summary Report Ends -->
 <?php if ($Page->Export == "") { ?>
 	</div>
@@ -2331,17 +2624,21 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 if ($rsgrp) $rsgrp->Close();
 if ($rs) $rs->Close();
 ?>
-<?php if ($Page->Export == "" && !$Page->DrillDown) { ?>
+<?php if ($Page->Export == "" && !$Page->DrillDown || $Page->Export <> "" && $Page->CustomExport <> "") { ?>
 <script type="text/javascript">
 
 // Write your table-specific startup script here
 // document.write("page loaded");
 //$("span").removeClass("ewAggregateCaption");
 //$(".ewSummaryCount").html($(".ewSummaryCount").html().replace('(',''));
-
-$(".ewAggregateCaption").hide();
-
+//$(".ewAggregateCaption").hide();
 //$(".ewAggregateValue").hide();
+
+</script>
+<?php } ?>
+<?php if ($Page->Export <> "" || $Page->UseCustomTemplate) { ?>
+<script type="text/javascript">
+ewr_ApplyTemplate("tpd_r_lapgjbrngansummary", "tpm_r_lapgjbrngansummary", "r_lapgjbrngansummary", "<?php echo $Page->CustomExport ?>", <?php echo ewr_JsonEncode($Page->FirstRowData) ?>);
 </script>
 <?php } ?>
 <?php include_once "phprptinc/footer.php" ?>
