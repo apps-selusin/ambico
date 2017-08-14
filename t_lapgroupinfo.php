@@ -385,7 +385,7 @@ class ct_lapgroup extends cTable {
 			$rsaudit = $rs;
 			$fldname = 'lapgroup_id';
 			if (!array_key_exists($fldname, $rsaudit)) $rsaudit[$fldname] = $rsold[$fldname];
-			$this->WriteAuditTrailOnEdit($rsaudit, $rsold);
+			$this->WriteAuditTrailOnEdit($rsold, $rsaudit);
 		}
 		return $bUpdate;
 	}

@@ -525,11 +525,11 @@ class ct_pengecualian_peg_add extends ct_pengecualian_peg {
 		}
 		if (!$this->jam_masuk->FldIsDetailKey) {
 			$this->jam_masuk->setFormValue($objForm->GetValue("x_jam_masuk"));
-			$this->jam_masuk->CurrentValue = ew_UnFormatDateTime($this->jam_masuk->CurrentValue, 9);
+			$this->jam_masuk->CurrentValue = ew_UnFormatDateTime($this->jam_masuk->CurrentValue, 4);
 		}
 		if (!$this->jam_keluar->FldIsDetailKey) {
 			$this->jam_keluar->setFormValue($objForm->GetValue("x_jam_keluar"));
-			$this->jam_keluar->CurrentValue = ew_UnFormatDateTime($this->jam_keluar->CurrentValue, 9);
+			$this->jam_keluar->CurrentValue = ew_UnFormatDateTime($this->jam_keluar->CurrentValue, 4);
 		}
 		if (!$this->pegawai_id2->FldIsDetailKey) {
 			$this->pegawai_id2->setFormValue($objForm->GetValue("x_pegawai_id2"));
@@ -550,9 +550,9 @@ class ct_pengecualian_peg_add extends ct_pengecualian_peg {
 		$this->tgl2->CurrentValue = $this->tgl2->FormValue;
 		$this->tgl2->CurrentValue = ew_UnFormatDateTime($this->tgl2->CurrentValue, 0);
 		$this->jam_masuk->CurrentValue = $this->jam_masuk->FormValue;
-		$this->jam_masuk->CurrentValue = ew_UnFormatDateTime($this->jam_masuk->CurrentValue, 9);
+		$this->jam_masuk->CurrentValue = ew_UnFormatDateTime($this->jam_masuk->CurrentValue, 4);
 		$this->jam_keluar->CurrentValue = $this->jam_keluar->FormValue;
-		$this->jam_keluar->CurrentValue = ew_UnFormatDateTime($this->jam_keluar->CurrentValue, 9);
+		$this->jam_keluar->CurrentValue = ew_UnFormatDateTime($this->jam_keluar->CurrentValue, 4);
 		$this->pegawai_id2->CurrentValue = $this->pegawai_id2->FormValue;
 		$this->pegawai_id3->CurrentValue = $this->pegawai_id3->FormValue;
 	}
@@ -747,12 +747,12 @@ class ct_pengecualian_peg_add extends ct_pengecualian_peg {
 
 		// jam_masuk
 		$this->jam_masuk->ViewValue = $this->jam_masuk->CurrentValue;
-		$this->jam_masuk->ViewValue = ew_FormatDateTime($this->jam_masuk->ViewValue, 9);
+		$this->jam_masuk->ViewValue = ew_FormatDateTime($this->jam_masuk->ViewValue, 4);
 		$this->jam_masuk->ViewCustomAttributes = "";
 
 		// jam_keluar
 		$this->jam_keluar->ViewValue = $this->jam_keluar->CurrentValue;
-		$this->jam_keluar->ViewValue = ew_FormatDateTime($this->jam_keluar->ViewValue, 9);
+		$this->jam_keluar->ViewValue = ew_FormatDateTime($this->jam_keluar->ViewValue, 4);
 		$this->jam_keluar->ViewCustomAttributes = "";
 
 		// pegawai_id2
@@ -944,13 +944,13 @@ class ct_pengecualian_peg_add extends ct_pengecualian_peg {
 			// jam_masuk
 			$this->jam_masuk->EditAttrs["class"] = "form-control";
 			$this->jam_masuk->EditCustomAttributes = "";
-			$this->jam_masuk->EditValue = ew_HtmlEncode(ew_FormatDateTime($this->jam_masuk->CurrentValue, 9));
+			$this->jam_masuk->EditValue = ew_HtmlEncode($this->jam_masuk->CurrentValue);
 			$this->jam_masuk->PlaceHolder = ew_RemoveHtml($this->jam_masuk->FldCaption());
 
 			// jam_keluar
 			$this->jam_keluar->EditAttrs["class"] = "form-control";
 			$this->jam_keluar->EditCustomAttributes = "";
-			$this->jam_keluar->EditValue = ew_HtmlEncode(ew_FormatDateTime($this->jam_keluar->CurrentValue, 9));
+			$this->jam_keluar->EditValue = ew_HtmlEncode($this->jam_keluar->CurrentValue);
 			$this->jam_keluar->PlaceHolder = ew_RemoveHtml($this->jam_keluar->FldCaption());
 
 			// pegawai_id2
@@ -1076,10 +1076,10 @@ class ct_pengecualian_peg_add extends ct_pengecualian_peg {
 		if (!ew_CheckDateDef($this->tgl2->FormValue)) {
 			ew_AddMessage($gsFormError, $this->tgl2->FldErrMsg());
 		}
-		if (!ew_CheckDate($this->jam_masuk->FormValue)) {
+		if (!ew_CheckTime($this->jam_masuk->FormValue)) {
 			ew_AddMessage($gsFormError, $this->jam_masuk->FldErrMsg());
 		}
-		if (!ew_CheckDate($this->jam_keluar->FormValue)) {
+		if (!ew_CheckTime($this->jam_keluar->FormValue)) {
 			ew_AddMessage($gsFormError, $this->jam_keluar->FldErrMsg());
 		}
 
@@ -1139,10 +1139,10 @@ class ct_pengecualian_peg_add extends ct_pengecualian_peg {
 		$this->tgl2->SetDbValueDef($rsnew, $this->tgl2->CurrentValue, ew_CurrentDate(), FALSE);
 
 		// jam_masuk
-		$this->jam_masuk->SetDbValueDef($rsnew, ew_UnFormatDateTime($this->jam_masuk->CurrentValue, 9), NULL, FALSE);
+		$this->jam_masuk->SetDbValueDef($rsnew, $this->jam_masuk->CurrentValue, NULL, FALSE);
 
 		// jam_keluar
-		$this->jam_keluar->SetDbValueDef($rsnew, ew_UnFormatDateTime($this->jam_keluar->CurrentValue, 9), NULL, FALSE);
+		$this->jam_keluar->SetDbValueDef($rsnew, $this->jam_keluar->CurrentValue, NULL, FALSE);
 
 		// pegawai_id2
 		$this->pegawai_id2->SetDbValueDef($rsnew, $this->pegawai_id2->CurrentValue, NULL, FALSE);
@@ -1441,10 +1441,10 @@ ft_pengecualian_pegadd.Validate = function() {
 			if (elm && !ew_CheckDateDef(elm.value))
 				return this.OnError(elm, "<?php echo ew_JsEncode2($t_pengecualian_peg->tgl2->FldErrMsg()) ?>");
 			elm = this.GetElements("x" + infix + "_jam_masuk");
-			if (elm && !ew_CheckDate(elm.value))
+			if (elm && !ew_CheckTime(elm.value))
 				return this.OnError(elm, "<?php echo ew_JsEncode2($t_pengecualian_peg->jam_masuk->FldErrMsg()) ?>");
 			elm = this.GetElements("x" + infix + "_jam_keluar");
-			if (elm && !ew_CheckDate(elm.value))
+			if (elm && !ew_CheckTime(elm.value))
 				return this.OnError(elm, "<?php echo ew_JsEncode2($t_pengecualian_peg->jam_keluar->FldErrMsg()) ?>");
 
 			// Fire Form_CustomValidate event
@@ -1588,7 +1588,7 @@ ew_CreateCalendar("ft_pengecualian_pegadd", "x_tgl2", 0);
 		<label id="elh_t_pengecualian_peg_jam_masuk" for="x_jam_masuk" class="col-sm-2 control-label ewLabel"><?php echo $t_pengecualian_peg->jam_masuk->FldCaption() ?></label>
 		<div class="col-sm-10"><div<?php echo $t_pengecualian_peg->jam_masuk->CellAttributes() ?>>
 <span id="el_t_pengecualian_peg_jam_masuk">
-<input type="text" data-table="t_pengecualian_peg" data-field="x_jam_masuk" data-format="9" name="x_jam_masuk" id="x_jam_masuk" placeholder="<?php echo ew_HtmlEncode($t_pengecualian_peg->jam_masuk->getPlaceHolder()) ?>" value="<?php echo $t_pengecualian_peg->jam_masuk->EditValue ?>"<?php echo $t_pengecualian_peg->jam_masuk->EditAttributes() ?>>
+<input type="text" data-table="t_pengecualian_peg" data-field="x_jam_masuk" name="x_jam_masuk" id="x_jam_masuk" placeholder="<?php echo ew_HtmlEncode($t_pengecualian_peg->jam_masuk->getPlaceHolder()) ?>" value="<?php echo $t_pengecualian_peg->jam_masuk->EditValue ?>"<?php echo $t_pengecualian_peg->jam_masuk->EditAttributes() ?>>
 </span>
 <?php echo $t_pengecualian_peg->jam_masuk->CustomMsg ?></div></div>
 	</div>
@@ -1598,7 +1598,7 @@ ew_CreateCalendar("ft_pengecualian_pegadd", "x_tgl2", 0);
 		<label id="elh_t_pengecualian_peg_jam_keluar" for="x_jam_keluar" class="col-sm-2 control-label ewLabel"><?php echo $t_pengecualian_peg->jam_keluar->FldCaption() ?></label>
 		<div class="col-sm-10"><div<?php echo $t_pengecualian_peg->jam_keluar->CellAttributes() ?>>
 <span id="el_t_pengecualian_peg_jam_keluar">
-<input type="text" data-table="t_pengecualian_peg" data-field="x_jam_keluar" data-format="9" name="x_jam_keluar" id="x_jam_keluar" placeholder="<?php echo ew_HtmlEncode($t_pengecualian_peg->jam_keluar->getPlaceHolder()) ?>" value="<?php echo $t_pengecualian_peg->jam_keluar->EditValue ?>"<?php echo $t_pengecualian_peg->jam_keluar->EditAttributes() ?>>
+<input type="text" data-table="t_pengecualian_peg" data-field="x_jam_keluar" name="x_jam_keluar" id="x_jam_keluar" placeholder="<?php echo ew_HtmlEncode($t_pengecualian_peg->jam_keluar->getPlaceHolder()) ?>" value="<?php echo $t_pengecualian_peg->jam_keluar->EditValue ?>"<?php echo $t_pengecualian_peg->jam_keluar->EditAttributes() ?>>
 </span>
 <?php echo $t_pengecualian_peg->jam_keluar->CustomMsg ?></div></div>
 	</div>

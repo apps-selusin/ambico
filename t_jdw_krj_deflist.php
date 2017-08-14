@@ -1238,7 +1238,7 @@ class ct_jdw_krj_def_list extends ct_jdw_krj_def {
 
 		// Load server side filters
 		if (EW_SEARCH_FILTER_OPTION == "Server") {
-			$sSavedFilterList = $UserProfile->GetSearchFilters(CurrentUserName(), "ft_jdw_krj_deflistsrch");
+			$sSavedFilterList = isset($UserProfile) ? $UserProfile->GetSearchFilters(CurrentUserName(), "ft_jdw_krj_deflistsrch") : "";
 		} else {
 			$sSavedFilterList = "";
 		}

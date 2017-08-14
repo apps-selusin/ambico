@@ -1239,7 +1239,7 @@ class ct_jk_list extends ct_jk {
 
 		// Load server side filters
 		if (EW_SEARCH_FILTER_OPTION == "Server") {
-			$sSavedFilterList = $UserProfile->GetSearchFilters(CurrentUserName(), "ft_jklistsrch");
+			$sSavedFilterList = isset($UserProfile) ? $UserProfile->GetSearchFilters(CurrentUserName(), "ft_jklistsrch") : "";
 		} else {
 			$sSavedFilterList = "";
 		}

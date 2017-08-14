@@ -60,10 +60,10 @@ ft_pengecualian_peggrid.Validate = function() {
 			if (elm && !ew_CheckDateDef(elm.value))
 				return this.OnError(elm, "<?php echo ew_JsEncode2($t_pengecualian_peg->tgl2->FldErrMsg()) ?>");
 			elm = this.GetElements("x" + infix + "_jam_masuk");
-			if (elm && !ew_CheckDate(elm.value))
+			if (elm && !ew_CheckTime(elm.value))
 				return this.OnError(elm, "<?php echo ew_JsEncode2($t_pengecualian_peg->jam_masuk->FldErrMsg()) ?>");
 			elm = this.GetElements("x" + infix + "_jam_keluar");
-			if (elm && !ew_CheckDate(elm.value))
+			if (elm && !ew_CheckTime(elm.value))
 				return this.OnError(elm, "<?php echo ew_JsEncode2($t_pengecualian_peg->jam_keluar->FldErrMsg()) ?>");
 
 			// Fire Form_CustomValidate event
@@ -550,13 +550,13 @@ ew_CreateCalendar("ft_pengecualian_peggrid", "x<?php echo $t_pengecualian_peg_gr
 		<td data-name="jam_masuk"<?php echo $t_pengecualian_peg->jam_masuk->CellAttributes() ?>>
 <?php if ($t_pengecualian_peg->RowType == EW_ROWTYPE_ADD) { // Add record ?>
 <span id="el<?php echo $t_pengecualian_peg_grid->RowCnt ?>_t_pengecualian_peg_jam_masuk" class="form-group t_pengecualian_peg_jam_masuk">
-<input type="text" data-table="t_pengecualian_peg" data-field="x_jam_masuk" data-format="9" name="x<?php echo $t_pengecualian_peg_grid->RowIndex ?>_jam_masuk" id="x<?php echo $t_pengecualian_peg_grid->RowIndex ?>_jam_masuk" placeholder="<?php echo ew_HtmlEncode($t_pengecualian_peg->jam_masuk->getPlaceHolder()) ?>" value="<?php echo $t_pengecualian_peg->jam_masuk->EditValue ?>"<?php echo $t_pengecualian_peg->jam_masuk->EditAttributes() ?>>
+<input type="text" data-table="t_pengecualian_peg" data-field="x_jam_masuk" name="x<?php echo $t_pengecualian_peg_grid->RowIndex ?>_jam_masuk" id="x<?php echo $t_pengecualian_peg_grid->RowIndex ?>_jam_masuk" placeholder="<?php echo ew_HtmlEncode($t_pengecualian_peg->jam_masuk->getPlaceHolder()) ?>" value="<?php echo $t_pengecualian_peg->jam_masuk->EditValue ?>"<?php echo $t_pengecualian_peg->jam_masuk->EditAttributes() ?>>
 </span>
 <input type="hidden" data-table="t_pengecualian_peg" data-field="x_jam_masuk" name="o<?php echo $t_pengecualian_peg_grid->RowIndex ?>_jam_masuk" id="o<?php echo $t_pengecualian_peg_grid->RowIndex ?>_jam_masuk" value="<?php echo ew_HtmlEncode($t_pengecualian_peg->jam_masuk->OldValue) ?>">
 <?php } ?>
 <?php if ($t_pengecualian_peg->RowType == EW_ROWTYPE_EDIT) { // Edit record ?>
 <span id="el<?php echo $t_pengecualian_peg_grid->RowCnt ?>_t_pengecualian_peg_jam_masuk" class="form-group t_pengecualian_peg_jam_masuk">
-<input type="text" data-table="t_pengecualian_peg" data-field="x_jam_masuk" data-format="9" name="x<?php echo $t_pengecualian_peg_grid->RowIndex ?>_jam_masuk" id="x<?php echo $t_pengecualian_peg_grid->RowIndex ?>_jam_masuk" placeholder="<?php echo ew_HtmlEncode($t_pengecualian_peg->jam_masuk->getPlaceHolder()) ?>" value="<?php echo $t_pengecualian_peg->jam_masuk->EditValue ?>"<?php echo $t_pengecualian_peg->jam_masuk->EditAttributes() ?>>
+<input type="text" data-table="t_pengecualian_peg" data-field="x_jam_masuk" name="x<?php echo $t_pengecualian_peg_grid->RowIndex ?>_jam_masuk" id="x<?php echo $t_pengecualian_peg_grid->RowIndex ?>_jam_masuk" placeholder="<?php echo ew_HtmlEncode($t_pengecualian_peg->jam_masuk->getPlaceHolder()) ?>" value="<?php echo $t_pengecualian_peg->jam_masuk->EditValue ?>"<?php echo $t_pengecualian_peg->jam_masuk->EditAttributes() ?>>
 </span>
 <?php } ?>
 <?php if ($t_pengecualian_peg->RowType == EW_ROWTYPE_VIEW) { // View record ?>
@@ -578,13 +578,13 @@ ew_CreateCalendar("ft_pengecualian_peggrid", "x<?php echo $t_pengecualian_peg_gr
 		<td data-name="jam_keluar"<?php echo $t_pengecualian_peg->jam_keluar->CellAttributes() ?>>
 <?php if ($t_pengecualian_peg->RowType == EW_ROWTYPE_ADD) { // Add record ?>
 <span id="el<?php echo $t_pengecualian_peg_grid->RowCnt ?>_t_pengecualian_peg_jam_keluar" class="form-group t_pengecualian_peg_jam_keluar">
-<input type="text" data-table="t_pengecualian_peg" data-field="x_jam_keluar" data-format="9" name="x<?php echo $t_pengecualian_peg_grid->RowIndex ?>_jam_keluar" id="x<?php echo $t_pengecualian_peg_grid->RowIndex ?>_jam_keluar" placeholder="<?php echo ew_HtmlEncode($t_pengecualian_peg->jam_keluar->getPlaceHolder()) ?>" value="<?php echo $t_pengecualian_peg->jam_keluar->EditValue ?>"<?php echo $t_pengecualian_peg->jam_keluar->EditAttributes() ?>>
+<input type="text" data-table="t_pengecualian_peg" data-field="x_jam_keluar" name="x<?php echo $t_pengecualian_peg_grid->RowIndex ?>_jam_keluar" id="x<?php echo $t_pengecualian_peg_grid->RowIndex ?>_jam_keluar" placeholder="<?php echo ew_HtmlEncode($t_pengecualian_peg->jam_keluar->getPlaceHolder()) ?>" value="<?php echo $t_pengecualian_peg->jam_keluar->EditValue ?>"<?php echo $t_pengecualian_peg->jam_keluar->EditAttributes() ?>>
 </span>
 <input type="hidden" data-table="t_pengecualian_peg" data-field="x_jam_keluar" name="o<?php echo $t_pengecualian_peg_grid->RowIndex ?>_jam_keluar" id="o<?php echo $t_pengecualian_peg_grid->RowIndex ?>_jam_keluar" value="<?php echo ew_HtmlEncode($t_pengecualian_peg->jam_keluar->OldValue) ?>">
 <?php } ?>
 <?php if ($t_pengecualian_peg->RowType == EW_ROWTYPE_EDIT) { // Edit record ?>
 <span id="el<?php echo $t_pengecualian_peg_grid->RowCnt ?>_t_pengecualian_peg_jam_keluar" class="form-group t_pengecualian_peg_jam_keluar">
-<input type="text" data-table="t_pengecualian_peg" data-field="x_jam_keluar" data-format="9" name="x<?php echo $t_pengecualian_peg_grid->RowIndex ?>_jam_keluar" id="x<?php echo $t_pengecualian_peg_grid->RowIndex ?>_jam_keluar" placeholder="<?php echo ew_HtmlEncode($t_pengecualian_peg->jam_keluar->getPlaceHolder()) ?>" value="<?php echo $t_pengecualian_peg->jam_keluar->EditValue ?>"<?php echo $t_pengecualian_peg->jam_keluar->EditAttributes() ?>>
+<input type="text" data-table="t_pengecualian_peg" data-field="x_jam_keluar" name="x<?php echo $t_pengecualian_peg_grid->RowIndex ?>_jam_keluar" id="x<?php echo $t_pengecualian_peg_grid->RowIndex ?>_jam_keluar" placeholder="<?php echo ew_HtmlEncode($t_pengecualian_peg->jam_keluar->getPlaceHolder()) ?>" value="<?php echo $t_pengecualian_peg->jam_keluar->EditValue ?>"<?php echo $t_pengecualian_peg->jam_keluar->EditAttributes() ?>>
 </span>
 <?php } ?>
 <?php if ($t_pengecualian_peg->RowType == EW_ROWTYPE_VIEW) { // View record ?>
@@ -816,7 +816,7 @@ ew_CreateCalendar("ft_pengecualian_peggrid", "x<?php echo $t_pengecualian_peg_gr
 		<td data-name="jam_masuk">
 <?php if ($t_pengecualian_peg->CurrentAction <> "F") { ?>
 <span id="el$rowindex$_t_pengecualian_peg_jam_masuk" class="form-group t_pengecualian_peg_jam_masuk">
-<input type="text" data-table="t_pengecualian_peg" data-field="x_jam_masuk" data-format="9" name="x<?php echo $t_pengecualian_peg_grid->RowIndex ?>_jam_masuk" id="x<?php echo $t_pengecualian_peg_grid->RowIndex ?>_jam_masuk" placeholder="<?php echo ew_HtmlEncode($t_pengecualian_peg->jam_masuk->getPlaceHolder()) ?>" value="<?php echo $t_pengecualian_peg->jam_masuk->EditValue ?>"<?php echo $t_pengecualian_peg->jam_masuk->EditAttributes() ?>>
+<input type="text" data-table="t_pengecualian_peg" data-field="x_jam_masuk" name="x<?php echo $t_pengecualian_peg_grid->RowIndex ?>_jam_masuk" id="x<?php echo $t_pengecualian_peg_grid->RowIndex ?>_jam_masuk" placeholder="<?php echo ew_HtmlEncode($t_pengecualian_peg->jam_masuk->getPlaceHolder()) ?>" value="<?php echo $t_pengecualian_peg->jam_masuk->EditValue ?>"<?php echo $t_pengecualian_peg->jam_masuk->EditAttributes() ?>>
 </span>
 <?php } else { ?>
 <span id="el$rowindex$_t_pengecualian_peg_jam_masuk" class="form-group t_pengecualian_peg_jam_masuk">
@@ -832,7 +832,7 @@ ew_CreateCalendar("ft_pengecualian_peggrid", "x<?php echo $t_pengecualian_peg_gr
 		<td data-name="jam_keluar">
 <?php if ($t_pengecualian_peg->CurrentAction <> "F") { ?>
 <span id="el$rowindex$_t_pengecualian_peg_jam_keluar" class="form-group t_pengecualian_peg_jam_keluar">
-<input type="text" data-table="t_pengecualian_peg" data-field="x_jam_keluar" data-format="9" name="x<?php echo $t_pengecualian_peg_grid->RowIndex ?>_jam_keluar" id="x<?php echo $t_pengecualian_peg_grid->RowIndex ?>_jam_keluar" placeholder="<?php echo ew_HtmlEncode($t_pengecualian_peg->jam_keluar->getPlaceHolder()) ?>" value="<?php echo $t_pengecualian_peg->jam_keluar->EditValue ?>"<?php echo $t_pengecualian_peg->jam_keluar->EditAttributes() ?>>
+<input type="text" data-table="t_pengecualian_peg" data-field="x_jam_keluar" name="x<?php echo $t_pengecualian_peg_grid->RowIndex ?>_jam_keluar" id="x<?php echo $t_pengecualian_peg_grid->RowIndex ?>_jam_keluar" placeholder="<?php echo ew_HtmlEncode($t_pengecualian_peg->jam_keluar->getPlaceHolder()) ?>" value="<?php echo $t_pengecualian_peg->jam_keluar->EditValue ?>"<?php echo $t_pengecualian_peg->jam_keluar->EditAttributes() ?>>
 </span>
 <?php } else { ?>
 <span id="el$rowindex$_t_pengecualian_peg_jam_keluar" class="form-group t_pengecualian_peg_jam_keluar">

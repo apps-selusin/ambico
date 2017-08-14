@@ -1241,7 +1241,7 @@ class ct_kegiatan_list extends ct_kegiatan {
 
 		// Load server side filters
 		if (EW_SEARCH_FILTER_OPTION == "Server") {
-			$sSavedFilterList = $UserProfile->GetSearchFilters(CurrentUserName(), "ft_kegiatanlistsrch");
+			$sSavedFilterList = isset($UserProfile) ? $UserProfile->GetSearchFilters(CurrentUserName(), "ft_kegiatanlistsrch") : "";
 		} else {
 			$sSavedFilterList = "";
 		}

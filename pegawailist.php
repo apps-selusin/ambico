@@ -1284,7 +1284,7 @@ class cpegawai_list extends cpegawai {
 
 		// Load server side filters
 		if (EW_SEARCH_FILTER_OPTION == "Server") {
-			$sSavedFilterList = $UserProfile->GetSearchFilters(CurrentUserName(), "fpegawailistsrch");
+			$sSavedFilterList = isset($UserProfile) ? $UserProfile->GetSearchFilters(CurrentUserName(), "fpegawailistsrch") : "";
 		} else {
 			$sSavedFilterList = "";
 		}

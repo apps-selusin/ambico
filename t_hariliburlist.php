@@ -1230,7 +1230,7 @@ class ct_harilibur_list extends ct_harilibur {
 
 		// Load server side filters
 		if (EW_SEARCH_FILTER_OPTION == "Server") {
-			$sSavedFilterList = $UserProfile->GetSearchFilters(CurrentUserName(), "ft_hariliburlistsrch");
+			$sSavedFilterList = isset($UserProfile) ? $UserProfile->GetSearchFilters(CurrentUserName(), "ft_hariliburlistsrch") : "";
 		} else {
 			$sSavedFilterList = "";
 		}

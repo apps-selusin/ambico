@@ -1257,7 +1257,7 @@ class ct_rumus_list extends ct_rumus {
 
 		// Load server side filters
 		if (EW_SEARCH_FILTER_OPTION == "Server") {
-			$sSavedFilterList = $UserProfile->GetSearchFilters(CurrentUserName(), "ft_rumuslistsrch");
+			$sSavedFilterList = isset($UserProfile) ? $UserProfile->GetSearchFilters(CurrentUserName(), "ft_rumuslistsrch") : "";
 		} else {
 			$sSavedFilterList = "";
 		}

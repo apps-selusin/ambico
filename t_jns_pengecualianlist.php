@@ -1230,7 +1230,7 @@ class ct_jns_pengecualian_list extends ct_jns_pengecualian {
 
 		// Load server side filters
 		if (EW_SEARCH_FILTER_OPTION == "Server") {
-			$sSavedFilterList = $UserProfile->GetSearchFilters(CurrentUserName(), "ft_jns_pengecualianlistsrch");
+			$sSavedFilterList = isset($UserProfile) ? $UserProfile->GetSearchFilters(CurrentUserName(), "ft_jns_pengecualianlistsrch") : "";
 		} else {
 			$sSavedFilterList = "";
 		}

@@ -1230,7 +1230,7 @@ class cpembagian1_list extends cpembagian1 {
 
 		// Load server side filters
 		if (EW_SEARCH_FILTER_OPTION == "Server") {
-			$sSavedFilterList = $UserProfile->GetSearchFilters(CurrentUserName(), "fpembagian1listsrch");
+			$sSavedFilterList = isset($UserProfile) ? $UserProfile->GetSearchFilters(CurrentUserName(), "fpembagian1listsrch") : "";
 		} else {
 			$sSavedFilterList = "";
 		}

@@ -1251,7 +1251,7 @@ class ct_user_list extends ct_user {
 
 		// Load server side filters
 		if (EW_SEARCH_FILTER_OPTION == "Server") {
-			$sSavedFilterList = $UserProfile->GetSearchFilters(CurrentUserName(), "ft_userlistsrch");
+			$sSavedFilterList = isset($UserProfile) ? $UserProfile->GetSearchFilters(CurrentUserName(), "ft_userlistsrch") : "";
 		} else {
 			$sSavedFilterList = "";
 		}

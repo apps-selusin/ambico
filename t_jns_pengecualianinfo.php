@@ -360,7 +360,7 @@ class ct_jns_pengecualian extends cTable {
 			$rsaudit = $rs;
 			$fldname = 'jns_id';
 			if (!array_key_exists($fldname, $rsaudit)) $rsaudit[$fldname] = $rsold[$fldname];
-			$this->WriteAuditTrailOnEdit($rsaudit, $rsold);
+			$this->WriteAuditTrailOnEdit($rsold, $rsaudit);
 		}
 		return $bUpdate;
 	}

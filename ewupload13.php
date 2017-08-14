@@ -148,8 +148,12 @@ class cewupload {
 		$uploadtable = (@$_GET["table"] <> "") ? $_GET["table"] : ((@$_POST["table"] <> "") ? $_POST["table"] : "");
 		$exts = (@$_POST["exts"] <> "") ? $_POST["exts"] : "";
 		$arExt = explode(",", $exts);
-		$arAllowedExt = explode(",", EW_UPLOAD_ALLOWED_FILE_EXT);
-		$exts = implode(",", array_intersect($arExt, $arAllowedExt)) ?: EW_UPLOAD_ALLOWED_FILE_EXT; // Make sure $exts is a subset of EW_UPLOAD_ALLOWED_FILE_EXT
+		if (EW_UPLOAD_ALLOWED_FILE_EXT <> "") {
+			$arAllowedExt = explode(",", EW_UPLOAD_ALLOWED_FILE_EXT);
+			$exts = implode(",", array_intersect($arExt, $arAllowedExt)) ?: EW_UPLOAD_ALLOWED_FILE_EXT; // Make sure $exts is a subset of EW_UPLOAD_ALLOWED_FILE_EXT
+		} else {
+			$exts = "[\s\S]*"; // Allow all file types
+		}
 		$filetypes = '/\\.(' . str_replace(",", "|", $exts) . ')$/i';
 		$maxsize = (@$_POST["maxsize"] <> "") ? intval($_POST["maxsize"]) : NULL;
 		$maxfilecount = (@$_POST["maxfilecount"] <> "" && @$_POST["maxfilecount"] <> "0") ? intval($_POST["maxfilecount"]) : NULL;

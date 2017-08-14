@@ -1223,12 +1223,12 @@ class ct_pengecualian_peg_grid extends ct_pengecualian_peg {
 		$this->tgl2->setOldValue($objForm->GetValue("o_tgl2"));
 		if (!$this->jam_masuk->FldIsDetailKey) {
 			$this->jam_masuk->setFormValue($objForm->GetValue("x_jam_masuk"));
-			$this->jam_masuk->CurrentValue = ew_UnFormatDateTime($this->jam_masuk->CurrentValue, 9);
+			$this->jam_masuk->CurrentValue = ew_UnFormatDateTime($this->jam_masuk->CurrentValue, 4);
 		}
 		$this->jam_masuk->setOldValue($objForm->GetValue("o_jam_masuk"));
 		if (!$this->jam_keluar->FldIsDetailKey) {
 			$this->jam_keluar->setFormValue($objForm->GetValue("x_jam_keluar"));
-			$this->jam_keluar->CurrentValue = ew_UnFormatDateTime($this->jam_keluar->CurrentValue, 9);
+			$this->jam_keluar->CurrentValue = ew_UnFormatDateTime($this->jam_keluar->CurrentValue, 4);
 		}
 		$this->jam_keluar->setOldValue($objForm->GetValue("o_jam_keluar"));
 		if (!$this->pegawai_id2->FldIsDetailKey) {
@@ -1255,9 +1255,9 @@ class ct_pengecualian_peg_grid extends ct_pengecualian_peg {
 		$this->tgl2->CurrentValue = $this->tgl2->FormValue;
 		$this->tgl2->CurrentValue = ew_UnFormatDateTime($this->tgl2->CurrentValue, 0);
 		$this->jam_masuk->CurrentValue = $this->jam_masuk->FormValue;
-		$this->jam_masuk->CurrentValue = ew_UnFormatDateTime($this->jam_masuk->CurrentValue, 9);
+		$this->jam_masuk->CurrentValue = ew_UnFormatDateTime($this->jam_masuk->CurrentValue, 4);
 		$this->jam_keluar->CurrentValue = $this->jam_keluar->FormValue;
-		$this->jam_keluar->CurrentValue = ew_UnFormatDateTime($this->jam_keluar->CurrentValue, 9);
+		$this->jam_keluar->CurrentValue = ew_UnFormatDateTime($this->jam_keluar->CurrentValue, 4);
 		$this->pegawai_id2->CurrentValue = $this->pegawai_id2->FormValue;
 		$this->pegawai_id3->CurrentValue = $this->pegawai_id3->FormValue;
 	}
@@ -1488,12 +1488,12 @@ class ct_pengecualian_peg_grid extends ct_pengecualian_peg {
 
 		// jam_masuk
 		$this->jam_masuk->ViewValue = $this->jam_masuk->CurrentValue;
-		$this->jam_masuk->ViewValue = ew_FormatDateTime($this->jam_masuk->ViewValue, 9);
+		$this->jam_masuk->ViewValue = ew_FormatDateTime($this->jam_masuk->ViewValue, 4);
 		$this->jam_masuk->ViewCustomAttributes = "";
 
 		// jam_keluar
 		$this->jam_keluar->ViewValue = $this->jam_keluar->CurrentValue;
-		$this->jam_keluar->ViewValue = ew_FormatDateTime($this->jam_keluar->ViewValue, 9);
+		$this->jam_keluar->ViewValue = ew_FormatDateTime($this->jam_keluar->ViewValue, 4);
 		$this->jam_keluar->ViewCustomAttributes = "";
 
 		// pegawai_id2
@@ -1686,13 +1686,13 @@ class ct_pengecualian_peg_grid extends ct_pengecualian_peg {
 			// jam_masuk
 			$this->jam_masuk->EditAttrs["class"] = "form-control";
 			$this->jam_masuk->EditCustomAttributes = "";
-			$this->jam_masuk->EditValue = ew_HtmlEncode(ew_FormatDateTime($this->jam_masuk->CurrentValue, 9));
+			$this->jam_masuk->EditValue = ew_HtmlEncode($this->jam_masuk->CurrentValue);
 			$this->jam_masuk->PlaceHolder = ew_RemoveHtml($this->jam_masuk->FldCaption());
 
 			// jam_keluar
 			$this->jam_keluar->EditAttrs["class"] = "form-control";
 			$this->jam_keluar->EditCustomAttributes = "";
-			$this->jam_keluar->EditValue = ew_HtmlEncode(ew_FormatDateTime($this->jam_keluar->CurrentValue, 9));
+			$this->jam_keluar->EditValue = ew_HtmlEncode($this->jam_keluar->CurrentValue);
 			$this->jam_keluar->PlaceHolder = ew_RemoveHtml($this->jam_keluar->FldCaption());
 
 			// pegawai_id2
@@ -1875,13 +1875,13 @@ class ct_pengecualian_peg_grid extends ct_pengecualian_peg {
 			// jam_masuk
 			$this->jam_masuk->EditAttrs["class"] = "form-control";
 			$this->jam_masuk->EditCustomAttributes = "";
-			$this->jam_masuk->EditValue = ew_HtmlEncode(ew_FormatDateTime($this->jam_masuk->CurrentValue, 9));
+			$this->jam_masuk->EditValue = ew_HtmlEncode($this->jam_masuk->CurrentValue);
 			$this->jam_masuk->PlaceHolder = ew_RemoveHtml($this->jam_masuk->FldCaption());
 
 			// jam_keluar
 			$this->jam_keluar->EditAttrs["class"] = "form-control";
 			$this->jam_keluar->EditCustomAttributes = "";
-			$this->jam_keluar->EditValue = ew_HtmlEncode(ew_FormatDateTime($this->jam_keluar->CurrentValue, 9));
+			$this->jam_keluar->EditValue = ew_HtmlEncode($this->jam_keluar->CurrentValue);
 			$this->jam_keluar->PlaceHolder = ew_RemoveHtml($this->jam_keluar->FldCaption());
 
 			// pegawai_id2
@@ -2004,10 +2004,10 @@ class ct_pengecualian_peg_grid extends ct_pengecualian_peg {
 		if (!ew_CheckDateDef($this->tgl2->FormValue)) {
 			ew_AddMessage($gsFormError, $this->tgl2->FldErrMsg());
 		}
-		if (!ew_CheckDate($this->jam_masuk->FormValue)) {
+		if (!ew_CheckTime($this->jam_masuk->FormValue)) {
 			ew_AddMessage($gsFormError, $this->jam_masuk->FldErrMsg());
 		}
-		if (!ew_CheckDate($this->jam_keluar->FormValue)) {
+		if (!ew_CheckTime($this->jam_keluar->FormValue)) {
 			ew_AddMessage($gsFormError, $this->jam_keluar->FldErrMsg());
 		}
 
@@ -2141,10 +2141,10 @@ class ct_pengecualian_peg_grid extends ct_pengecualian_peg {
 			$this->tgl2->SetDbValueDef($rsnew, $this->tgl2->CurrentValue, ew_CurrentDate(), $this->tgl2->ReadOnly);
 
 			// jam_masuk
-			$this->jam_masuk->SetDbValueDef($rsnew, ew_UnFormatDateTime($this->jam_masuk->CurrentValue, 9), NULL, $this->jam_masuk->ReadOnly);
+			$this->jam_masuk->SetDbValueDef($rsnew, $this->jam_masuk->CurrentValue, NULL, $this->jam_masuk->ReadOnly);
 
 			// jam_keluar
-			$this->jam_keluar->SetDbValueDef($rsnew, ew_UnFormatDateTime($this->jam_keluar->CurrentValue, 9), NULL, $this->jam_keluar->ReadOnly);
+			$this->jam_keluar->SetDbValueDef($rsnew, $this->jam_keluar->CurrentValue, NULL, $this->jam_keluar->ReadOnly);
 
 			// pegawai_id2
 			$this->pegawai_id2->SetDbValueDef($rsnew, $this->pegawai_id2->CurrentValue, NULL, $this->pegawai_id2->ReadOnly);
@@ -2255,10 +2255,10 @@ class ct_pengecualian_peg_grid extends ct_pengecualian_peg {
 		$this->tgl2->SetDbValueDef($rsnew, $this->tgl2->CurrentValue, ew_CurrentDate(), FALSE);
 
 		// jam_masuk
-		$this->jam_masuk->SetDbValueDef($rsnew, ew_UnFormatDateTime($this->jam_masuk->CurrentValue, 9), NULL, FALSE);
+		$this->jam_masuk->SetDbValueDef($rsnew, $this->jam_masuk->CurrentValue, NULL, FALSE);
 
 		// jam_keluar
-		$this->jam_keluar->SetDbValueDef($rsnew, ew_UnFormatDateTime($this->jam_keluar->CurrentValue, 9), NULL, FALSE);
+		$this->jam_keluar->SetDbValueDef($rsnew, $this->jam_keluar->CurrentValue, NULL, FALSE);
 
 		// pegawai_id2
 		$this->pegawai_id2->SetDbValueDef($rsnew, $this->pegawai_id2->CurrentValue, NULL, FALSE);

@@ -1308,7 +1308,8 @@ function ew_GetUrl($url) {
 }
 
 // Include mobiledetect.php
-include_once("mobile_detect.php");
+if (!class_exists("Mobile_Detect"))
+	include_once("mobile_detect.php");
 
 // Check if mobile device
 function ew_IsMobile() {

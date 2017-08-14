@@ -88,15 +88,15 @@ class ct_pengecualian_peg extends cTable {
 		$this->fields['tgl2'] = &$this->tgl2;
 
 		// jam_masuk
-		$this->jam_masuk = new cField('t_pengecualian_peg', 't_pengecualian_peg', 'x_jam_masuk', 'jam_masuk', '`jam_masuk`', ew_CastDateFieldForLike('`jam_masuk`', 9, "DB"), 135, 9, FALSE, '`jam_masuk`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->jam_masuk = new cField('t_pengecualian_peg', 't_pengecualian_peg', 'x_jam_masuk', 'jam_masuk', '`jam_masuk`', ew_CastDateFieldForLike('`jam_masuk`', 4, "DB"), 134, 4, FALSE, '`jam_masuk`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
 		$this->jam_masuk->Sortable = TRUE; // Allow sort
-		$this->jam_masuk->FldDefaultErrMsg = str_replace("%s", $GLOBALS["EW_DATE_SEPARATOR"], $Language->Phrase("IncorrectDateYMD"));
+		$this->jam_masuk->FldDefaultErrMsg = str_replace("%s", $GLOBALS["EW_TIME_SEPARATOR"], $Language->Phrase("IncorrectTime"));
 		$this->fields['jam_masuk'] = &$this->jam_masuk;
 
 		// jam_keluar
-		$this->jam_keluar = new cField('t_pengecualian_peg', 't_pengecualian_peg', 'x_jam_keluar', 'jam_keluar', '`jam_keluar`', ew_CastDateFieldForLike('`jam_keluar`', 9, "DB"), 135, 9, FALSE, '`jam_keluar`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->jam_keluar = new cField('t_pengecualian_peg', 't_pengecualian_peg', 'x_jam_keluar', 'jam_keluar', '`jam_keluar`', ew_CastDateFieldForLike('`jam_keluar`', 4, "DB"), 134, 4, FALSE, '`jam_keluar`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
 		$this->jam_keluar->Sortable = TRUE; // Allow sort
-		$this->jam_keluar->FldDefaultErrMsg = str_replace("%s", $GLOBALS["EW_DATE_SEPARATOR"], $Language->Phrase("IncorrectDateYMD"));
+		$this->jam_keluar->FldDefaultErrMsg = str_replace("%s", $GLOBALS["EW_TIME_SEPARATOR"], $Language->Phrase("IncorrectTime"));
 		$this->fields['jam_keluar'] = &$this->jam_keluar;
 
 		// pegawai_id2
@@ -539,7 +539,7 @@ class ct_pengecualian_peg extends cTable {
 			$rsaudit = $rs;
 			$fldname = 'pengecualian_id';
 			if (!array_key_exists($fldname, $rsaudit)) $rsaudit[$fldname] = $rsold[$fldname];
-			$this->WriteAuditTrailOnEdit($rsaudit, $rsold);
+			$this->WriteAuditTrailOnEdit($rsold, $rsaudit);
 		}
 		return $bUpdate;
 	}
@@ -856,12 +856,12 @@ class ct_pengecualian_peg extends cTable {
 
 		// jam_masuk
 		$this->jam_masuk->ViewValue = $this->jam_masuk->CurrentValue;
-		$this->jam_masuk->ViewValue = ew_FormatDateTime($this->jam_masuk->ViewValue, 9);
+		$this->jam_masuk->ViewValue = ew_FormatDateTime($this->jam_masuk->ViewValue, 4);
 		$this->jam_masuk->ViewCustomAttributes = "";
 
 		// jam_keluar
 		$this->jam_keluar->ViewValue = $this->jam_keluar->CurrentValue;
-		$this->jam_keluar->ViewValue = ew_FormatDateTime($this->jam_keluar->ViewValue, 9);
+		$this->jam_keluar->ViewValue = ew_FormatDateTime($this->jam_keluar->ViewValue, 4);
 		$this->jam_keluar->ViewCustomAttributes = "";
 
 		// pegawai_id2
@@ -1032,13 +1032,13 @@ class ct_pengecualian_peg extends cTable {
 		// jam_masuk
 		$this->jam_masuk->EditAttrs["class"] = "form-control";
 		$this->jam_masuk->EditCustomAttributes = "";
-		$this->jam_masuk->EditValue = ew_FormatDateTime($this->jam_masuk->CurrentValue, 9);
+		$this->jam_masuk->EditValue = $this->jam_masuk->CurrentValue;
 		$this->jam_masuk->PlaceHolder = ew_RemoveHtml($this->jam_masuk->FldCaption());
 
 		// jam_keluar
 		$this->jam_keluar->EditAttrs["class"] = "form-control";
 		$this->jam_keluar->EditCustomAttributes = "";
-		$this->jam_keluar->EditValue = ew_FormatDateTime($this->jam_keluar->CurrentValue, 9);
+		$this->jam_keluar->EditValue = $this->jam_keluar->CurrentValue;
 		$this->jam_keluar->PlaceHolder = ew_RemoveHtml($this->jam_keluar->FldCaption());
 
 		// pegawai_id2

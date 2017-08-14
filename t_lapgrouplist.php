@@ -1239,7 +1239,7 @@ class ct_lapgroup_list extends ct_lapgroup {
 
 		// Load server side filters
 		if (EW_SEARCH_FILTER_OPTION == "Server") {
-			$sSavedFilterList = $UserProfile->GetSearchFilters(CurrentUserName(), "ft_lapgrouplistsrch");
+			$sSavedFilterList = isset($UserProfile) ? $UserProfile->GetSearchFilters(CurrentUserName(), "ft_lapgrouplistsrch") : "";
 		} else {
 			$sSavedFilterList = "";
 		}

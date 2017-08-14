@@ -858,12 +858,12 @@ class ct_pengecualian_peg_view extends ct_pengecualian_peg {
 
 		// jam_masuk
 		$this->jam_masuk->ViewValue = $this->jam_masuk->CurrentValue;
-		$this->jam_masuk->ViewValue = ew_FormatDateTime($this->jam_masuk->ViewValue, 9);
+		$this->jam_masuk->ViewValue = ew_FormatDateTime($this->jam_masuk->ViewValue, 4);
 		$this->jam_masuk->ViewCustomAttributes = "";
 
 		// jam_keluar
 		$this->jam_keluar->ViewValue = $this->jam_keluar->CurrentValue;
-		$this->jam_keluar->ViewValue = ew_FormatDateTime($this->jam_keluar->ViewValue, 9);
+		$this->jam_keluar->ViewValue = ew_FormatDateTime($this->jam_keluar->ViewValue, 4);
 		$this->jam_keluar->ViewCustomAttributes = "";
 
 		// pegawai_id2

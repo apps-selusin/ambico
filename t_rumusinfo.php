@@ -411,7 +411,7 @@ class ct_rumus extends cTable {
 			$rsaudit = $rs;
 			$fldname = 'rumus_id';
 			if (!array_key_exists($fldname, $rsaudit)) $rsaudit[$fldname] = $rsold[$fldname];
-			$this->WriteAuditTrailOnEdit($rsaudit, $rsold);
+			$this->WriteAuditTrailOnEdit($rsold, $rsaudit);
 		}
 		return $bUpdate;
 	}

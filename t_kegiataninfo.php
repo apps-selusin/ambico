@@ -381,7 +381,7 @@ class ct_kegiatan extends cTable {
 			$rsaudit = $rs;
 			$fldname = 'keg_id';
 			if (!array_key_exists($fldname, $rsaudit)) $rsaudit[$fldname] = $rsold[$fldname];
-			$this->WriteAuditTrailOnEdit($rsaudit, $rsold);
+			$this->WriteAuditTrailOnEdit($rsold, $rsaudit);
 		}
 		return $bUpdate;
 	}
