@@ -133,6 +133,7 @@ while (!$rs->EOF) {
 					else {
 						//$mpremi_hadir = 0;
 						$mabsen = 1;
+						$mupah += $rs->fields["upah"]; // 10:01 PM 8/28/2017
 						$mpot_absen += $rs->fields["pot_absen"];
 						//$mabsen = 1; // untuk acuan perhitungan tunjangan hadir
 						//$mp_absen += ($hk_def == 5 ? $p_absen5 : $p_absen6);
@@ -171,7 +172,23 @@ while (!$rs->EOF) {
 					// upah
 					$mupah += $rs->fields["upah"];
 					// premi hadir
-					$mpremi_hadir = $rs->fields["premi_hadir"];
+					$mpremi_hadir = $rs->fields["premi_hadir"]; // 10:03 PM 8/28/2017
+					
+					/*
+					10:03 PM 8/28/2017
+					*/
+					
+					if ($kode_pengecualian == "S1" 
+						or $kode_pengecualian == "P4" 
+						or $kode_pengecualian == "TL"
+						or $kode_pengecualian == "HD") {
+							
+						$mpremi_hadir = 0;
+					}
+					
+					/*
+					10:03 PM 8/28/2017
+					*/
 					
 					// hitung premi malam
 					//if (!$data_valid and substr($rs->fields["jk_kd"], 0, 2) == "S3") {
