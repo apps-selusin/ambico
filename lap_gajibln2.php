@@ -207,12 +207,12 @@ while (!$rs->EOF) {
 			if ($mabsen == 1 or $mterlambat == 1) $t_hadir = 0;
 			$bruto = $gp + $t_jbtn - $mp_absen + $mt_malam + $t_hadir + $mt_um; //+ $mt_fork;
 			$netto = $bruto - $p_aspen - $p_bpjs;
-			
+			//$mpegawai_nama = addslashes($mpegawai_nama);
 			$msql = "
 				insert into t_gjbln values (null, 
 				'".$mlapgroup_nama."'
 				, '".$mpembagian2_nama."'
-				, '".$pegawai_nama."'
+				, '".addslashes($pegawai_nama)."'
 				, '".$pegawai_nip."'
 				, ".$gp."
 				, ".$t_jbtn."
