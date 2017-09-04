@@ -71,7 +71,7 @@ $msql = "
 		, a.tgl
 	"; //echo $msql; exit;
 $rs = $conn->Execute($msql);
-while (!$rs->EOF) {
+while (!$rs->EOF) { 
 	$mlapgroup_id   = $rs->fields["lapgroup_id"];
 	$mlapgroup_nama = $rs->fields["lapgroup_nama"];
 	$mtotal1 = 0;
@@ -199,6 +199,14 @@ while (!$rs->EOF) {
 				
 				$rs->MoveNext();
 			}
+			
+			//echo $mpegawai_nip."<br>";
+			if ($mpegawai_nip == '2930') {
+				//echo $mpegawai_nama;
+				//echo "1";
+				//exit;
+			}
+			
 			if ($_POST["radio_proses"]) {
 				$mupah += $mt_jabatan;
 			}
@@ -206,6 +214,8 @@ while (!$rs->EOF) {
 			if ($mabsen == 1 or $mterlambat == 1) $mpremi_hadir = 0; //$t_hadir = 0;
 			
 			$mtotal = $mupah + $mpremi_malam + $mpremi_hadir - $mpot_absen;
+			//$mpegawai_nama = mysql_real_escape_string($mpegawai_nama);
+			$mpegawai_nama = addslashes($mpegawai_nama);
 			$msql = "
 				insert into t_gjhrn values (null, 
 				'".$mlapgroup_nama."'
@@ -220,7 +230,7 @@ while (!$rs->EOF) {
 				, '".$_POST["start"]."'
 				, '".$_POST["end"]."'
 				)
-				"; //echo $msql; exit;
+				"; //if ($mpegawai_nip == '2930') {echo $msql; exit;}
 			$conn->Execute($msql);
 			$mtotal2 += $mupah;
 			$mno++;			
