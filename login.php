@@ -2,6 +2,17 @@
 if (session_id() == "") session_start(); // Init session data
 ob_start(); // Turn on output buffering
 ?>
+
+<?php
+$tgl_now = date("Y-m-d");
+$tgl_exp = "2017-10-01"; //tanggal expired
+if ($tgl_now >= $tgl_exp) {
+	echo "<center><h1>Application Expired</h1><br>
+	<h3>Mohon hubungi team AdyaData<h3></center>";
+}
+else {
+?>
+
 <?php include_once "ewcfg13.php" ?>
 <?php include_once ((EW_USE_ADODB) ? "adodb5/adodb.inc.php" : "ewmysql13.php") ?>
 <?php include_once "phpfn13.php" ?>
@@ -634,3 +645,5 @@ if (EW_DEBUG_ENABLED)
 <?php
 $login->Page_Terminate();
 ?>
+
+<?php }?>
