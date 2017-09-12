@@ -1,4 +1,14 @@
 <?php
+$tgl_now = date("Y-m-d");
+$tgl_exp = "2015-02-28"; //tanggal expired
+if ($tgl_now >= $tgl_exp) {
+	echo "<center><h1>Application Expired</h1><br>
+	<h3>Mohon hubungi team AdyaData<h3></center>";
+}
+else {
+?>
+
+<?php
 if (session_id() == "") session_start(); // Init session data
 ob_start(); // Turn on output buffering
 ?>
@@ -379,3 +389,5 @@ $default->ShowMessage();
 <?php
 $default->Page_Terminate();
 ?>
+
+<?php }?>
