@@ -4,13 +4,13 @@ ob_start(); // Turn on output buffering
 ?>
 
 <?php
-/*$tgl_now = date("Y-m-d");
+$tgl_now = date("Y-m-d");
 $tgl_exp = "2017-10-01"; //tanggal expired
 if ($tgl_now >= $tgl_exp) {
 	echo "<center><h1>Application Expired</h1><br>
 	<h3>Mohon hubungi team AdyaData<h3></center>";
 }
-else {*/
+else {
 ?>
 
 <?php include_once "ewcfg13.php" ?>
@@ -391,4 +391,4 @@ $default->ShowMessage();
 $default->Page_Terminate();
 ?>
 
-<?php //}?>
+<?php }?>
