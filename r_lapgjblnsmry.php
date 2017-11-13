@@ -537,6 +537,7 @@ class crr_lapgjbln_summary extends crr_lapgjbln {
 		global $ReportLanguage;
 
 		// Set field visibility for detail fields
+		$this->rec_no->SetVisibility();
 		$this->nama->SetVisibility();
 		$this->nip->SetVisibility();
 		$this->gp->SetVisibility();
@@ -554,7 +555,7 @@ class crr_lapgjbln_summary extends crr_lapgjbln {
 		// 1st dimension = no of groups (level 0 used for grand total)
 		// 2nd dimension = no of fields
 
-		$nDtls = 13;
+		$nDtls = 14;
 		$nGrps = 3;
 		$this->Val = &ewr_InitArray($nDtls, 0);
 		$this->Cnt = &ewr_Init2DArray($nGrps, $nDtls, 0);
@@ -567,7 +568,7 @@ class crr_lapgjbln_summary extends crr_lapgjbln {
 		$this->GrandMx = &ewr_InitArray($nDtls, NULL);
 
 		// Set up array if accumulation required: array(Accum, SkipNullOrZero)
-		$this->Col = array(array(FALSE, FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(TRUE,FALSE), array(TRUE,FALSE), array(TRUE,FALSE), array(TRUE,FALSE), array(TRUE,FALSE), array(TRUE,FALSE), array(TRUE,FALSE), array(TRUE,FALSE), array(TRUE,FALSE), array(TRUE,FALSE));
+		$this->Col = array(array(FALSE, FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(TRUE,FALSE), array(TRUE,FALSE), array(TRUE,FALSE), array(TRUE,FALSE), array(TRUE,FALSE), array(TRUE,FALSE), array(TRUE,FALSE), array(TRUE,FALSE), array(TRUE,FALSE), array(TRUE,FALSE));
 
 		// Set up groups per page dynamically
 		$this->SetUpDisplayGrps();
@@ -881,6 +882,7 @@ class crr_lapgjbln_summary extends crr_lapgjbln {
 					$this->bagian->setDbValue(ewr_GroupValue($this->bagian, $rs->fields('bagian')));
 			}
 			$this->divisi->setDbValue($rs->fields('divisi'));
+			$this->rec_no->setDbValue($rs->fields('rec_no'));
 			$this->nama->setDbValue($rs->fields('nama'));
 			$this->nip->setDbValue($rs->fields('nip'));
 			$this->gp->setDbValue($rs->fields('gp'));
@@ -896,22 +898,24 @@ class crr_lapgjbln_summary extends crr_lapgjbln {
 			$this->j_netto->setDbValue($rs->fields('j_netto'));
 			$this->start->setDbValue($rs->fields('start'));
 			$this->end->setDbValue($rs->fields('end'));
-			$this->Val[1] = $this->nama->CurrentValue;
-			$this->Val[2] = $this->nip->CurrentValue;
-			$this->Val[3] = $this->gp->CurrentValue;
-			$this->Val[4] = $this->t_jbtn->CurrentValue;
-			$this->Val[5] = $this->p_absen->CurrentValue;
-			$this->Val[6] = $this->t_malam->CurrentValue;
-			$this->Val[7] = $this->t_hadir->CurrentValue;
-			$this->Val[8] = $this->t_um->CurrentValue;
-			$this->Val[9] = $this->j_bruto->CurrentValue;
-			$this->Val[10] = $this->p_aspen->CurrentValue;
-			$this->Val[11] = $this->p_bpjs->CurrentValue;
-			$this->Val[12] = $this->j_netto->CurrentValue;
+			$this->Val[1] = $this->rec_no->CurrentValue;
+			$this->Val[2] = $this->nama->CurrentValue;
+			$this->Val[3] = $this->nip->CurrentValue;
+			$this->Val[4] = $this->gp->CurrentValue;
+			$this->Val[5] = $this->t_jbtn->CurrentValue;
+			$this->Val[6] = $this->p_absen->CurrentValue;
+			$this->Val[7] = $this->t_malam->CurrentValue;
+			$this->Val[8] = $this->t_hadir->CurrentValue;
+			$this->Val[9] = $this->t_um->CurrentValue;
+			$this->Val[10] = $this->j_bruto->CurrentValue;
+			$this->Val[11] = $this->p_aspen->CurrentValue;
+			$this->Val[12] = $this->p_bpjs->CurrentValue;
+			$this->Val[13] = $this->j_netto->CurrentValue;
 		} else {
 			$this->gjbln_id->setDbValue("");
 			$this->bagian->setDbValue("");
 			$this->divisi->setDbValue("");
+			$this->rec_no->setDbValue("");
 			$this->nama->setDbValue("");
 			$this->nip->setDbValue("");
 			$this->gp->setDbValue("");
@@ -1095,25 +1099,26 @@ class crr_lapgjbln_summary extends crr_lapgjbln {
 				$this->GrandCnt[1] = $this->TotCount;
 				$this->GrandCnt[2] = $this->TotCount;
 				$this->GrandCnt[3] = $this->TotCount;
-				$this->GrandSmry[3] = $rsagg->fields("sum_gp");
 				$this->GrandCnt[4] = $this->TotCount;
-				$this->GrandSmry[4] = $rsagg->fields("sum_t_jbtn");
+				$this->GrandSmry[4] = $rsagg->fields("sum_gp");
 				$this->GrandCnt[5] = $this->TotCount;
-				$this->GrandSmry[5] = $rsagg->fields("sum_p_absen");
+				$this->GrandSmry[5] = $rsagg->fields("sum_t_jbtn");
 				$this->GrandCnt[6] = $this->TotCount;
-				$this->GrandSmry[6] = $rsagg->fields("sum_t_malam");
+				$this->GrandSmry[6] = $rsagg->fields("sum_p_absen");
 				$this->GrandCnt[7] = $this->TotCount;
-				$this->GrandSmry[7] = $rsagg->fields("sum_t_hadir");
+				$this->GrandSmry[7] = $rsagg->fields("sum_t_malam");
 				$this->GrandCnt[8] = $this->TotCount;
-				$this->GrandSmry[8] = $rsagg->fields("sum_t_um");
+				$this->GrandSmry[8] = $rsagg->fields("sum_t_hadir");
 				$this->GrandCnt[9] = $this->TotCount;
-				$this->GrandSmry[9] = $rsagg->fields("sum_j_bruto");
+				$this->GrandSmry[9] = $rsagg->fields("sum_t_um");
 				$this->GrandCnt[10] = $this->TotCount;
-				$this->GrandSmry[10] = $rsagg->fields("sum_p_aspen");
+				$this->GrandSmry[10] = $rsagg->fields("sum_j_bruto");
 				$this->GrandCnt[11] = $this->TotCount;
-				$this->GrandSmry[11] = $rsagg->fields("sum_p_bpjs");
+				$this->GrandSmry[11] = $rsagg->fields("sum_p_aspen");
 				$this->GrandCnt[12] = $this->TotCount;
-				$this->GrandSmry[12] = $rsagg->fields("sum_j_netto");
+				$this->GrandSmry[12] = $rsagg->fields("sum_p_bpjs");
+				$this->GrandCnt[13] = $this->TotCount;
+				$this->GrandSmry[13] = $rsagg->fields("sum_j_netto");
 				$rsagg->Close();
 				$bGotSummary = TRUE;
 			}
@@ -1228,6 +1233,9 @@ class crr_lapgjbln_summary extends crr_lapgjbln {
 			// divisi
 			$this->divisi->HrefValue = "";
 
+			// rec_no
+			$this->rec_no->HrefValue = "";
+
 			// nama
 			$this->nama->HrefValue = "";
 
@@ -1285,6 +1293,10 @@ class crr_lapgjbln_summary extends crr_lapgjbln {
 			$this->divisi->GroupViewValue = ewr_DisplayGroupValue($this->divisi, $this->divisi->GroupViewValue);
 			if ($this->divisi->GroupValue() == $this->divisi->GroupOldValue() && !$this->ChkLvlBreak(2))
 				$this->divisi->GroupViewValue = "&nbsp;";
+
+			// rec_no
+			$this->rec_no->ViewValue = $this->rec_no->CurrentValue;
+			$this->rec_no->CellAttrs["class"] = ($this->RecCount % 2 <> 1) ? "ewTableAltRow" : "ewTableRow";
 
 			// nama
 			$this->nama->ViewValue = $this->nama->CurrentValue;
@@ -1359,6 +1371,9 @@ class crr_lapgjbln_summary extends crr_lapgjbln {
 
 			// divisi
 			$this->divisi->HrefValue = "";
+
+			// rec_no
+			$this->rec_no->HrefValue = "";
 
 			// nama
 			$this->nama->HrefValue = "";
@@ -1527,6 +1542,15 @@ class crr_lapgjbln_summary extends crr_lapgjbln {
 			$LinkAttrs = &$this->divisi->LinkAttrs;
 			$this->Cell_Rendered($this->divisi, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
 
+			// rec_no
+			$CurrentValue = $this->rec_no->CurrentValue;
+			$ViewValue = &$this->rec_no->ViewValue;
+			$ViewAttrs = &$this->rec_no->ViewAttrs;
+			$CellAttrs = &$this->rec_no->CellAttrs;
+			$HrefValue = &$this->rec_no->HrefValue;
+			$LinkAttrs = &$this->rec_no->LinkAttrs;
+			$this->Cell_Rendered($this->rec_no, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
+
 			// nama
 			$CurrentValue = $this->nama->CurrentValue;
 			$ViewValue = &$this->nama->ViewValue;
@@ -1648,6 +1672,7 @@ class crr_lapgjbln_summary extends crr_lapgjbln {
 		$this->DtlColumnCount = 0;
 		if ($this->bagian->Visible) $this->GrpColumnCount += 1;
 		if ($this->divisi->Visible) { $this->GrpColumnCount += 1; $this->SubGrpColumnCount += 1; }
+		if ($this->rec_no->Visible) $this->DtlColumnCount += 1;
 		if ($this->nama->Visible) $this->DtlColumnCount += 1;
 		if ($this->nip->Visible) $this->DtlColumnCount += 1;
 		if ($this->gp->Visible) $this->DtlColumnCount += 1;
@@ -1712,6 +1737,7 @@ class crr_lapgjbln_summary extends crr_lapgjbln {
 			$this->setStartGroup(1);
 			$this->bagian->setSort("");
 			$this->divisi->setSort("");
+			$this->rec_no->setSort("");
 			$this->nama->setSort("");
 			$this->nip->setSort("");
 			$this->gp->setSort("");
@@ -1731,6 +1757,7 @@ class crr_lapgjbln_summary extends crr_lapgjbln {
 			$this->CurrentOrderType = $orderType;
 			$this->UpdateSort($this->bagian, $bCtrl); // bagian
 			$this->UpdateSort($this->divisi, $bCtrl); // divisi
+			$this->UpdateSort($this->rec_no, $bCtrl); // rec_no
 			$this->UpdateSort($this->nama, $bCtrl); // nama
 			$this->UpdateSort($this->nip, $bCtrl); // nip
 			$this->UpdateSort($this->gp, $bCtrl); // gp
@@ -2234,6 +2261,24 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 <?php } ?>
 	<?php } ?>
 <?php } ?>
+<?php if ($Page->rec_no->Visible) { ?>
+<?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
+	<td data-field="rec_no"><div class="r_lapgjbln_rec_no"><span class="ewTableHeaderCaption"><?php echo $Page->rec_no->FldCaption() ?></span></div></td>
+<?php } else { ?>
+	<td data-field="rec_no">
+<?php if ($Page->SortUrl($Page->rec_no) == "") { ?>
+		<div class="ewTableHeaderBtn r_lapgjbln_rec_no">
+			<span class="ewTableHeaderCaption"><?php echo $Page->rec_no->FldCaption() ?></span>
+		</div>
+<?php } else { ?>
+		<div class="ewTableHeaderBtn ewPointer r_lapgjbln_rec_no" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->rec_no) ?>',2);">
+			<span class="ewTableHeaderCaption"><?php echo $Page->rec_no->FldCaption() ?></span>
+			<span class="ewTableHeaderSort"><?php if ($Page->rec_no->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($Page->rec_no->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span>
+		</div>
+<?php } ?>
+	</td>
+<?php } ?>
+<?php } ?>
 <?php if ($Page->nama->Visible) { ?>
 <?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
 	<td data-field="nama"><div class="r_lapgjbln_nama"><span class="ewTableHeaderCaption"><?php echo $Page->nama->FldCaption() ?></span></div></td>
@@ -2575,6 +2620,10 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 <span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_r_lapgjbln_divisi"<?php echo $Page->divisi->ViewAttributes() ?>><?php echo $Page->divisi->GroupViewValue ?></span></td>
 	<?php } ?>
 <?php } ?>
+<?php if ($Page->rec_no->Visible) { ?>
+		<td data-field="rec_no"<?php echo $Page->rec_no->CellAttributes() ?>>
+<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->RecCount ?>_r_lapgjbln_rec_no"<?php echo $Page->rec_no->ViewAttributes() ?>><?php echo $Page->rec_no->ListViewValue() ?></span></td>
+<?php } ?>
 <?php if ($Page->nama->Visible) { ?>
 		<td data-field="nama"<?php echo $Page->nama->CellAttributes() ?>>
 <span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->RecCount ?>_r_lapgjbln_nama"<?php echo $Page->nama->ViewAttributes() ?>><?php echo $Page->nama->ListViewValue() ?></span></td>
@@ -2644,26 +2693,26 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 <?php
 			$Page->bagian->Count = $Page->GetSummaryCount(1, FALSE);
 			$Page->divisi->Count = $Page->GetSummaryCount(2, FALSE);
-			$Page->gp->Count = $Page->Cnt[2][3];
-			$Page->gp->SumValue = $Page->Smry[2][3]; // Load SUM
-			$Page->t_jbtn->Count = $Page->Cnt[2][4];
-			$Page->t_jbtn->SumValue = $Page->Smry[2][4]; // Load SUM
-			$Page->p_absen->Count = $Page->Cnt[2][5];
-			$Page->p_absen->SumValue = $Page->Smry[2][5]; // Load SUM
-			$Page->t_malam->Count = $Page->Cnt[2][6];
-			$Page->t_malam->SumValue = $Page->Smry[2][6]; // Load SUM
-			$Page->t_hadir->Count = $Page->Cnt[2][7];
-			$Page->t_hadir->SumValue = $Page->Smry[2][7]; // Load SUM
-			$Page->t_um->Count = $Page->Cnt[2][8];
-			$Page->t_um->SumValue = $Page->Smry[2][8]; // Load SUM
-			$Page->j_bruto->Count = $Page->Cnt[2][9];
-			$Page->j_bruto->SumValue = $Page->Smry[2][9]; // Load SUM
-			$Page->p_aspen->Count = $Page->Cnt[2][10];
-			$Page->p_aspen->SumValue = $Page->Smry[2][10]; // Load SUM
-			$Page->p_bpjs->Count = $Page->Cnt[2][11];
-			$Page->p_bpjs->SumValue = $Page->Smry[2][11]; // Load SUM
-			$Page->j_netto->Count = $Page->Cnt[2][12];
-			$Page->j_netto->SumValue = $Page->Smry[2][12]; // Load SUM
+			$Page->gp->Count = $Page->Cnt[2][4];
+			$Page->gp->SumValue = $Page->Smry[2][4]; // Load SUM
+			$Page->t_jbtn->Count = $Page->Cnt[2][5];
+			$Page->t_jbtn->SumValue = $Page->Smry[2][5]; // Load SUM
+			$Page->p_absen->Count = $Page->Cnt[2][6];
+			$Page->p_absen->SumValue = $Page->Smry[2][6]; // Load SUM
+			$Page->t_malam->Count = $Page->Cnt[2][7];
+			$Page->t_malam->SumValue = $Page->Smry[2][7]; // Load SUM
+			$Page->t_hadir->Count = $Page->Cnt[2][8];
+			$Page->t_hadir->SumValue = $Page->Smry[2][8]; // Load SUM
+			$Page->t_um->Count = $Page->Cnt[2][9];
+			$Page->t_um->SumValue = $Page->Smry[2][9]; // Load SUM
+			$Page->j_bruto->Count = $Page->Cnt[2][10];
+			$Page->j_bruto->SumValue = $Page->Smry[2][10]; // Load SUM
+			$Page->p_aspen->Count = $Page->Cnt[2][11];
+			$Page->p_aspen->SumValue = $Page->Smry[2][11]; // Load SUM
+			$Page->p_bpjs->Count = $Page->Cnt[2][12];
+			$Page->p_bpjs->SumValue = $Page->Smry[2][12]; // Load SUM
+			$Page->j_netto->Count = $Page->Cnt[2][13];
+			$Page->j_netto->SumValue = $Page->Smry[2][13]; // Load SUM
 			$Page->ResetAttrs();
 			$Page->RowType = EWR_ROWTYPE_TOTAL;
 			$Page->RowTotalType = EWR_ROWTOTAL_GROUP;
@@ -2694,6 +2743,9 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 		<span class="ewSummaryCount"><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptCnt") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><?php echo ewr_FormatNumber($Page->divisi->Count,0,-2,-2,-2) ?></span></span>
 	<?php } ?>
 		</td>
+<?php } ?>
+<?php if ($Page->rec_no->Visible) { ?>
+		<td data-field="rec_no"<?php echo $Page->divisi->CellAttributes() ?>></td>
 <?php } ?>
 <?php if ($Page->nama->Visible) { ?>
 		<td data-field="nama"<?php echo $Page->divisi->CellAttributes() ?>></td>
@@ -2747,6 +2799,9 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 <?php } ?>
 <?php if ($Page->GrpColumnCount > 0) { ?>
 		<td colspan="<?php echo ($Page->GrpColumnCount - 1) ?>"<?php echo $Page->divisi->CellAttributes() ?>><?php echo $ReportLanguage->Phrase("RptSum") ?></td>
+<?php } ?>
+<?php if ($Page->rec_no->Visible) { ?>
+		<td data-field="rec_no"<?php echo $Page->divisi->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
 <?php if ($Page->nama->Visible) { ?>
 		<td data-field="nama"<?php echo $Page->divisi->CellAttributes() ?>>&nbsp;</td>
@@ -2814,26 +2869,26 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 <?php
 			$Page->bagian->Count = $Page->GetSummaryCount(1, FALSE);
 			$Page->divisi->Count = $Page->GetSummaryCount(2, FALSE);
-			$Page->gp->Count = $Page->Cnt[1][3];
-			$Page->gp->SumValue = $Page->Smry[1][3]; // Load SUM
-			$Page->t_jbtn->Count = $Page->Cnt[1][4];
-			$Page->t_jbtn->SumValue = $Page->Smry[1][4]; // Load SUM
-			$Page->p_absen->Count = $Page->Cnt[1][5];
-			$Page->p_absen->SumValue = $Page->Smry[1][5]; // Load SUM
-			$Page->t_malam->Count = $Page->Cnt[1][6];
-			$Page->t_malam->SumValue = $Page->Smry[1][6]; // Load SUM
-			$Page->t_hadir->Count = $Page->Cnt[1][7];
-			$Page->t_hadir->SumValue = $Page->Smry[1][7]; // Load SUM
-			$Page->t_um->Count = $Page->Cnt[1][8];
-			$Page->t_um->SumValue = $Page->Smry[1][8]; // Load SUM
-			$Page->j_bruto->Count = $Page->Cnt[1][9];
-			$Page->j_bruto->SumValue = $Page->Smry[1][9]; // Load SUM
-			$Page->p_aspen->Count = $Page->Cnt[1][10];
-			$Page->p_aspen->SumValue = $Page->Smry[1][10]; // Load SUM
-			$Page->p_bpjs->Count = $Page->Cnt[1][11];
-			$Page->p_bpjs->SumValue = $Page->Smry[1][11]; // Load SUM
-			$Page->j_netto->Count = $Page->Cnt[1][12];
-			$Page->j_netto->SumValue = $Page->Smry[1][12]; // Load SUM
+			$Page->gp->Count = $Page->Cnt[1][4];
+			$Page->gp->SumValue = $Page->Smry[1][4]; // Load SUM
+			$Page->t_jbtn->Count = $Page->Cnt[1][5];
+			$Page->t_jbtn->SumValue = $Page->Smry[1][5]; // Load SUM
+			$Page->p_absen->Count = $Page->Cnt[1][6];
+			$Page->p_absen->SumValue = $Page->Smry[1][6]; // Load SUM
+			$Page->t_malam->Count = $Page->Cnt[1][7];
+			$Page->t_malam->SumValue = $Page->Smry[1][7]; // Load SUM
+			$Page->t_hadir->Count = $Page->Cnt[1][8];
+			$Page->t_hadir->SumValue = $Page->Smry[1][8]; // Load SUM
+			$Page->t_um->Count = $Page->Cnt[1][9];
+			$Page->t_um->SumValue = $Page->Smry[1][9]; // Load SUM
+			$Page->j_bruto->Count = $Page->Cnt[1][10];
+			$Page->j_bruto->SumValue = $Page->Smry[1][10]; // Load SUM
+			$Page->p_aspen->Count = $Page->Cnt[1][11];
+			$Page->p_aspen->SumValue = $Page->Smry[1][11]; // Load SUM
+			$Page->p_bpjs->Count = $Page->Cnt[1][12];
+			$Page->p_bpjs->SumValue = $Page->Smry[1][12]; // Load SUM
+			$Page->j_netto->Count = $Page->Cnt[1][13];
+			$Page->j_netto->SumValue = $Page->Smry[1][13]; // Load SUM
 			$Page->ResetAttrs();
 			$Page->RowType = EWR_ROWTYPE_TOTAL;
 			$Page->RowTotalType = EWR_ROWTOTAL_GROUP;
@@ -2864,6 +2919,9 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 		<span class="ewSummaryCount"><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptCnt") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><?php echo ewr_FormatNumber($Page->divisi->Count,0,-2,-2,-2) ?></span></span>
 	<?php } ?>
 		</td>
+<?php } ?>
+<?php if ($Page->rec_no->Visible) { ?>
+		<td data-field="rec_no"<?php echo $Page->bagian->CellAttributes() ?>></td>
 <?php } ?>
 <?php if ($Page->nama->Visible) { ?>
 		<td data-field="nama"<?php echo $Page->bagian->CellAttributes() ?>></td>
@@ -2911,6 +2969,9 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 	<tr<?php echo $Page->RowAttributes(); ?>>
 <?php if ($Page->GrpColumnCount > 0) { ?>
 		<td colspan="<?php echo ($Page->GrpColumnCount - 0) ?>"<?php echo $Page->bagian->CellAttributes() ?>><?php echo $ReportLanguage->Phrase("RptSum") ?></td>
+<?php } ?>
+<?php if ($Page->rec_no->Visible) { ?>
+		<td data-field="rec_no"<?php echo $Page->bagian->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
 <?php if ($Page->nama->Visible) { ?>
 		<td data-field="nama"<?php echo $Page->bagian->CellAttributes() ?>>&nbsp;</td>
@@ -2991,26 +3052,26 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 <tfoot>
 <?php if (($Page->StopGrp - $Page->StartGrp + 1) <> $Page->TotalGrps) { ?>
 <?php
-	$Page->gp->Count = $Page->Cnt[0][3];
-	$Page->gp->SumValue = $Page->Smry[0][3]; // Load SUM
-	$Page->t_jbtn->Count = $Page->Cnt[0][4];
-	$Page->t_jbtn->SumValue = $Page->Smry[0][4]; // Load SUM
-	$Page->p_absen->Count = $Page->Cnt[0][5];
-	$Page->p_absen->SumValue = $Page->Smry[0][5]; // Load SUM
-	$Page->t_malam->Count = $Page->Cnt[0][6];
-	$Page->t_malam->SumValue = $Page->Smry[0][6]; // Load SUM
-	$Page->t_hadir->Count = $Page->Cnt[0][7];
-	$Page->t_hadir->SumValue = $Page->Smry[0][7]; // Load SUM
-	$Page->t_um->Count = $Page->Cnt[0][8];
-	$Page->t_um->SumValue = $Page->Smry[0][8]; // Load SUM
-	$Page->j_bruto->Count = $Page->Cnt[0][9];
-	$Page->j_bruto->SumValue = $Page->Smry[0][9]; // Load SUM
-	$Page->p_aspen->Count = $Page->Cnt[0][10];
-	$Page->p_aspen->SumValue = $Page->Smry[0][10]; // Load SUM
-	$Page->p_bpjs->Count = $Page->Cnt[0][11];
-	$Page->p_bpjs->SumValue = $Page->Smry[0][11]; // Load SUM
-	$Page->j_netto->Count = $Page->Cnt[0][12];
-	$Page->j_netto->SumValue = $Page->Smry[0][12]; // Load SUM
+	$Page->gp->Count = $Page->Cnt[0][4];
+	$Page->gp->SumValue = $Page->Smry[0][4]; // Load SUM
+	$Page->t_jbtn->Count = $Page->Cnt[0][5];
+	$Page->t_jbtn->SumValue = $Page->Smry[0][5]; // Load SUM
+	$Page->p_absen->Count = $Page->Cnt[0][6];
+	$Page->p_absen->SumValue = $Page->Smry[0][6]; // Load SUM
+	$Page->t_malam->Count = $Page->Cnt[0][7];
+	$Page->t_malam->SumValue = $Page->Smry[0][7]; // Load SUM
+	$Page->t_hadir->Count = $Page->Cnt[0][8];
+	$Page->t_hadir->SumValue = $Page->Smry[0][8]; // Load SUM
+	$Page->t_um->Count = $Page->Cnt[0][9];
+	$Page->t_um->SumValue = $Page->Smry[0][9]; // Load SUM
+	$Page->j_bruto->Count = $Page->Cnt[0][10];
+	$Page->j_bruto->SumValue = $Page->Smry[0][10]; // Load SUM
+	$Page->p_aspen->Count = $Page->Cnt[0][11];
+	$Page->p_aspen->SumValue = $Page->Smry[0][11]; // Load SUM
+	$Page->p_bpjs->Count = $Page->Cnt[0][12];
+	$Page->p_bpjs->SumValue = $Page->Smry[0][12]; // Load SUM
+	$Page->j_netto->Count = $Page->Cnt[0][13];
+	$Page->j_netto->SumValue = $Page->Smry[0][13]; // Load SUM
 	$Page->ResetAttrs();
 	$Page->RowType = EWR_ROWTYPE_TOTAL;
 	$Page->RowTotalType = EWR_ROWTOTAL_PAGE;
@@ -3023,6 +3084,9 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 	<tr<?php echo $Page->RowAttributes(); ?>>
 <?php if ($Page->GrpColumnCount > 0) { ?>
 		<td colspan="<?php echo $Page->GrpColumnCount ?>" class="ewRptGrpAggregate">&nbsp;</td>
+<?php } ?>
+<?php if ($Page->rec_no->Visible) { ?>
+		<td data-field="rec_no"<?php echo $Page->rec_no->CellAttributes() ?>></td>
 <?php } ?>
 <?php if ($Page->nama->Visible) { ?>
 		<td data-field="nama"<?php echo $Page->nama->CellAttributes() ?>></td>
@@ -3066,6 +3130,9 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 	<tr<?php echo $Page->RowAttributes(); ?>>
 <?php if ($Page->GrpColumnCount > 0) { ?>
 		<td colspan="<?php echo $Page->GrpColumnCount ?>" class="ewRptGrpAggregate"><?php echo $ReportLanguage->Phrase("RptSum") ?></td>
+<?php } ?>
+<?php if ($Page->rec_no->Visible) { ?>
+		<td data-field="rec_no"<?php echo $Page->rec_no->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
 <?php if ($Page->nama->Visible) { ?>
 		<td data-field="nama"<?php echo $Page->nama->CellAttributes() ?>>&nbsp;</td>
@@ -3117,26 +3184,26 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 <?php } ?>
 <?php } ?>
 <?php
-	$Page->gp->Count = $Page->GrandCnt[3];
-	$Page->gp->SumValue = $Page->GrandSmry[3]; // Load SUM
-	$Page->t_jbtn->Count = $Page->GrandCnt[4];
-	$Page->t_jbtn->SumValue = $Page->GrandSmry[4]; // Load SUM
-	$Page->p_absen->Count = $Page->GrandCnt[5];
-	$Page->p_absen->SumValue = $Page->GrandSmry[5]; // Load SUM
-	$Page->t_malam->Count = $Page->GrandCnt[6];
-	$Page->t_malam->SumValue = $Page->GrandSmry[6]; // Load SUM
-	$Page->t_hadir->Count = $Page->GrandCnt[7];
-	$Page->t_hadir->SumValue = $Page->GrandSmry[7]; // Load SUM
-	$Page->t_um->Count = $Page->GrandCnt[8];
-	$Page->t_um->SumValue = $Page->GrandSmry[8]; // Load SUM
-	$Page->j_bruto->Count = $Page->GrandCnt[9];
-	$Page->j_bruto->SumValue = $Page->GrandSmry[9]; // Load SUM
-	$Page->p_aspen->Count = $Page->GrandCnt[10];
-	$Page->p_aspen->SumValue = $Page->GrandSmry[10]; // Load SUM
-	$Page->p_bpjs->Count = $Page->GrandCnt[11];
-	$Page->p_bpjs->SumValue = $Page->GrandSmry[11]; // Load SUM
-	$Page->j_netto->Count = $Page->GrandCnt[12];
-	$Page->j_netto->SumValue = $Page->GrandSmry[12]; // Load SUM
+	$Page->gp->Count = $Page->GrandCnt[4];
+	$Page->gp->SumValue = $Page->GrandSmry[4]; // Load SUM
+	$Page->t_jbtn->Count = $Page->GrandCnt[5];
+	$Page->t_jbtn->SumValue = $Page->GrandSmry[5]; // Load SUM
+	$Page->p_absen->Count = $Page->GrandCnt[6];
+	$Page->p_absen->SumValue = $Page->GrandSmry[6]; // Load SUM
+	$Page->t_malam->Count = $Page->GrandCnt[7];
+	$Page->t_malam->SumValue = $Page->GrandSmry[7]; // Load SUM
+	$Page->t_hadir->Count = $Page->GrandCnt[8];
+	$Page->t_hadir->SumValue = $Page->GrandSmry[8]; // Load SUM
+	$Page->t_um->Count = $Page->GrandCnt[9];
+	$Page->t_um->SumValue = $Page->GrandSmry[9]; // Load SUM
+	$Page->j_bruto->Count = $Page->GrandCnt[10];
+	$Page->j_bruto->SumValue = $Page->GrandSmry[10]; // Load SUM
+	$Page->p_aspen->Count = $Page->GrandCnt[11];
+	$Page->p_aspen->SumValue = $Page->GrandSmry[11]; // Load SUM
+	$Page->p_bpjs->Count = $Page->GrandCnt[12];
+	$Page->p_bpjs->SumValue = $Page->GrandSmry[12]; // Load SUM
+	$Page->j_netto->Count = $Page->GrandCnt[13];
+	$Page->j_netto->SumValue = $Page->GrandSmry[13]; // Load SUM
 	$Page->ResetAttrs();
 	$Page->RowType = EWR_ROWTYPE_TOTAL;
 	$Page->RowTotalType = EWR_ROWTOTAL_GRAND;
@@ -3149,6 +3216,9 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 	<tr<?php echo $Page->RowAttributes() ?>>
 <?php if ($Page->GrpColumnCount > 0) { ?>
 		<td colspan="<?php echo $Page->GrpColumnCount ?>" class="ewRptGrpAggregate">&nbsp;</td>
+<?php } ?>
+<?php if ($Page->rec_no->Visible) { ?>
+		<td data-field="rec_no"<?php echo $Page->rec_no->CellAttributes() ?>></td>
 <?php } ?>
 <?php if ($Page->nama->Visible) { ?>
 		<td data-field="nama"<?php echo $Page->nama->CellAttributes() ?>></td>
@@ -3192,6 +3262,9 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 	<tr<?php echo $Page->RowAttributes() ?>>
 <?php if ($Page->GrpColumnCount > 0) { ?>
 		<td colspan="<?php echo $Page->GrpColumnCount ?>" class="ewRptGrpAggregate"><?php echo $ReportLanguage->Phrase("RptSum") ?></td>
+<?php } ?>
+<?php if ($Page->rec_no->Visible) { ?>
+		<td data-field="rec_no"<?php echo $Page->rec_no->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
 <?php if ($Page->nama->Visible) { ?>
 		<td data-field="nama"<?php echo $Page->nama->CellAttributes() ?>>&nbsp;</td>

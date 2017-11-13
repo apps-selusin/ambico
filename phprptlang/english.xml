@@ -2785,6 +2785,9 @@
       <field id="end">
         <phrase id="fldcaption" value="end" />
       </field>
+      <field id="rec_no">
+        <phrase id="fldcaption" value="No. Urut" />
+      </field>
     </table>
     <table id="r_lapgjbln">
       <phrase id="tblcaption" value="Gaji (Bulanan)" />
@@ -2796,6 +2799,9 @@
       </field>
       <field id="divisi">
         <phrase id="fldcaption" value="Divisi" />
+      </field>
+      <field id="rec_no">
+        <phrase id="fldcaption" value="No. Urut" />
       </field>
       <field id="nama">
         <phrase id="fldcaption" value="Nama" />
