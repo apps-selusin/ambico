@@ -781,7 +781,6 @@ class crr_jdw_krj_def_summary extends crr_jdw_krj_def {
 		if (!$rs)
 			return;
 		if ($opt == 1) { // Get first row
-			$rs->MoveFirst(); // Move first
 				$this->FirstRowData = array();
 				$this->FirstRowData['pembagian2_nama'] = ewr_Conv($rs->fields('pembagian2_nama'), 200);
 				$this->FirstRowData['pegawai_nip'] = ewr_Conv($rs->fields('pegawai_nip'), 200);

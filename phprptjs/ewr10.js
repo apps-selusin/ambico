@@ -326,7 +326,7 @@ function ewr_ShowPopup(e, popupname, useRange, rangeFrom, rangeTo) {
 				var $this = $(this), w = Math.max(EWR_POPUP_MINWIDTH, dd.width + dd.deltaX),
 					h = Math.max(EWR_POPUP_MINHEIGHT, dd.height + dd.deltaY);
 				$this.css({ width: w, height: h });
-				$this.find(".popover-content").height(h - fh - padding);
+				$this.find(".popover-content").outerHeight(h - fh - padding);
 			}, { handle: ".ewResizeHandle" });
 	}
 	$el.data("args", {"popupname": popupname, "useRange": useRange, "rangeFrom": rangeFrom, "rangeTo": rangeTo}).popover("show");
@@ -1449,7 +1449,10 @@ function ewr_SetLanguage(el) {
 		var p = url.lastIndexOf(window.location.search);
 		url = url.substr(0, p) + q;
 	} else {
-		url += "?language=" + encodeURIComponent(val);
+		if(window.location.hash) // Add hash to end
+			url = url.split("#")[0] + "?language=" + encodeURIComponent(val) + "#" + url.split("#")[1];
+		else
+			url += "?language=" + encodeURIComponent(val);
 	}
 	window.location = url;
 }
@@ -2895,8 +2898,8 @@ function ewr_FormatDate(data, format) {
 }
 
 // Extend jQuery
-function ewr_Extend(jQuery) {
-	jQuery.extend({
+function ewr_Extend($) {
+	$.extend({
 		isBoolean: function(o) {
 			return typeof o === 'boolean';
 		},
@@ -2953,7 +2956,6 @@ function ewr_Extend(jQuery) {
 	 * Copyright (c) 2010 Three Dub Media - http://threedubmedia.com
 	 * Open Source MIT License - http://threedubmedia.com/code/license
 	 */
-	(function( $ ){
 
 	// Add the jquery instance method
 	$.fn.drag = function( str, arg, opts ){
@@ -3232,7 +3234,7 @@ function ewr_Extend(jQuery) {
 			event.type = type;
 
 			// Remove the original event
-			event.originalEvent = null;
+			//event.originalEvent = null; // For jQuery 3 //***
 
 			// Initialize the results
 			dd.results = [];
@@ -3420,7 +3422,6 @@ function ewr_Extend(jQuery) {
 
 	// Share the same special event configuration with related events...
 	$special.draginit = $special.dragstart = $special.dragend = drag;
-	})( jQuery );
 }
 ewr_Extend(jQuery);
 

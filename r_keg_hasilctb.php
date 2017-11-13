@@ -1118,9 +1118,9 @@ class crr_keg_hasil_crosstab extends crr_keg_hasil {
 					$ViewValue = &$smry->SummaryViewValue[$i];
 					$ViewAttrs = &$smry->SummaryViewAttrs[$i];
 					$CellAttrs = &$this->SummaryCellAttrs[$i];
-					$HrefValue = "";
+					$SmryHrefValue = "";
 					$LinkAttrs = &$smry->SummaryLinkAttrs[$i];
-					$this->Cell_Rendered($smry, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
+					$this->Cell_Rendered($smry, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $SmryHrefValue, $LinkAttrs);
 				}
 			}
 		} else {
@@ -1153,9 +1153,9 @@ class crr_keg_hasil_crosstab extends crr_keg_hasil {
 					$ViewValue = &$smry->SummaryViewValue[$i];
 					$ViewAttrs = &$smry->SummaryViewAttrs[$i];
 					$CellAttrs = &$this->SummaryCellAttrs[$i];
-					$HrefValue = "";
+					$SmryHrefValue = "";
 					$LinkAttrs = &$smry->SummaryLinkAttrs[$i];
-					$this->Cell_Rendered($smry, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
+					$this->Cell_Rendered($smry, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $SmryHrefValue, $LinkAttrs);
 				}
 			}
 		}

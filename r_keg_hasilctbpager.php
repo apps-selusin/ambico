@@ -38,6 +38,8 @@
 </div>
 <span>&nbsp;<?php echo $ReportLanguage->Phrase("of") ?>&nbsp;<?php echo $Pager->PageCount ?></span>
 </div>
+<?php } ?>
+<?php if ($Pager->RecordCount > 0) { ?>
 <div class="ewPager ewRec">
 <span><?php echo $ReportLanguage->Phrase("Record") ?> <?php echo $Pager->FromIndex ?> <?php echo $ReportLanguage->Phrase("To") ?> <?php echo $Pager->ToIndex ?> <?php echo $ReportLanguage->Phrase("Of") ?> <?php echo $Pager->RecordCount ?></span>
 </div>

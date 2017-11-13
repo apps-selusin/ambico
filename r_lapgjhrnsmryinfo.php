@@ -12,6 +12,7 @@ class crr_lapgjhrn extends crTableBase {
 	var $gjhrn_id;
 	var $bagian;
 	var $divisi;
+	var $rec_no;
 	var $nama;
 	var $nip;
 	var $upah;
@@ -64,6 +65,14 @@ class crr_lapgjhrn extends crTableBase {
 		$this->divisi->DateFilter = "";
 		$this->divisi->SqlSelect = "";
 		$this->divisi->SqlOrderBy = "";
+
+		// rec_no
+		$this->rec_no = new crField('r_lapgjhrn', 'r_lapgjhrn', 'x_rec_no', 'rec_no', '`rec_no`', 201, EWR_DATATYPE_MEMO, -1);
+		$this->rec_no->Sortable = TRUE; // Allow sort
+		$this->fields['rec_no'] = &$this->rec_no;
+		$this->rec_no->DateFilter = "";
+		$this->rec_no->SqlSelect = "";
+		$this->rec_no->SqlOrderBy = "";
 
 		// nama
 		$this->nama = new crField('r_lapgjhrn', 'r_lapgjhrn', 'x_nama', 'nama', '`nama`', 200, EWR_DATATYPE_STRING, -1);
@@ -229,7 +238,7 @@ class crr_lapgjhrn extends crTableBase {
 	var $_SqlSelect = "";
 
 	function getSqlSelect() {
-		return ($this->_SqlSelect <> "") ? $this->_SqlSelect : "SELECT * FROM " . $this->getSqlFrom();
+		return ($this->_SqlSelect <> "") ? $this->_SqlSelect : "SELECT *, '' AS `rec_no` FROM " . $this->getSqlFrom();
 	}
 
 	function SqlSelect() { // For backward compatibility
@@ -473,6 +482,7 @@ class crr_lapgjhrn extends crTableBase {
 		// To view properties of field class, use:
 		//var_dump($this-><FieldName>);
 
+		$this->rec_no->ViewValue = $this->RecCount;
 	}
 
 	// User ID Filtering event

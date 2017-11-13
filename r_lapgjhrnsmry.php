@@ -538,6 +538,7 @@ class crr_lapgjhrn_summary extends crr_lapgjhrn {
 
 		// Set field visibility for detail fields
 		$this->divisi->SetVisibility();
+		$this->rec_no->SetVisibility();
 		$this->nama->SetVisibility();
 		$this->nip->SetVisibility();
 		$this->upah->SetVisibility();
@@ -550,7 +551,7 @@ class crr_lapgjhrn_summary extends crr_lapgjhrn {
 		// 1st dimension = no of groups (level 0 used for grand total)
 		// 2nd dimension = no of fields
 
-		$nDtls = 9;
+		$nDtls = 10;
 		$nGrps = 2;
 		$this->Val = &ewr_InitArray($nDtls, 0);
 		$this->Cnt = &ewr_Init2DArray($nGrps, $nDtls, 0);
@@ -563,7 +564,7 @@ class crr_lapgjhrn_summary extends crr_lapgjhrn {
 		$this->GrandMx = &ewr_InitArray($nDtls, NULL);
 
 		// Set up array if accumulation required: array(Accum, SkipNullOrZero)
-		$this->Col = array(array(FALSE, FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(TRUE,FALSE), array(TRUE,FALSE), array(TRUE,FALSE), array(TRUE,FALSE), array(TRUE,FALSE));
+		$this->Col = array(array(FALSE, FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(TRUE,FALSE), array(TRUE,FALSE), array(TRUE,FALSE), array(TRUE,FALSE), array(TRUE,FALSE));
 
 		// Set up groups per page dynamically
 		$this->SetUpDisplayGrps();
@@ -859,6 +860,7 @@ class crr_lapgjhrn_summary extends crr_lapgjhrn {
 					$this->bagian->setDbValue(ewr_GroupValue($this->bagian, $rs->fields('bagian')));
 			}
 			$this->divisi->setDbValue($rs->fields('divisi'));
+			$this->rec_no->setDbValue($rs->fields('rec_no'));
 			$this->nama->setDbValue($rs->fields('nama'));
 			$this->nip->setDbValue($rs->fields('nip'));
 			$this->upah->setDbValue($rs->fields('upah'));
@@ -869,17 +871,19 @@ class crr_lapgjhrn_summary extends crr_lapgjhrn {
 			$this->start->setDbValue($rs->fields('start'));
 			$this->end->setDbValue($rs->fields('end'));
 			$this->Val[1] = $this->divisi->CurrentValue;
-			$this->Val[2] = $this->nama->CurrentValue;
-			$this->Val[3] = $this->nip->CurrentValue;
-			$this->Val[4] = $this->upah->CurrentValue;
-			$this->Val[5] = $this->premi_malam->CurrentValue;
-			$this->Val[6] = $this->premi_hadir->CurrentValue;
-			$this->Val[7] = $this->pot_absen->CurrentValue;
-			$this->Val[8] = $this->total->CurrentValue;
+			$this->Val[2] = $this->rec_no->CurrentValue;
+			$this->Val[3] = $this->nama->CurrentValue;
+			$this->Val[4] = $this->nip->CurrentValue;
+			$this->Val[5] = $this->upah->CurrentValue;
+			$this->Val[6] = $this->premi_malam->CurrentValue;
+			$this->Val[7] = $this->premi_hadir->CurrentValue;
+			$this->Val[8] = $this->pot_absen->CurrentValue;
+			$this->Val[9] = $this->total->CurrentValue;
 		} else {
 			$this->gjhrn_id->setDbValue("");
 			$this->bagian->setDbValue("");
 			$this->divisi->setDbValue("");
+			$this->rec_no->setDbValue("");
 			$this->nama->setDbValue("");
 			$this->nip->setDbValue("");
 			$this->upah->setDbValue("");
@@ -1058,15 +1062,16 @@ class crr_lapgjhrn_summary extends crr_lapgjhrn {
 				$this->GrandCnt[2] = $this->TotCount;
 				$this->GrandCnt[3] = $this->TotCount;
 				$this->GrandCnt[4] = $this->TotCount;
-				$this->GrandSmry[4] = $rsagg->fields("sum_upah");
 				$this->GrandCnt[5] = $this->TotCount;
-				$this->GrandSmry[5] = $rsagg->fields("sum_premi_malam");
+				$this->GrandSmry[5] = $rsagg->fields("sum_upah");
 				$this->GrandCnt[6] = $this->TotCount;
-				$this->GrandSmry[6] = $rsagg->fields("sum_premi_hadir");
+				$this->GrandSmry[6] = $rsagg->fields("sum_premi_malam");
 				$this->GrandCnt[7] = $this->TotCount;
-				$this->GrandSmry[7] = $rsagg->fields("sum_pot_absen");
+				$this->GrandSmry[7] = $rsagg->fields("sum_premi_hadir");
 				$this->GrandCnt[8] = $this->TotCount;
-				$this->GrandSmry[8] = $rsagg->fields("sum_total");
+				$this->GrandSmry[8] = $rsagg->fields("sum_pot_absen");
+				$this->GrandCnt[9] = $this->TotCount;
+				$this->GrandSmry[9] = $rsagg->fields("sum_total");
 				$rsagg->Close();
 				$bGotSummary = TRUE;
 			}
@@ -1142,6 +1147,9 @@ class crr_lapgjhrn_summary extends crr_lapgjhrn {
 			// divisi
 			$this->divisi->HrefValue = "";
 
+			// rec_no
+			$this->rec_no->HrefValue = "";
+
 			// nama
 			$this->nama->HrefValue = "";
 
@@ -1179,6 +1187,10 @@ class crr_lapgjhrn_summary extends crr_lapgjhrn {
 			// divisi
 			$this->divisi->ViewValue = $this->divisi->CurrentValue;
 			$this->divisi->CellAttrs["class"] = ($this->RecCount % 2 <> 1) ? "ewTableAltRow" : "ewTableRow";
+
+			// rec_no
+			$this->rec_no->ViewValue = $this->rec_no->CurrentValue;
+			$this->rec_no->CellAttrs["class"] = ($this->RecCount % 2 <> 1) ? "ewTableAltRow" : "ewTableRow";
 
 			// nama
 			$this->nama->ViewValue = $this->nama->CurrentValue;
@@ -1223,6 +1235,9 @@ class crr_lapgjhrn_summary extends crr_lapgjhrn {
 
 			// divisi
 			$this->divisi->HrefValue = "";
+
+			// rec_no
+			$this->rec_no->HrefValue = "";
 
 			// nama
 			$this->nama->HrefValue = "";
@@ -1322,6 +1337,15 @@ class crr_lapgjhrn_summary extends crr_lapgjhrn {
 			$LinkAttrs = &$this->divisi->LinkAttrs;
 			$this->Cell_Rendered($this->divisi, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
 
+			// rec_no
+			$CurrentValue = $this->rec_no->CurrentValue;
+			$ViewValue = &$this->rec_no->ViewValue;
+			$ViewAttrs = &$this->rec_no->ViewAttrs;
+			$CellAttrs = &$this->rec_no->CellAttrs;
+			$HrefValue = &$this->rec_no->HrefValue;
+			$LinkAttrs = &$this->rec_no->LinkAttrs;
+			$this->Cell_Rendered($this->rec_no, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
+
 			// nama
 			$CurrentValue = $this->nama->CurrentValue;
 			$ViewValue = &$this->nama->ViewValue;
@@ -1398,6 +1422,7 @@ class crr_lapgjhrn_summary extends crr_lapgjhrn {
 		$this->DtlColumnCount = 0;
 		if ($this->bagian->Visible) $this->GrpColumnCount += 1;
 		if ($this->divisi->Visible) $this->DtlColumnCount += 1;
+		if ($this->rec_no->Visible) $this->DtlColumnCount += 1;
 		if ($this->nama->Visible) $this->DtlColumnCount += 1;
 		if ($this->nip->Visible) $this->DtlColumnCount += 1;
 		if ($this->upah->Visible) $this->DtlColumnCount += 1;
@@ -1457,6 +1482,7 @@ class crr_lapgjhrn_summary extends crr_lapgjhrn {
 			$this->setStartGroup(1);
 			$this->bagian->setSort("");
 			$this->divisi->setSort("");
+			$this->rec_no->setSort("");
 			$this->nama->setSort("");
 			$this->nip->setSort("");
 			$this->upah->setSort("");
@@ -1471,6 +1497,7 @@ class crr_lapgjhrn_summary extends crr_lapgjhrn {
 			$this->CurrentOrderType = $orderType;
 			$this->UpdateSort($this->bagian, $bCtrl); // bagian
 			$this->UpdateSort($this->divisi, $bCtrl); // divisi
+			$this->UpdateSort($this->rec_no, $bCtrl); // rec_no
 			$this->UpdateSort($this->nama, $bCtrl); // nama
 			$this->UpdateSort($this->nip, $bCtrl); // nip
 			$this->UpdateSort($this->upah, $bCtrl); // upah
@@ -1962,6 +1989,24 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 	</td>
 <?php } ?>
 <?php } ?>
+<?php if ($Page->rec_no->Visible) { ?>
+<?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
+	<td data-field="rec_no"><div class="r_lapgjhrn_rec_no"><span class="ewTableHeaderCaption"><?php echo $Page->rec_no->FldCaption() ?></span></div></td>
+<?php } else { ?>
+	<td data-field="rec_no">
+<?php if ($Page->SortUrl($Page->rec_no) == "") { ?>
+		<div class="ewTableHeaderBtn r_lapgjhrn_rec_no">
+			<span class="ewTableHeaderCaption"><?php echo $Page->rec_no->FldCaption() ?></span>
+		</div>
+<?php } else { ?>
+		<div class="ewTableHeaderBtn ewPointer r_lapgjhrn_rec_no" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->rec_no) ?>',2);">
+			<span class="ewTableHeaderCaption"><?php echo $Page->rec_no->FldCaption() ?></span>
+			<span class="ewTableHeaderSort"><?php if ($Page->rec_no->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($Page->rec_no->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span>
+		</div>
+<?php } ?>
+	</td>
+<?php } ?>
+<?php } ?>
 <?php if ($Page->nama->Visible) { ?>
 <?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
 	<td data-field="nama"><div class="r_lapgjhrn_nama"><span class="ewTableHeaderCaption"><?php echo $Page->nama->FldCaption() ?></span></div></td>
@@ -2169,6 +2214,10 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 		<td data-field="divisi"<?php echo $Page->divisi->CellAttributes() ?>>
 <span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->RecCount ?>_r_lapgjhrn_divisi"<?php echo $Page->divisi->ViewAttributes() ?>><?php echo $Page->divisi->ListViewValue() ?></span></td>
 <?php } ?>
+<?php if ($Page->rec_no->Visible) { ?>
+		<td data-field="rec_no"<?php echo $Page->rec_no->CellAttributes() ?>>
+<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->RecCount ?>_r_lapgjhrn_rec_no"<?php echo $Page->rec_no->ViewAttributes() ?>><?php echo $Page->rec_no->ListViewValue() ?></span></td>
+<?php } ?>
 <?php if ($Page->nama->Visible) { ?>
 		<td data-field="nama"<?php echo $Page->nama->CellAttributes() ?>>
 <span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->RecCount ?>_r_lapgjhrn_nama"<?php echo $Page->nama->ViewAttributes() ?>><?php echo $Page->nama->ListViewValue() ?></span></td>
@@ -2235,16 +2284,16 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 <tfoot>
 <?php if (($Page->StopGrp - $Page->StartGrp + 1) <> $Page->TotalGrps) { ?>
 <?php
-	$Page->upah->Count = $Page->Cnt[0][4];
-	$Page->upah->SumValue = $Page->Smry[0][4]; // Load SUM
-	$Page->premi_malam->Count = $Page->Cnt[0][5];
-	$Page->premi_malam->SumValue = $Page->Smry[0][5]; // Load SUM
-	$Page->premi_hadir->Count = $Page->Cnt[0][6];
-	$Page->premi_hadir->SumValue = $Page->Smry[0][6]; // Load SUM
-	$Page->pot_absen->Count = $Page->Cnt[0][7];
-	$Page->pot_absen->SumValue = $Page->Smry[0][7]; // Load SUM
-	$Page->total->Count = $Page->Cnt[0][8];
-	$Page->total->SumValue = $Page->Smry[0][8]; // Load SUM
+	$Page->upah->Count = $Page->Cnt[0][5];
+	$Page->upah->SumValue = $Page->Smry[0][5]; // Load SUM
+	$Page->premi_malam->Count = $Page->Cnt[0][6];
+	$Page->premi_malam->SumValue = $Page->Smry[0][6]; // Load SUM
+	$Page->premi_hadir->Count = $Page->Cnt[0][7];
+	$Page->premi_hadir->SumValue = $Page->Smry[0][7]; // Load SUM
+	$Page->pot_absen->Count = $Page->Cnt[0][8];
+	$Page->pot_absen->SumValue = $Page->Smry[0][8]; // Load SUM
+	$Page->total->Count = $Page->Cnt[0][9];
+	$Page->total->SumValue = $Page->Smry[0][9]; // Load SUM
 	$Page->ResetAttrs();
 	$Page->RowType = EWR_ROWTYPE_TOTAL;
 	$Page->RowTotalType = EWR_ROWTOTAL_PAGE;
@@ -2260,6 +2309,9 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 <?php } ?>
 <?php if ($Page->divisi->Visible) { ?>
 		<td data-field="divisi"<?php echo $Page->divisi->CellAttributes() ?>></td>
+<?php } ?>
+<?php if ($Page->rec_no->Visible) { ?>
+		<td data-field="rec_no"<?php echo $Page->rec_no->CellAttributes() ?>></td>
 <?php } ?>
 <?php if ($Page->nama->Visible) { ?>
 		<td data-field="nama"<?php echo $Page->nama->CellAttributes() ?>></td>
@@ -2292,6 +2344,9 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 <?php if ($Page->divisi->Visible) { ?>
 		<td data-field="divisi"<?php echo $Page->divisi->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
+<?php if ($Page->rec_no->Visible) { ?>
+		<td data-field="rec_no"<?php echo $Page->rec_no->CellAttributes() ?>>&nbsp;</td>
+<?php } ?>
 <?php if ($Page->nama->Visible) { ?>
 		<td data-field="nama"<?php echo $Page->nama->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
@@ -2322,16 +2377,16 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 <?php } ?>
 <?php } ?>
 <?php
-	$Page->upah->Count = $Page->GrandCnt[4];
-	$Page->upah->SumValue = $Page->GrandSmry[4]; // Load SUM
-	$Page->premi_malam->Count = $Page->GrandCnt[5];
-	$Page->premi_malam->SumValue = $Page->GrandSmry[5]; // Load SUM
-	$Page->premi_hadir->Count = $Page->GrandCnt[6];
-	$Page->premi_hadir->SumValue = $Page->GrandSmry[6]; // Load SUM
-	$Page->pot_absen->Count = $Page->GrandCnt[7];
-	$Page->pot_absen->SumValue = $Page->GrandSmry[7]; // Load SUM
-	$Page->total->Count = $Page->GrandCnt[8];
-	$Page->total->SumValue = $Page->GrandSmry[8]; // Load SUM
+	$Page->upah->Count = $Page->GrandCnt[5];
+	$Page->upah->SumValue = $Page->GrandSmry[5]; // Load SUM
+	$Page->premi_malam->Count = $Page->GrandCnt[6];
+	$Page->premi_malam->SumValue = $Page->GrandSmry[6]; // Load SUM
+	$Page->premi_hadir->Count = $Page->GrandCnt[7];
+	$Page->premi_hadir->SumValue = $Page->GrandSmry[7]; // Load SUM
+	$Page->pot_absen->Count = $Page->GrandCnt[8];
+	$Page->pot_absen->SumValue = $Page->GrandSmry[8]; // Load SUM
+	$Page->total->Count = $Page->GrandCnt[9];
+	$Page->total->SumValue = $Page->GrandSmry[9]; // Load SUM
 	$Page->ResetAttrs();
 	$Page->RowType = EWR_ROWTYPE_TOTAL;
 	$Page->RowTotalType = EWR_ROWTOTAL_GRAND;
@@ -2347,6 +2402,9 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 <?php } ?>
 <?php if ($Page->divisi->Visible) { ?>
 		<td data-field="divisi"<?php echo $Page->divisi->CellAttributes() ?>></td>
+<?php } ?>
+<?php if ($Page->rec_no->Visible) { ?>
+		<td data-field="rec_no"<?php echo $Page->rec_no->CellAttributes() ?>></td>
 <?php } ?>
 <?php if ($Page->nama->Visible) { ?>
 		<td data-field="nama"<?php echo $Page->nama->CellAttributes() ?>></td>
@@ -2378,6 +2436,9 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 <?php } ?>
 <?php if ($Page->divisi->Visible) { ?>
 		<td data-field="divisi"<?php echo $Page->divisi->CellAttributes() ?>>&nbsp;</td>
+<?php } ?>
+<?php if ($Page->rec_no->Visible) { ?>
+		<td data-field="rec_no"<?php echo $Page->rec_no->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
 <?php if ($Page->nama->Visible) { ?>
 		<td data-field="nama"<?php echo $Page->nama->CellAttributes() ?>>&nbsp;</td>

@@ -781,7 +781,6 @@ class crr_att_log_summary extends crr_att_log {
 		if (!$rs)
 			return;
 		if ($opt == 1) { // Get first row
-			$rs->MoveFirst(); // Move first
 				$this->FirstRowData = array();
 				$this->FirstRowData['sn'] = ewr_Conv($rs->fields('sn'), 200);
 				$this->FirstRowData['att_id'] = ewr_Conv($rs->fields('att_id'), 200);

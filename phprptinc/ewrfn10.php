@@ -4212,7 +4212,7 @@ function ewr_FilterDropDownValue($fld, $sep = ", ") {
 	$value = $fld->DropDownValue;
 	if (is_array($value))
 		$value = implode($sep, $value);
-	if ($fld->DropDownValue == EWR_INIT_VALUE || is_null($fld->DropDownValue))
+	if ($value == EWR_INIT_VALUE || is_null($value))
 		$value = ($sep == ",") ? "" : $ReportLanguage->Phrase("PleaseSelect"); // Output empty string as value for input tag
 	return $value;
 }
@@ -5059,7 +5059,7 @@ function ewr_CrossTabField($smrytype, $smryfld, $colfld, $datetype, $val, $qc, $
 	}
 	switch ($smrytype) {
 	case "SUM":
-		$fld = $smrytype . "(" . $smryfld . "*" . ewr_SQLDistinctFactor($colfld, $datetype, $val, $qc, $dbid) . ")";
+		$fld = $smrytype . "(" . $smryfld . "*" . ewr_SQLDistinctFactor($colfld, $datetype, $wrkval, $wrkqc, $dbid) . ")";
 		break;
 	case "COUNT":
 		$fld = "SUM(" . ewr_SQLDistinctFactor($colfld, $datetype, $wrkval, $wrkqc, $dbid) . ")";
@@ -9109,9 +9109,11 @@ function ewr_GetFileUploadUrl($fld, $val, $resize = FALSE, $encrypt = EWR_ENCRYP
 // URL Encode file path
 function ewr_UrlEncodeFilePath($path) {
 	$ar = explode("/", $path);
-	$cnt = count($ar);
-	for ($i = 0; $i < $cnt; $i++)
-		$ar[$i] = urlencode($ar[$i]);
+	$scheme = parse_url($path, PHP_URL_SCHEME);
+	foreach ($ar as &$c) {
+		if ($c != $scheme . ":")
+			$c = rawurlencode($c);
+	}
 	return implode("/", $ar);
 }
 
@@ -9155,6 +9157,8 @@ function ewr_GetFileViewTag(&$fld, $val) {
 					$image = "<a" . $fld->LinkAttributes() . "><img class=\"ewImage\" alt=\"\" src=\"" . $fn . "\"" . $fld->ViewAttributes() . "></a>";
 				}
 			} else {
+				unset($fld->LinkAttrs["class"]);
+				unset($fld->LinkAttrs["data-rel"]);
 				if ($fld->FldDataType == EWR_DATATYPE_BLOB) {
 					$url = $fn;
 					$name = $fld->FldCaption();
@@ -9162,7 +9166,8 @@ function ewr_GetFileViewTag(&$fld, $val) {
 					$url = ewr_GetFileUploadUrl($fld, $wrkfile, FALSE, EWR_ENCRYPT_FILE_PATH, TRUE);
 					$name = basename($wrkfile);
 				}
-				$image = ($url <> "") ? "<a href=\"" . $url . "\">" . $name . "</a>" : $name;
+				$fld->HrefValue = $url;
+				$image = ($fld->HrefValue <> "") ? "<a" . $fld->LinkAttributes() . ">" . $name . "</a>" : $name;
 			}
 			if ($bMultiple)
 				$images .= "<li>" . $image . "</li>";

@@ -1109,9 +1109,9 @@ class crr_rekon_brngan_crosstab extends crr_rekon_brngan {
 					$ViewValue = &$smry->SummaryViewValue[$i];
 					$ViewAttrs = &$smry->SummaryViewAttrs[$i];
 					$CellAttrs = &$this->SummaryCellAttrs[$i];
-					$HrefValue = "";
+					$SmryHrefValue = "";
 					$LinkAttrs = &$smry->SummaryLinkAttrs[$i];
-					$this->Cell_Rendered($smry, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
+					$this->Cell_Rendered($smry, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $SmryHrefValue, $LinkAttrs);
 				}
 			}
 		} else {
@@ -1134,9 +1134,9 @@ class crr_rekon_brngan_crosstab extends crr_rekon_brngan {
 					$ViewValue = &$smry->SummaryViewValue[$i];
 					$ViewAttrs = &$smry->SummaryViewAttrs[$i];
 					$CellAttrs = &$this->SummaryCellAttrs[$i];
-					$HrefValue = "";
+					$SmryHrefValue = "";
 					$LinkAttrs = &$smry->SummaryLinkAttrs[$i];
-					$this->Cell_Rendered($smry, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
+					$this->Cell_Rendered($smry, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $SmryHrefValue, $LinkAttrs);
 				}
 			}
 		}
