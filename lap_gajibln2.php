@@ -59,6 +59,18 @@ function f_harilibur($mtgl, $mconn) {
 	}
 }
 
+function f_check_gol_hk($gol_hk, $pegawai_id, $start, $end, $mconn) {
+	$q = "select hk_def from v_jdw_krj_def where pegawai_id = ".$pegawai_id." and tgl between '".$start."' and '".$end."' group by hk_def";
+	//if ($pegawai_id == 71) {echo $q; exit;}
+	$r = $mconn->Execute($q);
+	if (!$r->EOF) {
+		if ($r->fields["hk_def"] == $gol_hk) {
+			return true;
+		}
+	}
+	return false;
+}
+
 $msql = "delete from t_gjbln";
 $conn->Execute($msql);
 
@@ -106,6 +118,11 @@ while (!$rs->EOF) {
 			$p_absen6   = $gp / 30; // potongan absen 6 hk
 			$p_aspen    = $gp * $rs->fields["pot_aspen"]; // potongan astek & pensiun
 			$p_bpjs     = ($rs->fields["pot_bpjs"] < 1 ? $gp * $rs->fields["pot_bpjs"] : $rs->fields["pot_bpjs"]); // potongan bpjs
+			
+			if(!f_check_gol_hk($rs->fields["gol_hk"], $pegawai_id, $_POST['start'], $_POST['end'], $conn)) {
+				$rs->MoveNext();
+				continue;
+			}
 			
 			$msql = "
 				select * from v_jdw_krj_def
