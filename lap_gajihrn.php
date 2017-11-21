@@ -74,6 +74,7 @@ $rs = $conn->Execute($msql);
 while (!$rs->EOF) { 
 	$mlapgroup_id   = $rs->fields["lapgroup_id"];
 	$mlapgroup_nama = $rs->fields["lapgroup_nama"];
+	$mlapgroup_index = $rs->fields["lapgroup_index"];
 	$mtotal1 = 0;
 	while ($rs->fields["lapgroup_id"] == $mlapgroup_id and !$rs->EOF) {
 		$mpembagian2_id   = $rs->fields["pembagian2_id"];
@@ -218,6 +219,7 @@ while (!$rs->EOF) {
 			$mpegawai_nama = addslashes($mpegawai_nama);
 			$msql = "
 				insert into t_gjhrn values (null, 
+				".$mlapgroup_index.",
 				'".$mlapgroup_nama."'
 				, '".$mpembagian2_nama."'
 				, '".$mpegawai_nama."'

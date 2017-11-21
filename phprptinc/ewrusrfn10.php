@@ -22,6 +22,8 @@ function GetStartsWithAFilter($FldExpression, $dbid) {
 function Page_Loading() {
 
 	//echo "Page Loading";
+	$_SESSION["rec_no"] = 1;
+	$_SESSION["r_lapgjhrn_flag"] = 0;
 }
 
 // Page Rendering event
@@ -36,6 +38,7 @@ function Page_Unloaded() {
 	//echo "Page Unloaded";
 }
 
+//$no = 0;
 function ewr_CurrentHost() {
 	return ewr_ServerVar("HTTP_HOST");
 }

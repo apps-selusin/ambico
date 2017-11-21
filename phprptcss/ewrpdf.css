@@ -28,7 +28,7 @@ body {
 .ewTable .ewTableHeader td, .ewTable .ewTableHeader th {
 	background-image: none; /* remove header bg image */
 	background-color: #40546A; /* header bgcolor */
-	color: #FFFFFF; /* header font color */
+	color: #000000; /* header font color */
 	vertical-align: top;
 }
 
@@ -193,11 +193,11 @@ body {
 }
 .ewRptColSummary {
 	background-color: #40546A; /* column summary */
-	color: #FFFFFF;
+	color: #000000;
 }
 .ewRptColHeader {
 	background-color: #40546A; /* column heading background color */
-	color: #FFFFFF; /* column heading text color */
+	color: #000000; /* column heading text color */
 }
 
 /* export page break */

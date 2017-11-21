@@ -1,18 +1,18 @@
 <?php
 
 // Global variable for table object
-$r_lapgjhrn = NULL;
+$t_gjhrn = NULL;
 
 //
-// Table class for r_lapgjhrn
+// Table class for t_gjhrn
 //
-class crr_lapgjhrn extends crTableBase {
+class crt_gjhrn extends crTableBase {
 	var $ShowGroupHeaderAsRow = FALSE;
 	var $ShowCompactSummaryFooter = TRUE;
 	var $gjhrn_id;
-	var $rec_no;
 	var $bagian;
 	var $divisi;
+	var $rec_no;
 	var $nama;
 	var $nip;
 	var $upah;
@@ -22,22 +22,21 @@ class crr_lapgjhrn extends crTableBase {
 	var $total;
 	var $start;
 	var $end;
-	var $lapgroup_index;
 
 	//
 	// Table class constructor
 	//
 	function __construct() {
 		global $ReportLanguage, $gsLanguage;
-		$this->TableVar = 'r_lapgjhrn';
-		$this->TableName = 'r_lapgjhrn';
-		$this->TableType = 'REPORT';
+		$this->TableVar = 't_gjhrn';
+		$this->TableName = 't_gjhrn';
+		$this->TableType = 'TABLE';
 		$this->DBID = 'DB';
 		$this->ExportAll = FALSE;
 		$this->ExportPageBreakCount = 0;
 
 		// gjhrn_id
-		$this->gjhrn_id = new crField('r_lapgjhrn', 'r_lapgjhrn', 'x_gjhrn_id', 'gjhrn_id', '`gjhrn_id`', 3, EWR_DATATYPE_NUMBER, -1);
+		$this->gjhrn_id = new crField('t_gjhrn', 't_gjhrn', 'x_gjhrn_id', 'gjhrn_id', '`gjhrn_id`', 3, EWR_DATATYPE_NUMBER, -1);
 		$this->gjhrn_id->Sortable = TRUE; // Allow sort
 		$this->gjhrn_id->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectInteger");
 		$this->fields['gjhrn_id'] = &$this->gjhrn_id;
@@ -45,44 +44,33 @@ class crr_lapgjhrn extends crTableBase {
 		$this->gjhrn_id->SqlSelect = "";
 		$this->gjhrn_id->SqlOrderBy = "";
 
+		// bagian
+		$this->bagian = new crField('t_gjhrn', 't_gjhrn', 'x_bagian', 'bagian', '`bagian`', 200, EWR_DATATYPE_STRING, -1);
+		$this->bagian->Sortable = TRUE; // Allow sort
+		$this->fields['bagian'] = &$this->bagian;
+		$this->bagian->DateFilter = "";
+		$this->bagian->SqlSelect = "";
+		$this->bagian->SqlOrderBy = "";
+
+		// divisi
+		$this->divisi = new crField('t_gjhrn', 't_gjhrn', 'x_divisi', 'divisi', '`divisi`', 200, EWR_DATATYPE_STRING, -1);
+		$this->divisi->Sortable = TRUE; // Allow sort
+		$this->fields['divisi'] = &$this->divisi;
+		$this->divisi->DateFilter = "";
+		$this->divisi->SqlSelect = "";
+		$this->divisi->SqlOrderBy = "";
+
 		// rec_no
-		$this->rec_no = new crField('r_lapgjhrn', 'r_lapgjhrn', 'x_rec_no', 'rec_no', '`rec_no`', 201, EWR_DATATYPE_MEMO, -1);
+		$this->rec_no = new crField('t_gjhrn', 't_gjhrn', 'x_rec_no', 'rec_no', '\'\'', 201, EWR_DATATYPE_MEMO, -1);
+		$this->rec_no->FldIsCustom = TRUE; // Custom field
 		$this->rec_no->Sortable = TRUE; // Allow sort
 		$this->fields['rec_no'] = &$this->rec_no;
 		$this->rec_no->DateFilter = "";
 		$this->rec_no->SqlSelect = "";
 		$this->rec_no->SqlOrderBy = "";
 
-		// bagian
-		$this->bagian = new crField('r_lapgjhrn', 'r_lapgjhrn', 'x_bagian', 'bagian', '`bagian`', 200, EWR_DATATYPE_STRING, -1);
-		$this->bagian->Sortable = TRUE; // Allow sort
-		$this->bagian->GroupingFieldId = 2;
-		$this->bagian->ShowGroupHeaderAsRow = $this->ShowGroupHeaderAsRow;
-		$this->bagian->ShowCompactSummaryFooter = $this->ShowCompactSummaryFooter;
-		$this->fields['bagian'] = &$this->bagian;
-		$this->bagian->DateFilter = "";
-		$this->bagian->SqlSelect = "";
-		$this->bagian->SqlOrderBy = "";
-		$this->bagian->FldGroupByType = "";
-		$this->bagian->FldGroupInt = "0";
-		$this->bagian->FldGroupSql = "";
-
-		// divisi
-		$this->divisi = new crField('r_lapgjhrn', 'r_lapgjhrn', 'x_divisi', 'divisi', '`divisi`', 200, EWR_DATATYPE_STRING, -1);
-		$this->divisi->Sortable = TRUE; // Allow sort
-		$this->divisi->GroupingFieldId = 3;
-		$this->divisi->ShowGroupHeaderAsRow = $this->ShowGroupHeaderAsRow;
-		$this->divisi->ShowCompactSummaryFooter = $this->ShowCompactSummaryFooter;
-		$this->fields['divisi'] = &$this->divisi;
-		$this->divisi->DateFilter = "";
-		$this->divisi->SqlSelect = "";
-		$this->divisi->SqlOrderBy = "";
-		$this->divisi->FldGroupByType = "";
-		$this->divisi->FldGroupInt = "0";
-		$this->divisi->FldGroupSql = "";
-
 		// nama
-		$this->nama = new crField('r_lapgjhrn', 'r_lapgjhrn', 'x_nama', 'nama', '`nama`', 200, EWR_DATATYPE_STRING, -1);
+		$this->nama = new crField('t_gjhrn', 't_gjhrn', 'x_nama', 'nama', '`nama`', 200, EWR_DATATYPE_STRING, -1);
 		$this->nama->Sortable = TRUE; // Allow sort
 		$this->fields['nama'] = &$this->nama;
 		$this->nama->DateFilter = "";
@@ -90,7 +78,7 @@ class crr_lapgjhrn extends crTableBase {
 		$this->nama->SqlOrderBy = "";
 
 		// nip
-		$this->nip = new crField('r_lapgjhrn', 'r_lapgjhrn', 'x_nip', 'nip', '`nip`', 200, EWR_DATATYPE_STRING, -1);
+		$this->nip = new crField('t_gjhrn', 't_gjhrn', 'x_nip', 'nip', '`nip`', 200, EWR_DATATYPE_STRING, -1);
 		$this->nip->Sortable = TRUE; // Allow sort
 		$this->fields['nip'] = &$this->nip;
 		$this->nip->DateFilter = "";
@@ -98,7 +86,7 @@ class crr_lapgjhrn extends crTableBase {
 		$this->nip->SqlOrderBy = "";
 
 		// upah
-		$this->upah = new crField('r_lapgjhrn', 'r_lapgjhrn', 'x_upah', 'upah', '`upah`', 4, EWR_DATATYPE_NUMBER, -1);
+		$this->upah = new crField('t_gjhrn', 't_gjhrn', 'x_upah', 'upah', '`upah`', 4, EWR_DATATYPE_NUMBER, -1);
 		$this->upah->Sortable = TRUE; // Allow sort
 		$this->upah->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectFloat");
 		$this->fields['upah'] = &$this->upah;
@@ -107,7 +95,7 @@ class crr_lapgjhrn extends crTableBase {
 		$this->upah->SqlOrderBy = "";
 
 		// premi_malam
-		$this->premi_malam = new crField('r_lapgjhrn', 'r_lapgjhrn', 'x_premi_malam', 'premi_malam', '`premi_malam`', 4, EWR_DATATYPE_NUMBER, -1);
+		$this->premi_malam = new crField('t_gjhrn', 't_gjhrn', 'x_premi_malam', 'premi_malam', '`premi_malam`', 4, EWR_DATATYPE_NUMBER, -1);
 		$this->premi_malam->Sortable = TRUE; // Allow sort
 		$this->premi_malam->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectFloat");
 		$this->fields['premi_malam'] = &$this->premi_malam;
@@ -116,7 +104,7 @@ class crr_lapgjhrn extends crTableBase {
 		$this->premi_malam->SqlOrderBy = "";
 
 		// premi_hadir
-		$this->premi_hadir = new crField('r_lapgjhrn', 'r_lapgjhrn', 'x_premi_hadir', 'premi_hadir', '`premi_hadir`', 4, EWR_DATATYPE_NUMBER, -1);
+		$this->premi_hadir = new crField('t_gjhrn', 't_gjhrn', 'x_premi_hadir', 'premi_hadir', '`premi_hadir`', 4, EWR_DATATYPE_NUMBER, -1);
 		$this->premi_hadir->Sortable = TRUE; // Allow sort
 		$this->premi_hadir->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectFloat");
 		$this->fields['premi_hadir'] = &$this->premi_hadir;
@@ -125,7 +113,7 @@ class crr_lapgjhrn extends crTableBase {
 		$this->premi_hadir->SqlOrderBy = "";
 
 		// pot_absen
-		$this->pot_absen = new crField('r_lapgjhrn', 'r_lapgjhrn', 'x_pot_absen', 'pot_absen', '`pot_absen`', 4, EWR_DATATYPE_NUMBER, -1);
+		$this->pot_absen = new crField('t_gjhrn', 't_gjhrn', 'x_pot_absen', 'pot_absen', '`pot_absen`', 4, EWR_DATATYPE_NUMBER, -1);
 		$this->pot_absen->Sortable = TRUE; // Allow sort
 		$this->pot_absen->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectFloat");
 		$this->fields['pot_absen'] = &$this->pot_absen;
@@ -134,7 +122,7 @@ class crr_lapgjhrn extends crTableBase {
 		$this->pot_absen->SqlOrderBy = "";
 
 		// total
-		$this->total = new crField('r_lapgjhrn', 'r_lapgjhrn', 'x_total', 'total', '`total`', 4, EWR_DATATYPE_NUMBER, -1);
+		$this->total = new crField('t_gjhrn', 't_gjhrn', 'x_total', 'total', '`total`', 4, EWR_DATATYPE_NUMBER, -1);
 		$this->total->Sortable = TRUE; // Allow sort
 		$this->total->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectFloat");
 		$this->fields['total'] = &$this->total;
@@ -143,7 +131,7 @@ class crr_lapgjhrn extends crTableBase {
 		$this->total->SqlOrderBy = "";
 
 		// start
-		$this->start = new crField('r_lapgjhrn', 'r_lapgjhrn', 'x_start', 'start', '`start`', 133, EWR_DATATYPE_DATE, 0);
+		$this->start = new crField('t_gjhrn', 't_gjhrn', 'x_start', 'start', '`start`', 133, EWR_DATATYPE_DATE, 0);
 		$this->start->Sortable = TRUE; // Allow sort
 		$this->start->FldDefaultErrMsg = str_replace("%s", $GLOBALS["EWR_DATE_FORMAT"], $ReportLanguage->Phrase("IncorrectDate"));
 		$this->fields['start'] = &$this->start;
@@ -152,28 +140,13 @@ class crr_lapgjhrn extends crTableBase {
 		$this->start->SqlOrderBy = "";
 
 		// end
-		$this->end = new crField('r_lapgjhrn', 'r_lapgjhrn', 'x_end', 'end', '`end`', 133, EWR_DATATYPE_DATE, 0);
+		$this->end = new crField('t_gjhrn', 't_gjhrn', 'x_end', 'end', '`end`', 133, EWR_DATATYPE_DATE, 0);
 		$this->end->Sortable = TRUE; // Allow sort
 		$this->end->FldDefaultErrMsg = str_replace("%s", $GLOBALS["EWR_DATE_FORMAT"], $ReportLanguage->Phrase("IncorrectDate"));
 		$this->fields['end'] = &$this->end;
 		$this->end->DateFilter = "";
 		$this->end->SqlSelect = "";
 		$this->end->SqlOrderBy = "";
-
-		// lapgroup_index
-		$this->lapgroup_index = new crField('r_lapgjhrn', 'r_lapgjhrn', 'x_lapgroup_index', 'lapgroup_index', '`lapgroup_index`', 16, EWR_DATATYPE_NUMBER, -1);
-		$this->lapgroup_index->Sortable = TRUE; // Allow sort
-		$this->lapgroup_index->GroupingFieldId = 1;
-		$this->lapgroup_index->ShowGroupHeaderAsRow = $this->ShowGroupHeaderAsRow;
-		$this->lapgroup_index->ShowCompactSummaryFooter = $this->ShowCompactSummaryFooter;
-		$this->lapgroup_index->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectInteger");
-		$this->fields['lapgroup_index'] = &$this->lapgroup_index;
-		$this->lapgroup_index->DateFilter = "";
-		$this->lapgroup_index->SqlSelect = "";
-		$this->lapgroup_index->SqlOrderBy = "";
-		$this->lapgroup_index->FldGroupByType = "";
-		$this->lapgroup_index->FldGroupInt = "0";
-		$this->lapgroup_index->FldGroupSql = "";
 	}
 
 	// Set Field Visibility
@@ -321,7 +294,7 @@ class crr_lapgjhrn extends crTableBase {
 	var $_SqlOrderBy = "";
 
 	function getSqlOrderBy() {
-		return ($this->_SqlOrderBy <> "") ? $this->_SqlOrderBy : "`lapgroup_index` ASC, `bagian` ASC, `divisi` ASC";
+		return ($this->_SqlOrderBy <> "") ? $this->_SqlOrderBy : "";
 	}
 
 	function SqlOrderBy() { // For backward compatibility
@@ -332,58 +305,11 @@ class crr_lapgjhrn extends crTableBase {
 		$this->_SqlOrderBy = $v;
 	}
 
-	// Table Level Group SQL
-	// First Group Field
-
-	var $_SqlFirstGroupField = "";
-
-	function getSqlFirstGroupField() {
-		return ($this->_SqlFirstGroupField <> "") ? $this->_SqlFirstGroupField : "`lapgroup_index`";
-	}
-
-	function SqlFirstGroupField() { // For backward compatibility
-		return $this->getSqlFirstGroupField();
-	}
-
-	function setSqlFirstGroupField($v) {
-		$this->_SqlFirstGroupField = $v;
-	}
-
-	// Select Group
-	var $_SqlSelectGroup = "";
-
-	function getSqlSelectGroup() {
-		return ($this->_SqlSelectGroup <> "") ? $this->_SqlSelectGroup : "SELECT DISTINCT " . $this->getSqlFirstGroupField() . " FROM " . $this->getSqlFrom();
-	}
-
-	function SqlSelectGroup() { // For backward compatibility
-		return $this->getSqlSelectGroup();
-	}
-
-	function setSqlSelectGroup($v) {
-		$this->_SqlSelectGroup = $v;
-	}
-
-	// Order By Group
-	var $_SqlOrderByGroup = "";
-
-	function getSqlOrderByGroup() {
-		return ($this->_SqlOrderByGroup <> "") ? $this->_SqlOrderByGroup : "`lapgroup_index` ASC";
-	}
-
-	function SqlOrderByGroup() { // For backward compatibility
-		return $this->getSqlOrderByGroup();
-	}
-
-	function setSqlOrderByGroup($v) {
-		$this->_SqlOrderByGroup = $v;
-	}
-
 	// Select Aggregate
 	var $_SqlSelectAgg = "";
 
 	function getSqlSelectAgg() {
-		return ($this->_SqlSelectAgg <> "") ? $this->_SqlSelectAgg : "SELECT SUM(`upah`) AS `sum_upah`, SUM(`premi_malam`) AS `sum_premi_malam`, SUM(`premi_hadir`) AS `sum_premi_hadir`, SUM(`pot_absen`) AS `sum_pot_absen`, SUM(`total`) AS `sum_total` FROM " . $this->getSqlFrom();
+		return ($this->_SqlSelectAgg <> "") ? $this->_SqlSelectAgg : "SELECT * FROM " . $this->getSqlFrom();
 	}
 
 	function SqlSelectAgg() { // For backward compatibility
@@ -488,14 +414,6 @@ class crr_lapgjhrn extends crTableBase {
 	function Row_Rendering() {
 
 		// Enter your code here
-		if ($_SESSION["r_lapgjhrn_flag"] == 0) {
-			$_SESSION["r_lapgjhrn_flag"] = 1;
-			$_SESSION["r_lapgjhrn_divisi"] = $this->divisi->DbValue;
-		}
-		if ($_SESSION["r_lapgjhrn_divisi"] != $this->divisi->DbValue) {
-			$_SESSION["r_lapgjhrn_divisi"] = $this->divisi->DbValue;
-			$_SESSION["rec_no"]--;
-		}
 	}
 
 	// Cell Rendered event
@@ -510,10 +428,8 @@ class crr_lapgjhrn extends crTableBase {
 	function Row_Rendered() {
 
 		// To view properties of field class, use:
-		//var_dump($this->nama);
-		//$this->rec_no->ViewValue = $this->RecCount;
+		//var_dump($this-><FieldName>);
 
-		$this->rec_no->ViewValue = $_SESSION["rec_no"]++;
 	}
 
 	// User ID Filtering event
