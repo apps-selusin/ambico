@@ -24,6 +24,8 @@ function Page_Loading() {
 	//echo "Page Loading";
 	$_SESSION["rec_no"] = 1;
 	$_SESSION["r_lapgjhrn_flag"] = 0;
+	$_SESSION["r_lapgjbln_rec_no"] = 1;
+	$_SESSION["r_lapgjbln_flag"] = 0;
 }
 
 // Page Rendering event

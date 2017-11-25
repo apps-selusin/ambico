@@ -875,6 +875,7 @@ class crr_lapgjbln_summary extends crr_lapgjbln {
 		}
 		if (!$rs->EOF) {
 			$this->gjbln_id->setDbValue($rs->fields('gjbln_id'));
+			$this->rec_no->setDbValue($rs->fields('rec_no'));
 			if ($opt <> 1) {
 				if (is_array($this->bagian->GroupDbValues))
 					$this->bagian->setDbValue(@$this->bagian->GroupDbValues[$rs->fields('bagian')]);
@@ -882,7 +883,6 @@ class crr_lapgjbln_summary extends crr_lapgjbln {
 					$this->bagian->setDbValue(ewr_GroupValue($this->bagian, $rs->fields('bagian')));
 			}
 			$this->divisi->setDbValue($rs->fields('divisi'));
-			$this->rec_no->setDbValue($rs->fields('rec_no'));
 			$this->nama->setDbValue($rs->fields('nama'));
 			$this->nip->setDbValue($rs->fields('nip'));
 			$this->gp->setDbValue($rs->fields('gp'));
@@ -913,9 +913,9 @@ class crr_lapgjbln_summary extends crr_lapgjbln {
 			$this->Val[13] = $this->j_netto->CurrentValue;
 		} else {
 			$this->gjbln_id->setDbValue("");
+			$this->rec_no->setDbValue("");
 			$this->bagian->setDbValue("");
 			$this->divisi->setDbValue("");
-			$this->rec_no->setDbValue("");
 			$this->nama->setDbValue("");
 			$this->nip->setDbValue("");
 			$this->gp->setDbValue("");
@@ -1723,7 +1723,7 @@ class crr_lapgjbln_summary extends crr_lapgjbln {
 	// - Variables setup: Session[EWR_TABLE_SESSION_ORDER_BY], Session["sort_Table_Field"]
 	function GetSort($options = array()) {
 		if ($this->DrillDown)
-			return "";
+			return "`nip` ASC";
 		$bResetSort = @$options["resetsort"] == "1" || @$_GET["cmd"] == "resetsort";
 		$orderBy = (@$options["order"] <> "") ? @$options["order"] : ewr_StripSlashes(@$_GET["order"]);
 		$orderType = (@$options["ordertype"] <> "") ? @$options["ordertype"] : ewr_StripSlashes(@$_GET["ordertype"]);
@@ -1773,6 +1773,12 @@ class crr_lapgjbln_summary extends crr_lapgjbln {
 			$sSortSql = $this->SortSql();
 			$this->setOrderBy($sSortSql);
 			$this->setStartGroup(1);
+		}
+
+		// Set up default sort
+		if ($this->getOrderBy() == "") {
+			$this->setOrderBy("`nip` ASC");
+			$this->nip->setSort("ASC");
 		}
 		return $this->getOrderBy();
 	}

@@ -10,9 +10,9 @@ class crr_lapgjbln extends crTableBase {
 	var $ShowGroupHeaderAsRow = FALSE;
 	var $ShowCompactSummaryFooter = TRUE;
 	var $gjbln_id;
+	var $rec_no;
 	var $bagian;
 	var $divisi;
-	var $rec_no;
 	var $nama;
 	var $nip;
 	var $gp;
@@ -50,6 +50,14 @@ class crr_lapgjbln extends crTableBase {
 		$this->gjbln_id->SqlSelect = "";
 		$this->gjbln_id->SqlOrderBy = "";
 
+		// rec_no
+		$this->rec_no = new crField('r_lapgjbln', 'r_lapgjbln', 'x_rec_no', 'rec_no', '`rec_no`', 201, EWR_DATATYPE_MEMO, -1);
+		$this->rec_no->Sortable = TRUE; // Allow sort
+		$this->fields['rec_no'] = &$this->rec_no;
+		$this->rec_no->DateFilter = "";
+		$this->rec_no->SqlSelect = "";
+		$this->rec_no->SqlOrderBy = "";
+
 		// bagian
 		$this->bagian = new crField('r_lapgjbln', 'r_lapgjbln', 'x_bagian', 'bagian', '`bagian`', 200, EWR_DATATYPE_STRING, -1);
 		$this->bagian->Sortable = TRUE; // Allow sort
@@ -79,14 +87,6 @@ class crr_lapgjbln extends crTableBase {
 		$this->divisi->FldGroupByType = "";
 		$this->divisi->FldGroupInt = "0";
 		$this->divisi->FldGroupSql = "";
-
-		// rec_no
-		$this->rec_no = new crField('r_lapgjbln', 'r_lapgjbln', 'x_rec_no', 'rec_no', '`rec_no`', 201, EWR_DATATYPE_MEMO, -1);
-		$this->rec_no->Sortable = TRUE; // Allow sort
-		$this->fields['rec_no'] = &$this->rec_no;
-		$this->rec_no->DateFilter = "";
-		$this->rec_no->SqlSelect = "";
-		$this->rec_no->SqlOrderBy = "";
 
 		// nama
 		$this->nama = new crField('r_lapgjbln', 'r_lapgjbln', 'x_nama', 'nama', '`nama`', 200, EWR_DATATYPE_STRING, -1);
@@ -536,6 +536,14 @@ class crr_lapgjbln extends crTableBase {
 	function Row_Rendering() {
 
 		// Enter your code here
+		if ($_SESSION["r_lapgjbln_flag"] == 0) {
+			$_SESSION["r_lapgjbln_flag"] = 1;
+			$_SESSION["r_lapgjbln_divisi"] = $this->divisi->DbValue;
+		}
+		if ($_SESSION["r_lapgjbln_divisi"] != $this->divisi->DbValue) {
+			$_SESSION["r_lapgjbln_divisi"] = $this->divisi->DbValue;
+			$_SESSION["r_lapgjbln_rec_no"]--;
+		}
 	}
 
 	// Cell Rendered event
@@ -552,7 +560,7 @@ class crr_lapgjbln extends crTableBase {
 		// To view properties of field class, use:
 		//var_dump($this-><FieldName>);
 
-		$this->rec_no->ViewValue = $this->RecCount;
+		$this->rec_no->ViewValue = $_SESSION["r_lapgjbln_rec_no"]++;
 	}
 
 	// User ID Filtering event
