@@ -101,6 +101,7 @@ $rs = $conn->Execute($msql);
 while (!$rs->EOF) {
 	$mlapgroup_id = $rs->fields["lapgroup_id"];
 	$mlapgroup_nama = $rs->fields["lapgroup_nama"];
+	$mlapgroup_index = $rs->fields["lapgroup_index"];
 	while ($rs->fields["lapgroup_id"] == $mlapgroup_id and !$rs->EOF) {
 		$mpembagian2_id = $rs->fields["pembagian2_id"];
 		$mpembagian2_nama = $rs->fields["pembagian2_nama"];
@@ -226,7 +227,8 @@ while (!$rs->EOF) {
 			$netto = $bruto - $p_aspen - $p_bpjs;
 			//$mpegawai_nama = addslashes($mpegawai_nama);
 			$msql = "
-				insert into t_gjbln values (null, 
+				insert into t_gjbln values (null,
+				".$mlapgroup_index.",
 				'".$mlapgroup_nama."'
 				, '".$mpembagian2_nama."'
 				, '".addslashes($pegawai_nama)."'

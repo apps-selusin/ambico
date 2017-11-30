@@ -556,7 +556,7 @@ class crr_lapgjbln_summary extends crr_lapgjbln {
 		// 2nd dimension = no of fields
 
 		$nDtls = 14;
-		$nGrps = 3;
+		$nGrps = 4;
 		$this->Val = &ewr_InitArray($nDtls, 0);
 		$this->Cnt = &ewr_Init2DArray($nGrps, $nDtls, 0);
 		$this->Smry = &ewr_Init2DArray($nGrps, $nDtls, 0);
@@ -665,16 +665,24 @@ class crr_lapgjbln_summary extends crr_lapgjbln {
 	function GetSummaryCount($lvl, $curValue = TRUE) {
 		$cnt = 0;
 		foreach ($this->DetailRows as $row) {
+			$wrklapgroup_index = $row["lapgroup_index"];
 			$wrkbagian = $row["bagian"];
 			$wrkdivisi = $row["divisi"];
 			if ($lvl >= 1) {
+				$val = $curValue ? $this->lapgroup_index->CurrentValue : $this->lapgroup_index->OldValue;
+				$grpval = $curValue ? $this->lapgroup_index->GroupValue() : $this->lapgroup_index->GroupOldValue();
+				if (is_null($val) && !is_null($wrklapgroup_index) || !is_null($val) && is_null($wrklapgroup_index) ||
+					$grpval <> $this->lapgroup_index->getGroupValueBase($wrklapgroup_index))
+				continue;
+			}
+			if ($lvl >= 2) {
 				$val = $curValue ? $this->bagian->CurrentValue : $this->bagian->OldValue;
 				$grpval = $curValue ? $this->bagian->GroupValue() : $this->bagian->GroupOldValue();
 				if (is_null($val) && !is_null($wrkbagian) || !is_null($val) && is_null($wrkbagian) ||
 					$grpval <> $this->bagian->getGroupValueBase($wrkbagian))
 				continue;
 			}
-			if ($lvl >= 2) {
+			if ($lvl >= 3) {
 				$val = $curValue ? $this->divisi->CurrentValue : $this->divisi->OldValue;
 				$grpval = $curValue ? $this->divisi->GroupValue() : $this->divisi->GroupOldValue();
 				if (is_null($val) && !is_null($wrkdivisi) || !is_null($val) && is_null($wrkdivisi) ||
@@ -690,13 +698,17 @@ class crr_lapgjbln_summary extends crr_lapgjbln {
 	function ChkLvlBreak($lvl) {
 		switch ($lvl) {
 			case 1:
+				return (is_null($this->lapgroup_index->CurrentValue) && !is_null($this->lapgroup_index->OldValue)) ||
+					(!is_null($this->lapgroup_index->CurrentValue) && is_null($this->lapgroup_index->OldValue)) ||
+					($this->lapgroup_index->GroupValue() <> $this->lapgroup_index->GroupOldValue());
+			case 2:
 				return (is_null($this->bagian->CurrentValue) && !is_null($this->bagian->OldValue)) ||
 					(!is_null($this->bagian->CurrentValue) && is_null($this->bagian->OldValue)) ||
-					($this->bagian->GroupValue() <> $this->bagian->GroupOldValue());
-			case 2:
+					($this->bagian->GroupValue() <> $this->bagian->GroupOldValue()) || $this->ChkLvlBreak(1); // Recurse upper level
+			case 3:
 				return (is_null($this->divisi->CurrentValue) && !is_null($this->divisi->OldValue)) ||
 					(!is_null($this->divisi->CurrentValue) && is_null($this->divisi->OldValue)) ||
-					($this->divisi->GroupValue() <> $this->divisi->GroupOldValue()) || $this->ChkLvlBreak(1); // Recurse upper level
+					($this->divisi->GroupValue() <> $this->divisi->GroupOldValue()) || $this->ChkLvlBreak(2); // Recurse upper level
 		}
 	}
 
@@ -814,14 +826,14 @@ class crr_lapgjbln_summary extends crr_lapgjbln {
 		if ($opt == 1) { // Get first group
 
 			//$rsgrp->MoveFirst(); // NOTE: no need to move position
-			$this->bagian->setDbValue(""); // Init first value
+			$this->lapgroup_index->setDbValue(""); // Init first value
 		} else { // Get next group
 			$rsgrp->MoveNext();
 		}
 		if (!$rsgrp->EOF)
-			$this->bagian->setDbValue($rsgrp->fields[0]);
+			$this->lapgroup_index->setDbValue($rsgrp->fields[0]);
 		if ($rsgrp->EOF) {
-			$this->bagian->setDbValue("");
+			$this->lapgroup_index->setDbValue("");
 		}
 	}
 
@@ -869,6 +881,7 @@ class crr_lapgjbln_summary extends crr_lapgjbln {
 				$this->FirstRowData['j_netto'] = ewr_Conv($rs->fields('j_netto'), 4);
 				$this->FirstRowData['start'] = ewr_Conv($rs->fields('start'), 133);
 				$this->FirstRowData['end'] = ewr_Conv($rs->fields('end'), 133);
+				$this->FirstRowData['lapgroup_index'] = ewr_Conv($rs->fields('lapgroup_index'), 16);
 			}
 		} else { // Get next row
 			$rs->MoveNext();
@@ -876,12 +889,7 @@ class crr_lapgjbln_summary extends crr_lapgjbln {
 		if (!$rs->EOF) {
 			$this->gjbln_id->setDbValue($rs->fields('gjbln_id'));
 			$this->rec_no->setDbValue($rs->fields('rec_no'));
-			if ($opt <> 1) {
-				if (is_array($this->bagian->GroupDbValues))
-					$this->bagian->setDbValue(@$this->bagian->GroupDbValues[$rs->fields('bagian')]);
-				else
-					$this->bagian->setDbValue(ewr_GroupValue($this->bagian, $rs->fields('bagian')));
-			}
+			$this->bagian->setDbValue($rs->fields('bagian'));
 			$this->divisi->setDbValue($rs->fields('divisi'));
 			$this->nama->setDbValue($rs->fields('nama'));
 			$this->nip->setDbValue($rs->fields('nip'));
@@ -898,6 +906,12 @@ class crr_lapgjbln_summary extends crr_lapgjbln {
 			$this->j_netto->setDbValue($rs->fields('j_netto'));
 			$this->start->setDbValue($rs->fields('start'));
 			$this->end->setDbValue($rs->fields('end'));
+			if ($opt <> 1) {
+				if (is_array($this->lapgroup_index->GroupDbValues))
+					$this->lapgroup_index->setDbValue(@$this->lapgroup_index->GroupDbValues[$rs->fields('lapgroup_index')]);
+				else
+					$this->lapgroup_index->setDbValue(ewr_GroupValue($this->lapgroup_index, $rs->fields('lapgroup_index')));
+			}
 			$this->Val[1] = $this->rec_no->CurrentValue;
 			$this->Val[2] = $this->nama->CurrentValue;
 			$this->Val[3] = $this->nip->CurrentValue;
@@ -931,6 +945,7 @@ class crr_lapgjbln_summary extends crr_lapgjbln {
 			$this->j_netto->setDbValue("");
 			$this->start->setDbValue("");
 			$this->end->setDbValue("");
+			$this->lapgroup_index->setDbValue("");
 		}
 	}
 
@@ -1148,12 +1163,21 @@ class crr_lapgjbln_summary extends crr_lapgjbln {
 
 		if ($this->RowType == EWR_ROWTYPE_TOTAL && !($this->RowTotalType == EWR_ROWTOTAL_GROUP && $this->RowTotalSubType == EWR_ROWTOTAL_HEADER)) { // Summary row
 			ewr_PrependClass($this->RowAttrs["class"], ($this->RowTotalType == EWR_ROWTOTAL_PAGE || $this->RowTotalType == EWR_ROWTOTAL_GRAND) ? "ewRptGrpAggregate" : "ewRptGrpSummary" . $this->RowGroupLevel); // Set up row class
-			if ($this->RowTotalType == EWR_ROWTOTAL_GROUP) $this->RowAttrs["data-group"] = $this->bagian->GroupOldValue(); // Set up group attribute
-			if ($this->RowTotalType == EWR_ROWTOTAL_GROUP && $this->RowGroupLevel >= 2) $this->RowAttrs["data-group-2"] = $this->divisi->GroupOldValue(); // Set up group attribute 2
+			if ($this->RowTotalType == EWR_ROWTOTAL_GROUP) $this->RowAttrs["data-group"] = $this->lapgroup_index->GroupOldValue(); // Set up group attribute
+			if ($this->RowTotalType == EWR_ROWTOTAL_GROUP && $this->RowGroupLevel >= 2) $this->RowAttrs["data-group-2"] = $this->bagian->GroupOldValue(); // Set up group attribute 2
+			if ($this->RowTotalType == EWR_ROWTOTAL_GROUP && $this->RowGroupLevel >= 3) $this->RowAttrs["data-group-3"] = $this->divisi->GroupOldValue(); // Set up group attribute 3
+
+			// lapgroup_index
+			$this->lapgroup_index->GroupViewValue = $this->lapgroup_index->GroupOldValue();
+			$this->lapgroup_index->CellAttrs["class"] = ($this->RowGroupLevel == 1) ? "ewRptGrpSummary1" : "ewRptGrpField1";
+			$this->lapgroup_index->GroupViewValue = ewr_DisplayGroupValue($this->lapgroup_index, $this->lapgroup_index->GroupViewValue);
+			$this->lapgroup_index->GroupSummaryOldValue = $this->lapgroup_index->GroupSummaryValue;
+			$this->lapgroup_index->GroupSummaryValue = $this->lapgroup_index->GroupViewValue;
+			$this->lapgroup_index->GroupSummaryViewValue = ($this->lapgroup_index->GroupSummaryOldValue <> $this->lapgroup_index->GroupSummaryValue) ? $this->lapgroup_index->GroupSummaryValue : "&nbsp;";
 
 			// bagian
 			$this->bagian->GroupViewValue = $this->bagian->GroupOldValue();
-			$this->bagian->CellAttrs["class"] = ($this->RowGroupLevel == 1) ? "ewRptGrpSummary1" : "ewRptGrpField1";
+			$this->bagian->CellAttrs["class"] = ($this->RowGroupLevel == 2) ? "ewRptGrpSummary2" : "ewRptGrpField2";
 			$this->bagian->GroupViewValue = ewr_DisplayGroupValue($this->bagian, $this->bagian->GroupViewValue);
 			$this->bagian->GroupSummaryOldValue = $this->bagian->GroupSummaryValue;
 			$this->bagian->GroupSummaryValue = $this->bagian->GroupViewValue;
@@ -1161,7 +1185,7 @@ class crr_lapgjbln_summary extends crr_lapgjbln {
 
 			// divisi
 			$this->divisi->GroupViewValue = $this->divisi->GroupOldValue();
-			$this->divisi->CellAttrs["class"] = ($this->RowGroupLevel == 2) ? "ewRptGrpSummary2" : "ewRptGrpField2";
+			$this->divisi->CellAttrs["class"] = ($this->RowGroupLevel == 3) ? "ewRptGrpSummary3" : "ewRptGrpField3";
 			$this->divisi->GroupViewValue = ewr_DisplayGroupValue($this->divisi, $this->divisi->GroupViewValue);
 			$this->divisi->GroupSummaryOldValue = $this->divisi->GroupSummaryValue;
 			$this->divisi->GroupSummaryValue = $this->divisi->GroupViewValue;
@@ -1227,6 +1251,9 @@ class crr_lapgjbln_summary extends crr_lapgjbln {
 			$this->j_netto->CellAttrs["style"] = "text-align:right;";
 			$this->j_netto->CellAttrs["class"] = ($this->RowTotalType == EWR_ROWTOTAL_PAGE || $this->RowTotalType == EWR_ROWTOTAL_GRAND) ? "ewRptGrpAggregate" : "ewRptGrpSummary" . $this->RowGroupLevel;
 
+			// lapgroup_index
+			$this->lapgroup_index->HrefValue = "";
+
 			// bagian
 			$this->bagian->HrefValue = "";
 
@@ -1273,25 +1300,34 @@ class crr_lapgjbln_summary extends crr_lapgjbln {
 			$this->j_netto->HrefValue = "";
 		} else {
 			if ($this->RowTotalType == EWR_ROWTOTAL_GROUP && $this->RowTotalSubType == EWR_ROWTOTAL_HEADER) {
-			$this->RowAttrs["data-group"] = $this->bagian->GroupValue(); // Set up group attribute
-			if ($this->RowGroupLevel >= 2) $this->RowAttrs["data-group-2"] = $this->divisi->GroupValue(); // Set up group attribute 2
+			$this->RowAttrs["data-group"] = $this->lapgroup_index->GroupValue(); // Set up group attribute
+			if ($this->RowGroupLevel >= 2) $this->RowAttrs["data-group-2"] = $this->bagian->GroupValue(); // Set up group attribute 2
+			if ($this->RowGroupLevel >= 3) $this->RowAttrs["data-group-3"] = $this->divisi->GroupValue(); // Set up group attribute 3
 			} else {
-			$this->RowAttrs["data-group"] = $this->bagian->GroupValue(); // Set up group attribute
-			$this->RowAttrs["data-group-2"] = $this->divisi->GroupValue(); // Set up group attribute 2
+			$this->RowAttrs["data-group"] = $this->lapgroup_index->GroupValue(); // Set up group attribute
+			$this->RowAttrs["data-group-2"] = $this->bagian->GroupValue(); // Set up group attribute 2
+			$this->RowAttrs["data-group-3"] = $this->divisi->GroupValue(); // Set up group attribute 3
 			}
+
+			// lapgroup_index
+			$this->lapgroup_index->GroupViewValue = $this->lapgroup_index->GroupValue();
+			$this->lapgroup_index->CellAttrs["class"] = "ewRptGrpField1";
+			$this->lapgroup_index->GroupViewValue = ewr_DisplayGroupValue($this->lapgroup_index, $this->lapgroup_index->GroupViewValue);
+			if ($this->lapgroup_index->GroupValue() == $this->lapgroup_index->GroupOldValue() && !$this->ChkLvlBreak(1))
+				$this->lapgroup_index->GroupViewValue = "&nbsp;";
 
 			// bagian
 			$this->bagian->GroupViewValue = $this->bagian->GroupValue();
-			$this->bagian->CellAttrs["class"] = "ewRptGrpField1";
+			$this->bagian->CellAttrs["class"] = "ewRptGrpField2";
 			$this->bagian->GroupViewValue = ewr_DisplayGroupValue($this->bagian, $this->bagian->GroupViewValue);
-			if ($this->bagian->GroupValue() == $this->bagian->GroupOldValue() && !$this->ChkLvlBreak(1))
+			if ($this->bagian->GroupValue() == $this->bagian->GroupOldValue() && !$this->ChkLvlBreak(2))
 				$this->bagian->GroupViewValue = "&nbsp;";
 
 			// divisi
 			$this->divisi->GroupViewValue = $this->divisi->GroupValue();
-			$this->divisi->CellAttrs["class"] = "ewRptGrpField2";
+			$this->divisi->CellAttrs["class"] = "ewRptGrpField3";
 			$this->divisi->GroupViewValue = ewr_DisplayGroupValue($this->divisi, $this->divisi->GroupViewValue);
-			if ($this->divisi->GroupValue() == $this->divisi->GroupOldValue() && !$this->ChkLvlBreak(2))
+			if ($this->divisi->GroupValue() == $this->divisi->GroupOldValue() && !$this->ChkLvlBreak(3))
 				$this->divisi->GroupViewValue = "&nbsp;";
 
 			// rec_no
@@ -1366,6 +1402,9 @@ class crr_lapgjbln_summary extends crr_lapgjbln {
 			$this->j_netto->CellAttrs["class"] = ($this->RecCount % 2 <> 1) ? "ewTableAltRow" : "ewTableRow";
 			$this->j_netto->CellAttrs["style"] = "text-align:right;";
 
+			// lapgroup_index
+			$this->lapgroup_index->HrefValue = "";
+
 			// bagian
 			$this->bagian->HrefValue = "";
 
@@ -1414,6 +1453,15 @@ class crr_lapgjbln_summary extends crr_lapgjbln {
 
 		// Call Cell_Rendered event
 		if ($this->RowType == EWR_ROWTYPE_TOTAL) { // Summary row
+
+			// lapgroup_index
+			$CurrentValue = $this->lapgroup_index->GroupViewValue;
+			$ViewValue = &$this->lapgroup_index->GroupViewValue;
+			$ViewAttrs = &$this->lapgroup_index->ViewAttrs;
+			$CellAttrs = &$this->lapgroup_index->CellAttrs;
+			$HrefValue = &$this->lapgroup_index->HrefValue;
+			$LinkAttrs = &$this->lapgroup_index->LinkAttrs;
+			$this->Cell_Rendered($this->lapgroup_index, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
 
 			// bagian
 			$CurrentValue = $this->bagian->GroupViewValue;
@@ -1523,6 +1571,15 @@ class crr_lapgjbln_summary extends crr_lapgjbln {
 			$LinkAttrs = &$this->j_netto->LinkAttrs;
 			$this->Cell_Rendered($this->j_netto, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
 		} else {
+
+			// lapgroup_index
+			$CurrentValue = $this->lapgroup_index->GroupValue();
+			$ViewValue = &$this->lapgroup_index->GroupViewValue;
+			$ViewAttrs = &$this->lapgroup_index->ViewAttrs;
+			$CellAttrs = &$this->lapgroup_index->CellAttrs;
+			$HrefValue = &$this->lapgroup_index->HrefValue;
+			$LinkAttrs = &$this->lapgroup_index->LinkAttrs;
+			$this->Cell_Rendered($this->lapgroup_index, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
 
 			// bagian
 			$CurrentValue = $this->bagian->GroupValue();
@@ -1670,7 +1727,8 @@ class crr_lapgjbln_summary extends crr_lapgjbln {
 		$this->GrpColumnCount = 0;
 		$this->SubGrpColumnCount = 0;
 		$this->DtlColumnCount = 0;
-		if ($this->bagian->Visible) $this->GrpColumnCount += 1;
+		if ($this->lapgroup_index->Visible) $this->GrpColumnCount += 1;
+		if ($this->bagian->Visible) { $this->GrpColumnCount += 1; $this->SubGrpColumnCount += 1; }
 		if ($this->divisi->Visible) { $this->GrpColumnCount += 1; $this->SubGrpColumnCount += 1; }
 		if ($this->rec_no->Visible) $this->DtlColumnCount += 1;
 		if ($this->nama->Visible) $this->DtlColumnCount += 1;
@@ -1735,6 +1793,7 @@ class crr_lapgjbln_summary extends crr_lapgjbln {
 		if ($bResetSort) {
 			$this->setOrderBy("");
 			$this->setStartGroup(1);
+			$this->lapgroup_index->setSort("");
 			$this->bagian->setSort("");
 			$this->divisi->setSort("");
 			$this->rec_no->setSort("");
@@ -1755,6 +1814,7 @@ class crr_lapgjbln_summary extends crr_lapgjbln {
 		} elseif ($orderBy <> "") {
 			$this->CurrentOrder = $orderBy;
 			$this->CurrentOrderType = $orderType;
+			$this->UpdateSort($this->lapgroup_index, $bCtrl); // lapgroup_index
 			$this->UpdateSort($this->bagian, $bCtrl); // bagian
 			$this->UpdateSort($this->divisi, $bCtrl); // divisi
 			$this->UpdateSort($this->rec_no, $bCtrl); // rec_no
@@ -1990,6 +2050,7 @@ class crr_lapgjbln_summary extends crr_lapgjbln {
 	function Page_Load() {
 
 		//echo "Page Load";
+		$this->lapgroup_index->Visible = FALSE;
 	}
 
 	// Page Unload event
@@ -2173,6 +2234,7 @@ $Page->RecIndex = 0;
 if ($Page->TotalGrps > 0) {
 	$Page->GetGrpRow(1);
 	$Page->GrpCounter[0] = 1;
+	$Page->GrpCounter[1] = 1;
 	$Page->GrpCount = 1;
 }
 $Page->GrpIdx = ewr_InitArray($Page->StopGrp - $Page->StartGrp + 1, -1);
@@ -2223,6 +2285,28 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 <thead>
 	<!-- Table header -->
 	<tr class="ewTableHeader">
+<?php if ($Page->lapgroup_index->Visible) { ?>
+	<?php if ($Page->lapgroup_index->ShowGroupHeaderAsRow) { ?>
+	<td data-field="lapgroup_index">&nbsp;</td>
+	<?php } else { ?>
+<?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
+	<td data-field="lapgroup_index"><div class="r_lapgjbln_lapgroup_index"><span class="ewTableHeaderCaption"><?php echo $Page->lapgroup_index->FldCaption() ?></span></div></td>
+<?php } else { ?>
+	<td data-field="lapgroup_index">
+<?php if ($Page->SortUrl($Page->lapgroup_index) == "") { ?>
+		<div class="ewTableHeaderBtn r_lapgjbln_lapgroup_index">
+			<span class="ewTableHeaderCaption"><?php echo $Page->lapgroup_index->FldCaption() ?></span>
+		</div>
+<?php } else { ?>
+		<div class="ewTableHeaderBtn ewPointer r_lapgjbln_lapgroup_index" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->lapgroup_index) ?>',2);">
+			<span class="ewTableHeaderCaption"><?php echo $Page->lapgroup_index->FldCaption() ?></span>
+			<span class="ewTableHeaderSort"><?php if ($Page->lapgroup_index->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($Page->lapgroup_index->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span>
+		</div>
+<?php } ?>
+	</td>
+<?php } ?>
+	<?php } ?>
+<?php } ?>
 <?php if ($Page->bagian->Visible) { ?>
 	<?php if ($Page->bagian->ShowGroupHeaderAsRow) { ?>
 	<td data-field="bagian">&nbsp;</td>
@@ -2510,7 +2594,7 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 	}
 
 	// Build detail SQL
-	$sWhere = ewr_DetailFilterSQL($Page->bagian, $Page->getSqlFirstGroupField(), $Page->bagian->GroupValue(), $Page->DBID);
+	$sWhere = ewr_DetailFilterSQL($Page->lapgroup_index, $Page->getSqlFirstGroupField(), $Page->lapgroup_index->GroupValue(), $Page->DBID);
 	if ($Page->PageFirstGroupFilter <> "") $Page->PageFirstGroupFilter .= " OR ";
 	$Page->PageFirstGroupFilter .= $sWhere;
 	if ($Page->Filter != "")
@@ -2521,11 +2605,12 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 	if ($rsdtlcnt > 0)
 		$Page->GetRow(1);
 	$Page->GrpIdx[$Page->GrpCount] = array(-1);
+	$Page->GrpIdx[$Page->GrpCount][] = array(-1);
 	while ($rs && !$rs->EOF) { // Loop detail records
 		$Page->RecCount++;
 		$Page->RecIndex++;
 ?>
-<?php if ($Page->bagian->Visible && $Page->ChkLvlBreak(1) && $Page->bagian->ShowGroupHeaderAsRow) { ?>
+<?php if ($Page->lapgroup_index->Visible && $Page->ChkLvlBreak(1) && $Page->lapgroup_index->ShowGroupHeaderAsRow) { ?>
 <?php
 
 		// Render header row
@@ -2534,14 +2619,54 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 		$Page->RowTotalType = EWR_ROWTOTAL_GROUP;
 		$Page->RowTotalSubType = EWR_ROWTOTAL_HEADER;
 		$Page->RowGroupLevel = 1;
-		$Page->bagian->Count = $Page->GetSummaryCount(1);
+		$Page->lapgroup_index->Count = $Page->GetSummaryCount(1);
 		$Page->RenderRow();
 ?>
 	<tr<?php echo $Page->RowAttributes(); ?>>
+<?php if ($Page->lapgroup_index->Visible) { ?>
+		<td data-field="lapgroup_index"<?php echo $Page->lapgroup_index->CellAttributes(); ?>><span class="ewGroupToggle icon-collapse"></span></td>
+<?php } ?>
+		<td data-field="lapgroup_index" colspan="<?php echo ($Page->GrpColumnCount + $Page->DtlColumnCount - 1) ?>"<?php echo $Page->lapgroup_index->CellAttributes() ?>>
+<?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
+		<span class="ewSummaryCaption r_lapgjbln_lapgroup_index"><span class="ewTableHeaderCaption"><?php echo $Page->lapgroup_index->FldCaption() ?></span></span>
+<?php } else { ?>
+	<?php if ($Page->SortUrl($Page->lapgroup_index) == "") { ?>
+		<span class="ewSummaryCaption r_lapgjbln_lapgroup_index">
+			<span class="ewTableHeaderCaption"><?php echo $Page->lapgroup_index->FldCaption() ?></span>
+		</span>
+	<?php } else { ?>
+		<span class="ewTableHeaderBtn ewPointer ewSummaryCaption r_lapgjbln_lapgroup_index" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->lapgroup_index) ?>',2);">
+			<span class="ewTableHeaderCaption"><?php echo $Page->lapgroup_index->FldCaption() ?></span>
+			<span class="ewTableHeaderSort"><?php if ($Page->lapgroup_index->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($Page->lapgroup_index->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span>
+		</span>
+	<?php } ?>
+<?php } ?>
+		<?php echo $ReportLanguage->Phrase("SummaryColon") ?>
+<span data-class="tpx<?php echo $Page->GrpCount ?>_r_lapgjbln_lapgroup_index"<?php echo $Page->lapgroup_index->ViewAttributes() ?>><?php echo $Page->lapgroup_index->GroupViewValue ?></span>
+		<span class="ewSummaryCount">(<span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptCnt") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><?php echo ewr_FormatNumber($Page->lapgroup_index->Count,0,-2,-2,-2) ?></span>)</span>
+		</td>
+	</tr>
+<?php } ?>
+<?php if ($Page->bagian->Visible && $Page->ChkLvlBreak(2) && $Page->bagian->ShowGroupHeaderAsRow) { ?>
+<?php
+
+		// Render header row
+		$Page->ResetAttrs();
+		$Page->RowType = EWR_ROWTYPE_TOTAL;
+		$Page->RowTotalType = EWR_ROWTOTAL_GROUP;
+		$Page->RowTotalSubType = EWR_ROWTOTAL_HEADER;
+		$Page->RowGroupLevel = 2;
+		$Page->bagian->Count = $Page->GetSummaryCount(2);
+		$Page->RenderRow();
+?>
+	<tr<?php echo $Page->RowAttributes(); ?>>
+<?php if ($Page->lapgroup_index->Visible) { ?>
+		<td data-field="lapgroup_index"<?php echo $Page->lapgroup_index->CellAttributes(); ?>></td>
+<?php } ?>
 <?php if ($Page->bagian->Visible) { ?>
 		<td data-field="bagian"<?php echo $Page->bagian->CellAttributes(); ?>><span class="ewGroupToggle icon-collapse"></span></td>
 <?php } ?>
-		<td data-field="bagian" colspan="<?php echo ($Page->GrpColumnCount + $Page->DtlColumnCount - 1) ?>"<?php echo $Page->bagian->CellAttributes() ?>>
+		<td data-field="bagian" colspan="<?php echo ($Page->GrpColumnCount + $Page->DtlColumnCount - 2) ?>"<?php echo $Page->bagian->CellAttributes() ?>>
 <?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
 		<span class="ewSummaryCaption r_lapgjbln_bagian"><span class="ewTableHeaderCaption"><?php echo $Page->bagian->FldCaption() ?></span></span>
 <?php } else { ?>
@@ -2557,12 +2682,12 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 	<?php } ?>
 <?php } ?>
 		<?php echo $ReportLanguage->Phrase("SummaryColon") ?>
-<span data-class="tpx<?php echo $Page->GrpCount ?>_r_lapgjbln_bagian"<?php echo $Page->bagian->ViewAttributes() ?>><?php echo $Page->bagian->GroupViewValue ?></span>
+<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_r_lapgjbln_bagian"<?php echo $Page->bagian->ViewAttributes() ?>><?php echo $Page->bagian->GroupViewValue ?></span>
 		<span class="ewSummaryCount">(<span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptCnt") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><?php echo ewr_FormatNumber($Page->bagian->Count,0,-2,-2,-2) ?></span>)</span>
 		</td>
 	</tr>
 <?php } ?>
-<?php if ($Page->divisi->Visible && $Page->ChkLvlBreak(2) && $Page->divisi->ShowGroupHeaderAsRow) { ?>
+<?php if ($Page->divisi->Visible && $Page->ChkLvlBreak(3) && $Page->divisi->ShowGroupHeaderAsRow) { ?>
 <?php
 
 		// Render header row
@@ -2570,18 +2695,21 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 		$Page->RowType = EWR_ROWTYPE_TOTAL;
 		$Page->RowTotalType = EWR_ROWTOTAL_GROUP;
 		$Page->RowTotalSubType = EWR_ROWTOTAL_HEADER;
-		$Page->RowGroupLevel = 2;
-		$Page->divisi->Count = $Page->GetSummaryCount(2);
+		$Page->RowGroupLevel = 3;
+		$Page->divisi->Count = $Page->GetSummaryCount(3);
 		$Page->RenderRow();
 ?>
 	<tr<?php echo $Page->RowAttributes(); ?>>
+<?php if ($Page->lapgroup_index->Visible) { ?>
+		<td data-field="lapgroup_index"<?php echo $Page->lapgroup_index->CellAttributes(); ?>></td>
+<?php } ?>
 <?php if ($Page->bagian->Visible) { ?>
 		<td data-field="bagian"<?php echo $Page->bagian->CellAttributes(); ?>></td>
 <?php } ?>
 <?php if ($Page->divisi->Visible) { ?>
 		<td data-field="divisi"<?php echo $Page->divisi->CellAttributes(); ?>><span class="ewGroupToggle icon-collapse"></span></td>
 <?php } ?>
-		<td data-field="divisi" colspan="<?php echo ($Page->GrpColumnCount + $Page->DtlColumnCount - 2) ?>"<?php echo $Page->divisi->CellAttributes() ?>>
+		<td data-field="divisi" colspan="<?php echo ($Page->GrpColumnCount + $Page->DtlColumnCount - 3) ?>"<?php echo $Page->divisi->CellAttributes() ?>>
 <?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
 		<span class="ewSummaryCaption r_lapgjbln_divisi"><span class="ewTableHeaderCaption"><?php echo $Page->divisi->FldCaption() ?></span></span>
 <?php } else { ?>
@@ -2597,7 +2725,7 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 	<?php } ?>
 <?php } ?>
 		<?php echo $ReportLanguage->Phrase("SummaryColon") ?>
-<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_r_lapgjbln_divisi"<?php echo $Page->divisi->ViewAttributes() ?>><?php echo $Page->divisi->GroupViewValue ?></span>
+<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->GrpCounter[1] ?>_r_lapgjbln_divisi"<?php echo $Page->divisi->ViewAttributes() ?>><?php echo $Page->divisi->GroupViewValue ?></span>
 		<span class="ewSummaryCount">(<span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptCnt") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><?php echo ewr_FormatNumber($Page->divisi->Count,0,-2,-2,-2) ?></span>)</span>
 		</td>
 	</tr>
@@ -2610,12 +2738,20 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 		$Page->RenderRow();
 ?>
 	<tr<?php echo $Page->RowAttributes(); ?>>
+<?php if ($Page->lapgroup_index->Visible) { ?>
+	<?php if ($Page->lapgroup_index->ShowGroupHeaderAsRow) { ?>
+		<td data-field="lapgroup_index"<?php echo $Page->lapgroup_index->CellAttributes(); ?>>&nbsp;</td>
+	<?php } else { ?>
+		<td data-field="lapgroup_index"<?php echo $Page->lapgroup_index->CellAttributes(); ?>>
+<span data-class="tpx<?php echo $Page->GrpCount ?>_r_lapgjbln_lapgroup_index"<?php echo $Page->lapgroup_index->ViewAttributes() ?>><?php echo $Page->lapgroup_index->GroupViewValue ?></span></td>
+	<?php } ?>
+<?php } ?>
 <?php if ($Page->bagian->Visible) { ?>
 	<?php if ($Page->bagian->ShowGroupHeaderAsRow) { ?>
 		<td data-field="bagian"<?php echo $Page->bagian->CellAttributes(); ?>>&nbsp;</td>
 	<?php } else { ?>
 		<td data-field="bagian"<?php echo $Page->bagian->CellAttributes(); ?>>
-<span data-class="tpx<?php echo $Page->GrpCount ?>_r_lapgjbln_bagian"<?php echo $Page->bagian->ViewAttributes() ?>><?php echo $Page->bagian->GroupViewValue ?></span></td>
+<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_r_lapgjbln_bagian"<?php echo $Page->bagian->ViewAttributes() ?>><?php echo $Page->bagian->GroupViewValue ?></span></td>
 	<?php } ?>
 <?php } ?>
 <?php if ($Page->divisi->Visible) { ?>
@@ -2623,60 +2759,60 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 		<td data-field="divisi"<?php echo $Page->divisi->CellAttributes(); ?>>&nbsp;</td>
 	<?php } else { ?>
 		<td data-field="divisi"<?php echo $Page->divisi->CellAttributes(); ?>>
-<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_r_lapgjbln_divisi"<?php echo $Page->divisi->ViewAttributes() ?>><?php echo $Page->divisi->GroupViewValue ?></span></td>
+<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->GrpCounter[1] ?>_r_lapgjbln_divisi"<?php echo $Page->divisi->ViewAttributes() ?>><?php echo $Page->divisi->GroupViewValue ?></span></td>
 	<?php } ?>
 <?php } ?>
 <?php if ($Page->rec_no->Visible) { ?>
 		<td data-field="rec_no"<?php echo $Page->rec_no->CellAttributes() ?>>
-<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->RecCount ?>_r_lapgjbln_rec_no"<?php echo $Page->rec_no->ViewAttributes() ?>><?php echo $Page->rec_no->ListViewValue() ?></span></td>
+<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->GrpCounter[1] ?>_<?php echo $Page->RecCount ?>_r_lapgjbln_rec_no"<?php echo $Page->rec_no->ViewAttributes() ?>><?php echo $Page->rec_no->ListViewValue() ?></span></td>
 <?php } ?>
 <?php if ($Page->nama->Visible) { ?>
 		<td data-field="nama"<?php echo $Page->nama->CellAttributes() ?>>
-<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->RecCount ?>_r_lapgjbln_nama"<?php echo $Page->nama->ViewAttributes() ?>><?php echo $Page->nama->ListViewValue() ?></span></td>
+<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->GrpCounter[1] ?>_<?php echo $Page->RecCount ?>_r_lapgjbln_nama"<?php echo $Page->nama->ViewAttributes() ?>><?php echo $Page->nama->ListViewValue() ?></span></td>
 <?php } ?>
 <?php if ($Page->nip->Visible) { ?>
 		<td data-field="nip"<?php echo $Page->nip->CellAttributes() ?>>
-<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->RecCount ?>_r_lapgjbln_nip"<?php echo $Page->nip->ViewAttributes() ?>><?php echo $Page->nip->ListViewValue() ?></span></td>
+<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->GrpCounter[1] ?>_<?php echo $Page->RecCount ?>_r_lapgjbln_nip"<?php echo $Page->nip->ViewAttributes() ?>><?php echo $Page->nip->ListViewValue() ?></span></td>
 <?php } ?>
 <?php if ($Page->gp->Visible) { ?>
 		<td data-field="gp"<?php echo $Page->gp->CellAttributes() ?>>
-<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->RecCount ?>_r_lapgjbln_gp"<?php echo $Page->gp->ViewAttributes() ?>><?php echo $Page->gp->ListViewValue() ?></span></td>
+<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->GrpCounter[1] ?>_<?php echo $Page->RecCount ?>_r_lapgjbln_gp"<?php echo $Page->gp->ViewAttributes() ?>><?php echo $Page->gp->ListViewValue() ?></span></td>
 <?php } ?>
 <?php if ($Page->t_jbtn->Visible) { ?>
 		<td data-field="t_jbtn"<?php echo $Page->t_jbtn->CellAttributes() ?>>
-<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->RecCount ?>_r_lapgjbln_t_jbtn"<?php echo $Page->t_jbtn->ViewAttributes() ?>><?php echo $Page->t_jbtn->ListViewValue() ?></span></td>
+<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->GrpCounter[1] ?>_<?php echo $Page->RecCount ?>_r_lapgjbln_t_jbtn"<?php echo $Page->t_jbtn->ViewAttributes() ?>><?php echo $Page->t_jbtn->ListViewValue() ?></span></td>
 <?php } ?>
 <?php if ($Page->p_absen->Visible) { ?>
 		<td data-field="p_absen"<?php echo $Page->p_absen->CellAttributes() ?>>
-<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->RecCount ?>_r_lapgjbln_p_absen"<?php echo $Page->p_absen->ViewAttributes() ?>><?php echo $Page->p_absen->ListViewValue() ?></span></td>
+<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->GrpCounter[1] ?>_<?php echo $Page->RecCount ?>_r_lapgjbln_p_absen"<?php echo $Page->p_absen->ViewAttributes() ?>><?php echo $Page->p_absen->ListViewValue() ?></span></td>
 <?php } ?>
 <?php if ($Page->t_malam->Visible) { ?>
 		<td data-field="t_malam"<?php echo $Page->t_malam->CellAttributes() ?>>
-<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->RecCount ?>_r_lapgjbln_t_malam"<?php echo $Page->t_malam->ViewAttributes() ?>><?php echo $Page->t_malam->ListViewValue() ?></span></td>
+<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->GrpCounter[1] ?>_<?php echo $Page->RecCount ?>_r_lapgjbln_t_malam"<?php echo $Page->t_malam->ViewAttributes() ?>><?php echo $Page->t_malam->ListViewValue() ?></span></td>
 <?php } ?>
 <?php if ($Page->t_hadir->Visible) { ?>
 		<td data-field="t_hadir"<?php echo $Page->t_hadir->CellAttributes() ?>>
-<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->RecCount ?>_r_lapgjbln_t_hadir"<?php echo $Page->t_hadir->ViewAttributes() ?>><?php echo $Page->t_hadir->ListViewValue() ?></span></td>
+<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->GrpCounter[1] ?>_<?php echo $Page->RecCount ?>_r_lapgjbln_t_hadir"<?php echo $Page->t_hadir->ViewAttributes() ?>><?php echo $Page->t_hadir->ListViewValue() ?></span></td>
 <?php } ?>
 <?php if ($Page->t_um->Visible) { ?>
 		<td data-field="t_um"<?php echo $Page->t_um->CellAttributes() ?>>
-<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->RecCount ?>_r_lapgjbln_t_um"<?php echo $Page->t_um->ViewAttributes() ?>><?php echo $Page->t_um->ListViewValue() ?></span></td>
+<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->GrpCounter[1] ?>_<?php echo $Page->RecCount ?>_r_lapgjbln_t_um"<?php echo $Page->t_um->ViewAttributes() ?>><?php echo $Page->t_um->ListViewValue() ?></span></td>
 <?php } ?>
 <?php if ($Page->j_bruto->Visible) { ?>
 		<td data-field="j_bruto"<?php echo $Page->j_bruto->CellAttributes() ?>>
-<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->RecCount ?>_r_lapgjbln_j_bruto"<?php echo $Page->j_bruto->ViewAttributes() ?>><?php echo $Page->j_bruto->ListViewValue() ?></span></td>
+<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->GrpCounter[1] ?>_<?php echo $Page->RecCount ?>_r_lapgjbln_j_bruto"<?php echo $Page->j_bruto->ViewAttributes() ?>><?php echo $Page->j_bruto->ListViewValue() ?></span></td>
 <?php } ?>
 <?php if ($Page->p_aspen->Visible) { ?>
 		<td data-field="p_aspen"<?php echo $Page->p_aspen->CellAttributes() ?>>
-<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->RecCount ?>_r_lapgjbln_p_aspen"<?php echo $Page->p_aspen->ViewAttributes() ?>><?php echo $Page->p_aspen->ListViewValue() ?></span></td>
+<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->GrpCounter[1] ?>_<?php echo $Page->RecCount ?>_r_lapgjbln_p_aspen"<?php echo $Page->p_aspen->ViewAttributes() ?>><?php echo $Page->p_aspen->ListViewValue() ?></span></td>
 <?php } ?>
 <?php if ($Page->p_bpjs->Visible) { ?>
 		<td data-field="p_bpjs"<?php echo $Page->p_bpjs->CellAttributes() ?>>
-<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->RecCount ?>_r_lapgjbln_p_bpjs"<?php echo $Page->p_bpjs->ViewAttributes() ?>><?php echo $Page->p_bpjs->ListViewValue() ?></span></td>
+<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->GrpCounter[1] ?>_<?php echo $Page->RecCount ?>_r_lapgjbln_p_bpjs"<?php echo $Page->p_bpjs->ViewAttributes() ?>><?php echo $Page->p_bpjs->ListViewValue() ?></span></td>
 <?php } ?>
 <?php if ($Page->j_netto->Visible) { ?>
 		<td data-field="j_netto"<?php echo $Page->j_netto->CellAttributes() ?>>
-<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->RecCount ?>_r_lapgjbln_j_netto"<?php echo $Page->j_netto->ViewAttributes() ?>><?php echo $Page->j_netto->ListViewValue() ?></span></td>
+<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->GrpCounter[1] ?>_<?php echo $Page->RecCount ?>_r_lapgjbln_j_netto"<?php echo $Page->j_netto->ViewAttributes() ?>><?php echo $Page->j_netto->ListViewValue() ?></span></td>
 <?php } ?>
 	</tr>
 <?php
@@ -2690,15 +2826,207 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 		// Show Footers
 ?>
 <?php
-		if ($Page->ChkLvlBreak(2)) {
-			$cnt = count(@$Page->GrpIdx[$Page->GrpCount]);
-			$Page->GrpIdx[$Page->GrpCount][$cnt] = $Page->RecCount;
+		if ($Page->ChkLvlBreak(3)) {
+			$cnt = count(@$Page->GrpIdx[$Page->GrpCount][$Page->GrpCounter[0]]);
+			$Page->GrpIdx[$Page->GrpCount][$Page->GrpCounter[0]][$cnt] = $Page->RecCount;
 		}
-		if ($Page->ChkLvlBreak(2) && $Page->divisi->Visible) {
+		if ($Page->ChkLvlBreak(3) && $Page->divisi->Visible) {
 ?>
 <?php
-			$Page->bagian->Count = $Page->GetSummaryCount(1, FALSE);
-			$Page->divisi->Count = $Page->GetSummaryCount(2, FALSE);
+			$Page->lapgroup_index->Count = $Page->GetSummaryCount(1, FALSE);
+			$Page->bagian->Count = $Page->GetSummaryCount(2, FALSE);
+			$Page->divisi->Count = $Page->GetSummaryCount(3, FALSE);
+			$Page->gp->Count = $Page->Cnt[3][4];
+			$Page->gp->SumValue = $Page->Smry[3][4]; // Load SUM
+			$Page->t_jbtn->Count = $Page->Cnt[3][5];
+			$Page->t_jbtn->SumValue = $Page->Smry[3][5]; // Load SUM
+			$Page->p_absen->Count = $Page->Cnt[3][6];
+			$Page->p_absen->SumValue = $Page->Smry[3][6]; // Load SUM
+			$Page->t_malam->Count = $Page->Cnt[3][7];
+			$Page->t_malam->SumValue = $Page->Smry[3][7]; // Load SUM
+			$Page->t_hadir->Count = $Page->Cnt[3][8];
+			$Page->t_hadir->SumValue = $Page->Smry[3][8]; // Load SUM
+			$Page->t_um->Count = $Page->Cnt[3][9];
+			$Page->t_um->SumValue = $Page->Smry[3][9]; // Load SUM
+			$Page->j_bruto->Count = $Page->Cnt[3][10];
+			$Page->j_bruto->SumValue = $Page->Smry[3][10]; // Load SUM
+			$Page->p_aspen->Count = $Page->Cnt[3][11];
+			$Page->p_aspen->SumValue = $Page->Smry[3][11]; // Load SUM
+			$Page->p_bpjs->Count = $Page->Cnt[3][12];
+			$Page->p_bpjs->SumValue = $Page->Smry[3][12]; // Load SUM
+			$Page->j_netto->Count = $Page->Cnt[3][13];
+			$Page->j_netto->SumValue = $Page->Smry[3][13]; // Load SUM
+			$Page->ResetAttrs();
+			$Page->RowType = EWR_ROWTYPE_TOTAL;
+			$Page->RowTotalType = EWR_ROWTOTAL_GROUP;
+			$Page->RowTotalSubType = EWR_ROWTOTAL_FOOTER;
+			$Page->RowGroupLevel = 3;
+			$Page->RenderRow();
+?>
+<?php if ($Page->divisi->ShowCompactSummaryFooter) { ?>
+	<tr<?php echo $Page->RowAttributes(); ?>>
+<?php if ($Page->lapgroup_index->Visible) { ?>
+		<td data-field="lapgroup_index"<?php echo $Page->lapgroup_index->CellAttributes() ?>>
+	<?php if ($Page->lapgroup_index->ShowGroupHeaderAsRow) { ?>
+		&nbsp;
+	<?php } elseif ($Page->RowGroupLevel <> 1) { ?>
+		&nbsp;
+	<?php } else { ?>
+		<span class="ewSummaryCount"><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptCnt") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><?php echo ewr_FormatNumber($Page->lapgroup_index->Count,0,-2,-2,-2) ?></span></span>
+	<?php } ?>
+		</td>
+<?php } ?>
+<?php if ($Page->bagian->Visible) { ?>
+		<td data-field="bagian"<?php echo $Page->bagian->CellAttributes() ?>>
+	<?php if ($Page->bagian->ShowGroupHeaderAsRow) { ?>
+		&nbsp;
+	<?php } elseif ($Page->RowGroupLevel <> 2) { ?>
+		&nbsp;
+	<?php } else { ?>
+		<span class="ewSummaryCount"><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptCnt") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><?php echo ewr_FormatNumber($Page->bagian->Count,0,-2,-2,-2) ?></span></span>
+	<?php } ?>
+		</td>
+<?php } ?>
+<?php if ($Page->divisi->Visible) { ?>
+		<td data-field="divisi"<?php echo $Page->divisi->CellAttributes() ?>>
+	<?php if ($Page->divisi->ShowGroupHeaderAsRow) { ?>
+		&nbsp;
+	<?php } elseif ($Page->RowGroupLevel <> 3) { ?>
+		&nbsp;
+	<?php } else { ?>
+		<span class="ewSummaryCount"><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptCnt") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><?php echo ewr_FormatNumber($Page->divisi->Count,0,-2,-2,-2) ?></span></span>
+	<?php } ?>
+		</td>
+<?php } ?>
+<?php if ($Page->rec_no->Visible) { ?>
+		<td data-field="rec_no"<?php echo $Page->divisi->CellAttributes() ?>></td>
+<?php } ?>
+<?php if ($Page->nama->Visible) { ?>
+		<td data-field="nama"<?php echo $Page->divisi->CellAttributes() ?>></td>
+<?php } ?>
+<?php if ($Page->nip->Visible) { ?>
+		<td data-field="nip"<?php echo $Page->divisi->CellAttributes() ?>></td>
+<?php } ?>
+<?php if ($Page->gp->Visible) { ?>
+		<td data-field="gp"<?php echo $Page->divisi->CellAttributes() ?>><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptSum") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><span data-class="tpgs<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->GrpCounter[1] ?>_r_lapgjbln_gp"<?php echo $Page->gp->ViewAttributes() ?>><?php echo $Page->gp->SumViewValue ?></span></span></td>
+<?php } ?>
+<?php if ($Page->t_jbtn->Visible) { ?>
+		<td data-field="t_jbtn"<?php echo $Page->divisi->CellAttributes() ?>><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptSum") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><span data-class="tpgs<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->GrpCounter[1] ?>_r_lapgjbln_t_jbtn"<?php echo $Page->t_jbtn->ViewAttributes() ?>><?php echo $Page->t_jbtn->SumViewValue ?></span></span></td>
+<?php } ?>
+<?php if ($Page->p_absen->Visible) { ?>
+		<td data-field="p_absen"<?php echo $Page->divisi->CellAttributes() ?>><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptSum") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><span data-class="tpgs<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->GrpCounter[1] ?>_r_lapgjbln_p_absen"<?php echo $Page->p_absen->ViewAttributes() ?>><?php echo $Page->p_absen->SumViewValue ?></span></span></td>
+<?php } ?>
+<?php if ($Page->t_malam->Visible) { ?>
+		<td data-field="t_malam"<?php echo $Page->divisi->CellAttributes() ?>><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptSum") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><span data-class="tpgs<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->GrpCounter[1] ?>_r_lapgjbln_t_malam"<?php echo $Page->t_malam->ViewAttributes() ?>><?php echo $Page->t_malam->SumViewValue ?></span></span></td>
+<?php } ?>
+<?php if ($Page->t_hadir->Visible) { ?>
+		<td data-field="t_hadir"<?php echo $Page->divisi->CellAttributes() ?>><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptSum") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><span data-class="tpgs<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->GrpCounter[1] ?>_r_lapgjbln_t_hadir"<?php echo $Page->t_hadir->ViewAttributes() ?>><?php echo $Page->t_hadir->SumViewValue ?></span></span></td>
+<?php } ?>
+<?php if ($Page->t_um->Visible) { ?>
+		<td data-field="t_um"<?php echo $Page->divisi->CellAttributes() ?>><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptSum") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><span data-class="tpgs<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->GrpCounter[1] ?>_r_lapgjbln_t_um"<?php echo $Page->t_um->ViewAttributes() ?>><?php echo $Page->t_um->SumViewValue ?></span></span></td>
+<?php } ?>
+<?php if ($Page->j_bruto->Visible) { ?>
+		<td data-field="j_bruto"<?php echo $Page->divisi->CellAttributes() ?>><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptSum") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><span data-class="tpgs<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->GrpCounter[1] ?>_r_lapgjbln_j_bruto"<?php echo $Page->j_bruto->ViewAttributes() ?>><?php echo $Page->j_bruto->SumViewValue ?></span></span></td>
+<?php } ?>
+<?php if ($Page->p_aspen->Visible) { ?>
+		<td data-field="p_aspen"<?php echo $Page->divisi->CellAttributes() ?>><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptSum") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><span data-class="tpgs<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->GrpCounter[1] ?>_r_lapgjbln_p_aspen"<?php echo $Page->p_aspen->ViewAttributes() ?>><?php echo $Page->p_aspen->SumViewValue ?></span></span></td>
+<?php } ?>
+<?php if ($Page->p_bpjs->Visible) { ?>
+		<td data-field="p_bpjs"<?php echo $Page->divisi->CellAttributes() ?>><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptSum") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><span data-class="tpgs<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->GrpCounter[1] ?>_r_lapgjbln_p_bpjs"<?php echo $Page->p_bpjs->ViewAttributes() ?>><?php echo $Page->p_bpjs->SumViewValue ?></span></span></td>
+<?php } ?>
+<?php if ($Page->j_netto->Visible) { ?>
+		<td data-field="j_netto"<?php echo $Page->divisi->CellAttributes() ?>><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptSum") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><span data-class="tpgs<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->GrpCounter[1] ?>_r_lapgjbln_j_netto"<?php echo $Page->j_netto->ViewAttributes() ?>><?php echo $Page->j_netto->SumViewValue ?></span></span></td>
+<?php } ?>
+	</tr>
+<?php } else { ?>
+	<tr<?php echo $Page->RowAttributes(); ?>>
+<?php if ($Page->lapgroup_index->Visible) { ?>
+		<td data-field="lapgroup_index"<?php echo $Page->lapgroup_index->CellAttributes() ?>>&nbsp;</td>
+<?php } ?>
+<?php if ($Page->bagian->Visible) { ?>
+		<td data-field="bagian"<?php echo $Page->bagian->CellAttributes() ?>>&nbsp;</td>
+<?php } ?>
+<?php if ($Page->SubGrpColumnCount + $Page->DtlColumnCount - 1 > 0) { ?>
+		<td colspan="<?php echo ($Page->SubGrpColumnCount + $Page->DtlColumnCount - 1) ?>"<?php echo $Page->j_netto->CellAttributes() ?>><?php echo str_replace(array("%v", "%c"), array($Page->divisi->GroupViewValue, $Page->divisi->FldCaption()), $ReportLanguage->Phrase("RptSumHead")) ?> <span class="ewDirLtr">(<?php echo ewr_FormatNumber($Page->Cnt[3][0],0,-2,-2,-2) ?><?php echo $ReportLanguage->Phrase("RptDtlRec") ?>)</span></td>
+<?php } ?>
+	</tr>
+	<tr<?php echo $Page->RowAttributes(); ?>>
+<?php if ($Page->lapgroup_index->Visible) { ?>
+		<td data-field="lapgroup_index"<?php echo $Page->lapgroup_index->CellAttributes() ?>>&nbsp;</td>
+<?php } ?>
+<?php if ($Page->bagian->Visible) { ?>
+		<td data-field="bagian"<?php echo $Page->bagian->CellAttributes() ?>>&nbsp;</td>
+<?php } ?>
+<?php if ($Page->GrpColumnCount > 0) { ?>
+		<td colspan="<?php echo ($Page->GrpColumnCount - 2) ?>"<?php echo $Page->divisi->CellAttributes() ?>><?php echo $ReportLanguage->Phrase("RptSum") ?></td>
+<?php } ?>
+<?php if ($Page->rec_no->Visible) { ?>
+		<td data-field="rec_no"<?php echo $Page->divisi->CellAttributes() ?>>&nbsp;</td>
+<?php } ?>
+<?php if ($Page->nama->Visible) { ?>
+		<td data-field="nama"<?php echo $Page->divisi->CellAttributes() ?>>&nbsp;</td>
+<?php } ?>
+<?php if ($Page->nip->Visible) { ?>
+		<td data-field="nip"<?php echo $Page->divisi->CellAttributes() ?>>&nbsp;</td>
+<?php } ?>
+<?php if ($Page->gp->Visible) { ?>
+		<td data-field="gp"<?php echo $Page->j_netto->CellAttributes() ?>>
+<span data-class="tpgs<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->GrpCounter[1] ?>_r_lapgjbln_gp"<?php echo $Page->gp->ViewAttributes() ?>><?php echo $Page->gp->SumViewValue ?></span></td>
+<?php } ?>
+<?php if ($Page->t_jbtn->Visible) { ?>
+		<td data-field="t_jbtn"<?php echo $Page->j_netto->CellAttributes() ?>>
+<span data-class="tpgs<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->GrpCounter[1] ?>_r_lapgjbln_t_jbtn"<?php echo $Page->t_jbtn->ViewAttributes() ?>><?php echo $Page->t_jbtn->SumViewValue ?></span></td>
+<?php } ?>
+<?php if ($Page->p_absen->Visible) { ?>
+		<td data-field="p_absen"<?php echo $Page->j_netto->CellAttributes() ?>>
+<span data-class="tpgs<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->GrpCounter[1] ?>_r_lapgjbln_p_absen"<?php echo $Page->p_absen->ViewAttributes() ?>><?php echo $Page->p_absen->SumViewValue ?></span></td>
+<?php } ?>
+<?php if ($Page->t_malam->Visible) { ?>
+		<td data-field="t_malam"<?php echo $Page->j_netto->CellAttributes() ?>>
+<span data-class="tpgs<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->GrpCounter[1] ?>_r_lapgjbln_t_malam"<?php echo $Page->t_malam->ViewAttributes() ?>><?php echo $Page->t_malam->SumViewValue ?></span></td>
+<?php } ?>
+<?php if ($Page->t_hadir->Visible) { ?>
+		<td data-field="t_hadir"<?php echo $Page->j_netto->CellAttributes() ?>>
+<span data-class="tpgs<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->GrpCounter[1] ?>_r_lapgjbln_t_hadir"<?php echo $Page->t_hadir->ViewAttributes() ?>><?php echo $Page->t_hadir->SumViewValue ?></span></td>
+<?php } ?>
+<?php if ($Page->t_um->Visible) { ?>
+		<td data-field="t_um"<?php echo $Page->j_netto->CellAttributes() ?>>
+<span data-class="tpgs<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->GrpCounter[1] ?>_r_lapgjbln_t_um"<?php echo $Page->t_um->ViewAttributes() ?>><?php echo $Page->t_um->SumViewValue ?></span></td>
+<?php } ?>
+<?php if ($Page->j_bruto->Visible) { ?>
+		<td data-field="j_bruto"<?php echo $Page->j_netto->CellAttributes() ?>>
+<span data-class="tpgs<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->GrpCounter[1] ?>_r_lapgjbln_j_bruto"<?php echo $Page->j_bruto->ViewAttributes() ?>><?php echo $Page->j_bruto->SumViewValue ?></span></td>
+<?php } ?>
+<?php if ($Page->p_aspen->Visible) { ?>
+		<td data-field="p_aspen"<?php echo $Page->j_netto->CellAttributes() ?>>
+<span data-class="tpgs<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->GrpCounter[1] ?>_r_lapgjbln_p_aspen"<?php echo $Page->p_aspen->ViewAttributes() ?>><?php echo $Page->p_aspen->SumViewValue ?></span></td>
+<?php } ?>
+<?php if ($Page->p_bpjs->Visible) { ?>
+		<td data-field="p_bpjs"<?php echo $Page->j_netto->CellAttributes() ?>>
+<span data-class="tpgs<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->GrpCounter[1] ?>_r_lapgjbln_p_bpjs"<?php echo $Page->p_bpjs->ViewAttributes() ?>><?php echo $Page->p_bpjs->SumViewValue ?></span></td>
+<?php } ?>
+<?php if ($Page->j_netto->Visible) { ?>
+		<td data-field="j_netto"<?php echo $Page->j_netto->CellAttributes() ?>>
+<span data-class="tpgs<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->GrpCounter[1] ?>_r_lapgjbln_j_netto"<?php echo $Page->j_netto->ViewAttributes() ?>><?php echo $Page->j_netto->SumViewValue ?></span></td>
+<?php } ?>
+	</tr>
+<?php } ?>
+<?php
+
+			// Reset level 3 summary
+			$Page->ResetLevelSummary(3);
+		} // End show footer check
+		if ($Page->ChkLvlBreak(3)) {
+			$Page->GrpCounter[1]++;
+		}
+?>
+<?php
+		if ($Page->ChkLvlBreak(2) && $Page->bagian->Visible) {
+?>
+<?php
+			$Page->lapgroup_index->Count = $Page->GetSummaryCount(1, FALSE);
+			$Page->bagian->Count = $Page->GetSummaryCount(2, FALSE);
+			$Page->divisi->Count = $Page->GetSummaryCount(3, FALSE);
 			$Page->gp->Count = $Page->Cnt[2][4];
 			$Page->gp->SumValue = $Page->Smry[2][4]; // Load SUM
 			$Page->t_jbtn->Count = $Page->Cnt[2][5];
@@ -2726,13 +3054,24 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 			$Page->RowGroupLevel = 2;
 			$Page->RenderRow();
 ?>
-<?php if ($Page->divisi->ShowCompactSummaryFooter) { ?>
+<?php if ($Page->bagian->ShowCompactSummaryFooter) { ?>
 	<tr<?php echo $Page->RowAttributes(); ?>>
+<?php if ($Page->lapgroup_index->Visible) { ?>
+		<td data-field="lapgroup_index"<?php echo $Page->lapgroup_index->CellAttributes() ?>>
+	<?php if ($Page->lapgroup_index->ShowGroupHeaderAsRow) { ?>
+		&nbsp;
+	<?php } elseif ($Page->RowGroupLevel <> 1) { ?>
+		&nbsp;
+	<?php } else { ?>
+		<span class="ewSummaryCount"><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptCnt") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><?php echo ewr_FormatNumber($Page->lapgroup_index->Count,0,-2,-2,-2) ?></span></span>
+	<?php } ?>
+		</td>
+<?php } ?>
 <?php if ($Page->bagian->Visible) { ?>
 		<td data-field="bagian"<?php echo $Page->bagian->CellAttributes() ?>>
 	<?php if ($Page->bagian->ShowGroupHeaderAsRow) { ?>
 		&nbsp;
-	<?php } elseif ($Page->RowGroupLevel <> 1) { ?>
+	<?php } elseif ($Page->RowGroupLevel <> 2) { ?>
 		&nbsp;
 	<?php } else { ?>
 		<span class="ewSummaryCount"><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptCnt") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><?php echo ewr_FormatNumber($Page->bagian->Count,0,-2,-2,-2) ?></span></span>
@@ -2740,10 +3079,10 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 		</td>
 <?php } ?>
 <?php if ($Page->divisi->Visible) { ?>
-		<td data-field="divisi"<?php echo $Page->divisi->CellAttributes() ?>>
+		<td data-field="divisi"<?php echo $Page->bagian->CellAttributes() ?>>
 	<?php if ($Page->divisi->ShowGroupHeaderAsRow) { ?>
 		&nbsp;
-	<?php } elseif ($Page->RowGroupLevel <> 2) { ?>
+	<?php } elseif ($Page->RowGroupLevel <> 3) { ?>
 		&nbsp;
 	<?php } else { ?>
 		<span class="ewSummaryCount"><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptCnt") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><?php echo ewr_FormatNumber($Page->divisi->Count,0,-2,-2,-2) ?></span></span>
@@ -2751,69 +3090,69 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 		</td>
 <?php } ?>
 <?php if ($Page->rec_no->Visible) { ?>
-		<td data-field="rec_no"<?php echo $Page->divisi->CellAttributes() ?>></td>
+		<td data-field="rec_no"<?php echo $Page->bagian->CellAttributes() ?>></td>
 <?php } ?>
 <?php if ($Page->nama->Visible) { ?>
-		<td data-field="nama"<?php echo $Page->divisi->CellAttributes() ?>></td>
+		<td data-field="nama"<?php echo $Page->bagian->CellAttributes() ?>></td>
 <?php } ?>
 <?php if ($Page->nip->Visible) { ?>
-		<td data-field="nip"<?php echo $Page->divisi->CellAttributes() ?>></td>
+		<td data-field="nip"<?php echo $Page->bagian->CellAttributes() ?>></td>
 <?php } ?>
 <?php if ($Page->gp->Visible) { ?>
-		<td data-field="gp"<?php echo $Page->divisi->CellAttributes() ?>><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptSum") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><span data-class="tpgs<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_r_lapgjbln_gp"<?php echo $Page->gp->ViewAttributes() ?>><?php echo $Page->gp->SumViewValue ?></span></span></td>
+		<td data-field="gp"<?php echo $Page->bagian->CellAttributes() ?>><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptSum") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><span data-class="tpgs<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_r_lapgjbln_gp"<?php echo $Page->gp->ViewAttributes() ?>><?php echo $Page->gp->SumViewValue ?></span></span></td>
 <?php } ?>
 <?php if ($Page->t_jbtn->Visible) { ?>
-		<td data-field="t_jbtn"<?php echo $Page->divisi->CellAttributes() ?>><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptSum") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><span data-class="tpgs<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_r_lapgjbln_t_jbtn"<?php echo $Page->t_jbtn->ViewAttributes() ?>><?php echo $Page->t_jbtn->SumViewValue ?></span></span></td>
+		<td data-field="t_jbtn"<?php echo $Page->bagian->CellAttributes() ?>><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptSum") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><span data-class="tpgs<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_r_lapgjbln_t_jbtn"<?php echo $Page->t_jbtn->ViewAttributes() ?>><?php echo $Page->t_jbtn->SumViewValue ?></span></span></td>
 <?php } ?>
 <?php if ($Page->p_absen->Visible) { ?>
-		<td data-field="p_absen"<?php echo $Page->divisi->CellAttributes() ?>><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptSum") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><span data-class="tpgs<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_r_lapgjbln_p_absen"<?php echo $Page->p_absen->ViewAttributes() ?>><?php echo $Page->p_absen->SumViewValue ?></span></span></td>
+		<td data-field="p_absen"<?php echo $Page->bagian->CellAttributes() ?>><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptSum") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><span data-class="tpgs<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_r_lapgjbln_p_absen"<?php echo $Page->p_absen->ViewAttributes() ?>><?php echo $Page->p_absen->SumViewValue ?></span></span></td>
 <?php } ?>
 <?php if ($Page->t_malam->Visible) { ?>
-		<td data-field="t_malam"<?php echo $Page->divisi->CellAttributes() ?>><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptSum") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><span data-class="tpgs<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_r_lapgjbln_t_malam"<?php echo $Page->t_malam->ViewAttributes() ?>><?php echo $Page->t_malam->SumViewValue ?></span></span></td>
+		<td data-field="t_malam"<?php echo $Page->bagian->CellAttributes() ?>><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptSum") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><span data-class="tpgs<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_r_lapgjbln_t_malam"<?php echo $Page->t_malam->ViewAttributes() ?>><?php echo $Page->t_malam->SumViewValue ?></span></span></td>
 <?php } ?>
 <?php if ($Page->t_hadir->Visible) { ?>
-		<td data-field="t_hadir"<?php echo $Page->divisi->CellAttributes() ?>><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptSum") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><span data-class="tpgs<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_r_lapgjbln_t_hadir"<?php echo $Page->t_hadir->ViewAttributes() ?>><?php echo $Page->t_hadir->SumViewValue ?></span></span></td>
+		<td data-field="t_hadir"<?php echo $Page->bagian->CellAttributes() ?>><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptSum") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><span data-class="tpgs<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_r_lapgjbln_t_hadir"<?php echo $Page->t_hadir->ViewAttributes() ?>><?php echo $Page->t_hadir->SumViewValue ?></span></span></td>
 <?php } ?>
 <?php if ($Page->t_um->Visible) { ?>
-		<td data-field="t_um"<?php echo $Page->divisi->CellAttributes() ?>><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptSum") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><span data-class="tpgs<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_r_lapgjbln_t_um"<?php echo $Page->t_um->ViewAttributes() ?>><?php echo $Page->t_um->SumViewValue ?></span></span></td>
+		<td data-field="t_um"<?php echo $Page->bagian->CellAttributes() ?>><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptSum") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><span data-class="tpgs<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_r_lapgjbln_t_um"<?php echo $Page->t_um->ViewAttributes() ?>><?php echo $Page->t_um->SumViewValue ?></span></span></td>
 <?php } ?>
 <?php if ($Page->j_bruto->Visible) { ?>
-		<td data-field="j_bruto"<?php echo $Page->divisi->CellAttributes() ?>><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptSum") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><span data-class="tpgs<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_r_lapgjbln_j_bruto"<?php echo $Page->j_bruto->ViewAttributes() ?>><?php echo $Page->j_bruto->SumViewValue ?></span></span></td>
+		<td data-field="j_bruto"<?php echo $Page->bagian->CellAttributes() ?>><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptSum") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><span data-class="tpgs<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_r_lapgjbln_j_bruto"<?php echo $Page->j_bruto->ViewAttributes() ?>><?php echo $Page->j_bruto->SumViewValue ?></span></span></td>
 <?php } ?>
 <?php if ($Page->p_aspen->Visible) { ?>
-		<td data-field="p_aspen"<?php echo $Page->divisi->CellAttributes() ?>><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptSum") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><span data-class="tpgs<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_r_lapgjbln_p_aspen"<?php echo $Page->p_aspen->ViewAttributes() ?>><?php echo $Page->p_aspen->SumViewValue ?></span></span></td>
+		<td data-field="p_aspen"<?php echo $Page->bagian->CellAttributes() ?>><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptSum") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><span data-class="tpgs<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_r_lapgjbln_p_aspen"<?php echo $Page->p_aspen->ViewAttributes() ?>><?php echo $Page->p_aspen->SumViewValue ?></span></span></td>
 <?php } ?>
 <?php if ($Page->p_bpjs->Visible) { ?>
-		<td data-field="p_bpjs"<?php echo $Page->divisi->CellAttributes() ?>><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptSum") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><span data-class="tpgs<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_r_lapgjbln_p_bpjs"<?php echo $Page->p_bpjs->ViewAttributes() ?>><?php echo $Page->p_bpjs->SumViewValue ?></span></span></td>
+		<td data-field="p_bpjs"<?php echo $Page->bagian->CellAttributes() ?>><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptSum") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><span data-class="tpgs<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_r_lapgjbln_p_bpjs"<?php echo $Page->p_bpjs->ViewAttributes() ?>><?php echo $Page->p_bpjs->SumViewValue ?></span></span></td>
 <?php } ?>
 <?php if ($Page->j_netto->Visible) { ?>
-		<td data-field="j_netto"<?php echo $Page->divisi->CellAttributes() ?>><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptSum") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><span data-class="tpgs<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_r_lapgjbln_j_netto"<?php echo $Page->j_netto->ViewAttributes() ?>><?php echo $Page->j_netto->SumViewValue ?></span></span></td>
+		<td data-field="j_netto"<?php echo $Page->bagian->CellAttributes() ?>><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptSum") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><span data-class="tpgs<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_r_lapgjbln_j_netto"<?php echo $Page->j_netto->ViewAttributes() ?>><?php echo $Page->j_netto->SumViewValue ?></span></span></td>
 <?php } ?>
 	</tr>
 <?php } else { ?>
 	<tr<?php echo $Page->RowAttributes(); ?>>
-<?php if ($Page->bagian->Visible) { ?>
-		<td data-field="bagian"<?php echo $Page->bagian->CellAttributes() ?>>&nbsp;</td>
+<?php if ($Page->lapgroup_index->Visible) { ?>
+		<td data-field="lapgroup_index"<?php echo $Page->lapgroup_index->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
 <?php if ($Page->SubGrpColumnCount + $Page->DtlColumnCount > 0) { ?>
-		<td colspan="<?php echo ($Page->SubGrpColumnCount + $Page->DtlColumnCount) ?>"<?php echo $Page->j_netto->CellAttributes() ?>><?php echo str_replace(array("%v", "%c"), array($Page->divisi->GroupViewValue, $Page->divisi->FldCaption()), $ReportLanguage->Phrase("RptSumHead")) ?> <span class="ewDirLtr">(<?php echo ewr_FormatNumber($Page->Cnt[2][0],0,-2,-2,-2) ?><?php echo $ReportLanguage->Phrase("RptDtlRec") ?>)</span></td>
+		<td colspan="<?php echo ($Page->SubGrpColumnCount + $Page->DtlColumnCount) ?>"<?php echo $Page->j_netto->CellAttributes() ?>><?php echo str_replace(array("%v", "%c"), array($Page->bagian->GroupViewValue, $Page->bagian->FldCaption()), $ReportLanguage->Phrase("RptSumHead")) ?> <span class="ewDirLtr">(<?php echo ewr_FormatNumber($Page->Cnt[2][0],0,-2,-2,-2) ?><?php echo $ReportLanguage->Phrase("RptDtlRec") ?>)</span></td>
 <?php } ?>
 	</tr>
 	<tr<?php echo $Page->RowAttributes(); ?>>
-<?php if ($Page->bagian->Visible) { ?>
-		<td data-field="bagian"<?php echo $Page->bagian->CellAttributes() ?>>&nbsp;</td>
+<?php if ($Page->lapgroup_index->Visible) { ?>
+		<td data-field="lapgroup_index"<?php echo $Page->lapgroup_index->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
 <?php if ($Page->GrpColumnCount > 0) { ?>
-		<td colspan="<?php echo ($Page->GrpColumnCount - 1) ?>"<?php echo $Page->divisi->CellAttributes() ?>><?php echo $ReportLanguage->Phrase("RptSum") ?></td>
+		<td colspan="<?php echo ($Page->GrpColumnCount - 1) ?>"<?php echo $Page->bagian->CellAttributes() ?>><?php echo $ReportLanguage->Phrase("RptSum") ?></td>
 <?php } ?>
 <?php if ($Page->rec_no->Visible) { ?>
-		<td data-field="rec_no"<?php echo $Page->divisi->CellAttributes() ?>>&nbsp;</td>
+		<td data-field="rec_no"<?php echo $Page->bagian->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
 <?php if ($Page->nama->Visible) { ?>
-		<td data-field="nama"<?php echo $Page->divisi->CellAttributes() ?>>&nbsp;</td>
+		<td data-field="nama"<?php echo $Page->bagian->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
 <?php if ($Page->nip->Visible) { ?>
-		<td data-field="nip"<?php echo $Page->divisi->CellAttributes() ?>>&nbsp;</td>
+		<td data-field="nip"<?php echo $Page->bagian->CellAttributes() ?>>&nbsp;</td>
 <?php } ?>
 <?php if ($Page->gp->Visible) { ?>
 		<td data-field="gp"<?php echo $Page->j_netto->CellAttributes() ?>>
@@ -2864,174 +3203,13 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 		} // End show footer check
 		if ($Page->ChkLvlBreak(2)) {
 			$Page->GrpCounter[0]++;
+			if (!$rs->EOF)
+				$Page->GrpIdx[$Page->GrpCount][$Page->GrpCounter[0]] = array(-1);
+			$Page->GrpCounter[1] = 1;
 		}
 ?>
 <?php
 	} // End detail records loop
-?>
-<?php
-		if ($Page->bagian->Visible) {
-?>
-<?php
-			$Page->bagian->Count = $Page->GetSummaryCount(1, FALSE);
-			$Page->divisi->Count = $Page->GetSummaryCount(2, FALSE);
-			$Page->gp->Count = $Page->Cnt[1][4];
-			$Page->gp->SumValue = $Page->Smry[1][4]; // Load SUM
-			$Page->t_jbtn->Count = $Page->Cnt[1][5];
-			$Page->t_jbtn->SumValue = $Page->Smry[1][5]; // Load SUM
-			$Page->p_absen->Count = $Page->Cnt[1][6];
-			$Page->p_absen->SumValue = $Page->Smry[1][6]; // Load SUM
-			$Page->t_malam->Count = $Page->Cnt[1][7];
-			$Page->t_malam->SumValue = $Page->Smry[1][7]; // Load SUM
-			$Page->t_hadir->Count = $Page->Cnt[1][8];
-			$Page->t_hadir->SumValue = $Page->Smry[1][8]; // Load SUM
-			$Page->t_um->Count = $Page->Cnt[1][9];
-			$Page->t_um->SumValue = $Page->Smry[1][9]; // Load SUM
-			$Page->j_bruto->Count = $Page->Cnt[1][10];
-			$Page->j_bruto->SumValue = $Page->Smry[1][10]; // Load SUM
-			$Page->p_aspen->Count = $Page->Cnt[1][11];
-			$Page->p_aspen->SumValue = $Page->Smry[1][11]; // Load SUM
-			$Page->p_bpjs->Count = $Page->Cnt[1][12];
-			$Page->p_bpjs->SumValue = $Page->Smry[1][12]; // Load SUM
-			$Page->j_netto->Count = $Page->Cnt[1][13];
-			$Page->j_netto->SumValue = $Page->Smry[1][13]; // Load SUM
-			$Page->ResetAttrs();
-			$Page->RowType = EWR_ROWTYPE_TOTAL;
-			$Page->RowTotalType = EWR_ROWTOTAL_GROUP;
-			$Page->RowTotalSubType = EWR_ROWTOTAL_FOOTER;
-			$Page->RowGroupLevel = 1;
-			$Page->RenderRow();
-?>
-<?php if ($Page->bagian->ShowCompactSummaryFooter) { ?>
-	<tr<?php echo $Page->RowAttributes(); ?>>
-<?php if ($Page->bagian->Visible) { ?>
-		<td data-field="bagian"<?php echo $Page->bagian->CellAttributes() ?>>
-	<?php if ($Page->bagian->ShowGroupHeaderAsRow) { ?>
-		&nbsp;
-	<?php } elseif ($Page->RowGroupLevel <> 1) { ?>
-		&nbsp;
-	<?php } else { ?>
-		<span class="ewSummaryCount"><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptCnt") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><?php echo ewr_FormatNumber($Page->bagian->Count,0,-2,-2,-2) ?></span></span>
-	<?php } ?>
-		</td>
-<?php } ?>
-<?php if ($Page->divisi->Visible) { ?>
-		<td data-field="divisi"<?php echo $Page->bagian->CellAttributes() ?>>
-	<?php if ($Page->divisi->ShowGroupHeaderAsRow) { ?>
-		&nbsp;
-	<?php } elseif ($Page->RowGroupLevel <> 2) { ?>
-		&nbsp;
-	<?php } else { ?>
-		<span class="ewSummaryCount"><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptCnt") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><?php echo ewr_FormatNumber($Page->divisi->Count,0,-2,-2,-2) ?></span></span>
-	<?php } ?>
-		</td>
-<?php } ?>
-<?php if ($Page->rec_no->Visible) { ?>
-		<td data-field="rec_no"<?php echo $Page->bagian->CellAttributes() ?>></td>
-<?php } ?>
-<?php if ($Page->nama->Visible) { ?>
-		<td data-field="nama"<?php echo $Page->bagian->CellAttributes() ?>></td>
-<?php } ?>
-<?php if ($Page->nip->Visible) { ?>
-		<td data-field="nip"<?php echo $Page->bagian->CellAttributes() ?>></td>
-<?php } ?>
-<?php if ($Page->gp->Visible) { ?>
-		<td data-field="gp"<?php echo $Page->bagian->CellAttributes() ?>><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptSum") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><span data-class="tpgs<?php echo $Page->GrpCount ?>_r_lapgjbln_gp"<?php echo $Page->gp->ViewAttributes() ?>><?php echo $Page->gp->SumViewValue ?></span></span></td>
-<?php } ?>
-<?php if ($Page->t_jbtn->Visible) { ?>
-		<td data-field="t_jbtn"<?php echo $Page->bagian->CellAttributes() ?>><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptSum") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><span data-class="tpgs<?php echo $Page->GrpCount ?>_r_lapgjbln_t_jbtn"<?php echo $Page->t_jbtn->ViewAttributes() ?>><?php echo $Page->t_jbtn->SumViewValue ?></span></span></td>
-<?php } ?>
-<?php if ($Page->p_absen->Visible) { ?>
-		<td data-field="p_absen"<?php echo $Page->bagian->CellAttributes() ?>><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptSum") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><span data-class="tpgs<?php echo $Page->GrpCount ?>_r_lapgjbln_p_absen"<?php echo $Page->p_absen->ViewAttributes() ?>><?php echo $Page->p_absen->SumViewValue ?></span></span></td>
-<?php } ?>
-<?php if ($Page->t_malam->Visible) { ?>
-		<td data-field="t_malam"<?php echo $Page->bagian->CellAttributes() ?>><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptSum") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><span data-class="tpgs<?php echo $Page->GrpCount ?>_r_lapgjbln_t_malam"<?php echo $Page->t_malam->ViewAttributes() ?>><?php echo $Page->t_malam->SumViewValue ?></span></span></td>
-<?php } ?>
-<?php if ($Page->t_hadir->Visible) { ?>
-		<td data-field="t_hadir"<?php echo $Page->bagian->CellAttributes() ?>><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptSum") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><span data-class="tpgs<?php echo $Page->GrpCount ?>_r_lapgjbln_t_hadir"<?php echo $Page->t_hadir->ViewAttributes() ?>><?php echo $Page->t_hadir->SumViewValue ?></span></span></td>
-<?php } ?>
-<?php if ($Page->t_um->Visible) { ?>
-		<td data-field="t_um"<?php echo $Page->bagian->CellAttributes() ?>><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptSum") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><span data-class="tpgs<?php echo $Page->GrpCount ?>_r_lapgjbln_t_um"<?php echo $Page->t_um->ViewAttributes() ?>><?php echo $Page->t_um->SumViewValue ?></span></span></td>
-<?php } ?>
-<?php if ($Page->j_bruto->Visible) { ?>
-		<td data-field="j_bruto"<?php echo $Page->bagian->CellAttributes() ?>><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptSum") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><span data-class="tpgs<?php echo $Page->GrpCount ?>_r_lapgjbln_j_bruto"<?php echo $Page->j_bruto->ViewAttributes() ?>><?php echo $Page->j_bruto->SumViewValue ?></span></span></td>
-<?php } ?>
-<?php if ($Page->p_aspen->Visible) { ?>
-		<td data-field="p_aspen"<?php echo $Page->bagian->CellAttributes() ?>><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptSum") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><span data-class="tpgs<?php echo $Page->GrpCount ?>_r_lapgjbln_p_aspen"<?php echo $Page->p_aspen->ViewAttributes() ?>><?php echo $Page->p_aspen->SumViewValue ?></span></span></td>
-<?php } ?>
-<?php if ($Page->p_bpjs->Visible) { ?>
-		<td data-field="p_bpjs"<?php echo $Page->bagian->CellAttributes() ?>><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptSum") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><span data-class="tpgs<?php echo $Page->GrpCount ?>_r_lapgjbln_p_bpjs"<?php echo $Page->p_bpjs->ViewAttributes() ?>><?php echo $Page->p_bpjs->SumViewValue ?></span></span></td>
-<?php } ?>
-<?php if ($Page->j_netto->Visible) { ?>
-		<td data-field="j_netto"<?php echo $Page->bagian->CellAttributes() ?>><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptSum") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><span data-class="tpgs<?php echo $Page->GrpCount ?>_r_lapgjbln_j_netto"<?php echo $Page->j_netto->ViewAttributes() ?>><?php echo $Page->j_netto->SumViewValue ?></span></span></td>
-<?php } ?>
-	</tr>
-<?php } else { ?>
-	<tr<?php echo $Page->RowAttributes(); ?>>
-<?php if ($Page->GrpColumnCount + $Page->DtlColumnCount > 0) { ?>
-		<td colspan="<?php echo ($Page->GrpColumnCount + $Page->DtlColumnCount) ?>"<?php echo $Page->j_netto->CellAttributes() ?>><?php echo str_replace(array("%v", "%c"), array($Page->bagian->GroupViewValue, $Page->bagian->FldCaption()), $ReportLanguage->Phrase("RptSumHead")) ?> <span class="ewDirLtr">(<?php echo ewr_FormatNumber($Page->Cnt[1][0],0,-2,-2,-2) ?><?php echo $ReportLanguage->Phrase("RptDtlRec") ?>)</span></td>
-<?php } ?>
-	</tr>
-	<tr<?php echo $Page->RowAttributes(); ?>>
-<?php if ($Page->GrpColumnCount > 0) { ?>
-		<td colspan="<?php echo ($Page->GrpColumnCount - 0) ?>"<?php echo $Page->bagian->CellAttributes() ?>><?php echo $ReportLanguage->Phrase("RptSum") ?></td>
-<?php } ?>
-<?php if ($Page->rec_no->Visible) { ?>
-		<td data-field="rec_no"<?php echo $Page->bagian->CellAttributes() ?>>&nbsp;</td>
-<?php } ?>
-<?php if ($Page->nama->Visible) { ?>
-		<td data-field="nama"<?php echo $Page->bagian->CellAttributes() ?>>&nbsp;</td>
-<?php } ?>
-<?php if ($Page->nip->Visible) { ?>
-		<td data-field="nip"<?php echo $Page->bagian->CellAttributes() ?>>&nbsp;</td>
-<?php } ?>
-<?php if ($Page->gp->Visible) { ?>
-		<td data-field="gp"<?php echo $Page->j_netto->CellAttributes() ?>>
-<span data-class="tpgs<?php echo $Page->GrpCount ?>_r_lapgjbln_gp"<?php echo $Page->gp->ViewAttributes() ?>><?php echo $Page->gp->SumViewValue ?></span></td>
-<?php } ?>
-<?php if ($Page->t_jbtn->Visible) { ?>
-		<td data-field="t_jbtn"<?php echo $Page->j_netto->CellAttributes() ?>>
-<span data-class="tpgs<?php echo $Page->GrpCount ?>_r_lapgjbln_t_jbtn"<?php echo $Page->t_jbtn->ViewAttributes() ?>><?php echo $Page->t_jbtn->SumViewValue ?></span></td>
-<?php } ?>
-<?php if ($Page->p_absen->Visible) { ?>
-		<td data-field="p_absen"<?php echo $Page->j_netto->CellAttributes() ?>>
-<span data-class="tpgs<?php echo $Page->GrpCount ?>_r_lapgjbln_p_absen"<?php echo $Page->p_absen->ViewAttributes() ?>><?php echo $Page->p_absen->SumViewValue ?></span></td>
-<?php } ?>
-<?php if ($Page->t_malam->Visible) { ?>
-		<td data-field="t_malam"<?php echo $Page->j_netto->CellAttributes() ?>>
-<span data-class="tpgs<?php echo $Page->GrpCount ?>_r_lapgjbln_t_malam"<?php echo $Page->t_malam->ViewAttributes() ?>><?php echo $Page->t_malam->SumViewValue ?></span></td>
-<?php } ?>
-<?php if ($Page->t_hadir->Visible) { ?>
-		<td data-field="t_hadir"<?php echo $Page->j_netto->CellAttributes() ?>>
-<span data-class="tpgs<?php echo $Page->GrpCount ?>_r_lapgjbln_t_hadir"<?php echo $Page->t_hadir->ViewAttributes() ?>><?php echo $Page->t_hadir->SumViewValue ?></span></td>
-<?php } ?>
-<?php if ($Page->t_um->Visible) { ?>
-		<td data-field="t_um"<?php echo $Page->j_netto->CellAttributes() ?>>
-<span data-class="tpgs<?php echo $Page->GrpCount ?>_r_lapgjbln_t_um"<?php echo $Page->t_um->ViewAttributes() ?>><?php echo $Page->t_um->SumViewValue ?></span></td>
-<?php } ?>
-<?php if ($Page->j_bruto->Visible) { ?>
-		<td data-field="j_bruto"<?php echo $Page->j_netto->CellAttributes() ?>>
-<span data-class="tpgs<?php echo $Page->GrpCount ?>_r_lapgjbln_j_bruto"<?php echo $Page->j_bruto->ViewAttributes() ?>><?php echo $Page->j_bruto->SumViewValue ?></span></td>
-<?php } ?>
-<?php if ($Page->p_aspen->Visible) { ?>
-		<td data-field="p_aspen"<?php echo $Page->j_netto->CellAttributes() ?>>
-<span data-class="tpgs<?php echo $Page->GrpCount ?>_r_lapgjbln_p_aspen"<?php echo $Page->p_aspen->ViewAttributes() ?>><?php echo $Page->p_aspen->SumViewValue ?></span></td>
-<?php } ?>
-<?php if ($Page->p_bpjs->Visible) { ?>
-		<td data-field="p_bpjs"<?php echo $Page->j_netto->CellAttributes() ?>>
-<span data-class="tpgs<?php echo $Page->GrpCount ?>_r_lapgjbln_p_bpjs"<?php echo $Page->p_bpjs->ViewAttributes() ?>><?php echo $Page->p_bpjs->SumViewValue ?></span></td>
-<?php } ?>
-<?php if ($Page->j_netto->Visible) { ?>
-		<td data-field="j_netto"<?php echo $Page->j_netto->CellAttributes() ?>>
-<span data-class="tpgs<?php echo $Page->GrpCount ?>_r_lapgjbln_j_netto"<?php echo $Page->j_netto->ViewAttributes() ?>><?php echo $Page->j_netto->SumViewValue ?></span></td>
-<?php } ?>
-	</tr>
-<?php } ?>
-<?php
-
-			// Reset level 1 summary
-			$Page->ResetLevelSummary(1);
-		} // End show footer check
 ?>
 <?php
 
@@ -3046,6 +3224,7 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 	if ($Page->ShowHeader)
 		$Page->Page_Breaking($Page->ShowHeader, $Page->PageBreakContent);
 	$Page->GrpCount++;
+	$Page->GrpCounter[1] = 1;
 	$Page->GrpCounter[0] = 1;
 
 	// Handle EOF

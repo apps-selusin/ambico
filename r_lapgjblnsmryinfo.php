@@ -28,6 +28,7 @@ class crr_lapgjbln extends crTableBase {
 	var $j_netto;
 	var $start;
 	var $end;
+	var $lapgroup_index;
 
 	//
 	// Table class constructor
@@ -61,7 +62,7 @@ class crr_lapgjbln extends crTableBase {
 		// bagian
 		$this->bagian = new crField('r_lapgjbln', 'r_lapgjbln', 'x_bagian', 'bagian', '`bagian`', 200, EWR_DATATYPE_STRING, -1);
 		$this->bagian->Sortable = TRUE; // Allow sort
-		$this->bagian->GroupingFieldId = 1;
+		$this->bagian->GroupingFieldId = 2;
 		$this->bagian->ShowGroupHeaderAsRow = $this->ShowGroupHeaderAsRow;
 		$this->bagian->ShowCompactSummaryFooter = $this->ShowCompactSummaryFooter;
 		$this->bagian->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectInteger");
@@ -76,7 +77,7 @@ class crr_lapgjbln extends crTableBase {
 		// divisi
 		$this->divisi = new crField('r_lapgjbln', 'r_lapgjbln', 'x_divisi', 'divisi', '`divisi`', 200, EWR_DATATYPE_STRING, -1);
 		$this->divisi->Sortable = TRUE; // Allow sort
-		$this->divisi->GroupingFieldId = 2;
+		$this->divisi->GroupingFieldId = 3;
 		$this->divisi->ShowGroupHeaderAsRow = $this->ShowGroupHeaderAsRow;
 		$this->divisi->ShowCompactSummaryFooter = $this->ShowCompactSummaryFooter;
 		$this->divisi->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectInteger");
@@ -222,6 +223,21 @@ class crr_lapgjbln extends crTableBase {
 		$this->end->DateFilter = "";
 		$this->end->SqlSelect = "";
 		$this->end->SqlOrderBy = "";
+
+		// lapgroup_index
+		$this->lapgroup_index = new crField('r_lapgjbln', 'r_lapgjbln', 'x_lapgroup_index', 'lapgroup_index', '`lapgroup_index`', 16, EWR_DATATYPE_NUMBER, -1);
+		$this->lapgroup_index->Sortable = TRUE; // Allow sort
+		$this->lapgroup_index->GroupingFieldId = 1;
+		$this->lapgroup_index->ShowGroupHeaderAsRow = $this->ShowGroupHeaderAsRow;
+		$this->lapgroup_index->ShowCompactSummaryFooter = $this->ShowCompactSummaryFooter;
+		$this->lapgroup_index->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectInteger");
+		$this->fields['lapgroup_index'] = &$this->lapgroup_index;
+		$this->lapgroup_index->DateFilter = "";
+		$this->lapgroup_index->SqlSelect = "";
+		$this->lapgroup_index->SqlOrderBy = "";
+		$this->lapgroup_index->FldGroupByType = "";
+		$this->lapgroup_index->FldGroupInt = "0";
+		$this->lapgroup_index->FldGroupSql = "";
 	}
 
 	// Set Field Visibility
@@ -369,7 +385,7 @@ class crr_lapgjbln extends crTableBase {
 	var $_SqlOrderBy = "";
 
 	function getSqlOrderBy() {
-		return ($this->_SqlOrderBy <> "") ? $this->_SqlOrderBy : "`bagian` ASC, `divisi` ASC";
+		return ($this->_SqlOrderBy <> "") ? $this->_SqlOrderBy : "`lapgroup_index` ASC, `bagian` ASC, `divisi` ASC";
 	}
 
 	function SqlOrderBy() { // For backward compatibility
@@ -386,7 +402,7 @@ class crr_lapgjbln extends crTableBase {
 	var $_SqlFirstGroupField = "";
 
 	function getSqlFirstGroupField() {
-		return ($this->_SqlFirstGroupField <> "") ? $this->_SqlFirstGroupField : "`bagian`";
+		return ($this->_SqlFirstGroupField <> "") ? $this->_SqlFirstGroupField : "`lapgroup_index`";
 	}
 
 	function SqlFirstGroupField() { // For backward compatibility
@@ -416,7 +432,7 @@ class crr_lapgjbln extends crTableBase {
 	var $_SqlOrderByGroup = "";
 
 	function getSqlOrderByGroup() {
-		return ($this->_SqlOrderByGroup <> "") ? $this->_SqlOrderByGroup : "`bagian` ASC";
+		return ($this->_SqlOrderByGroup <> "") ? $this->_SqlOrderByGroup : "`lapgroup_index` ASC";
 	}
 
 	function SqlOrderByGroup() { // For backward compatibility

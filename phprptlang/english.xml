@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<ew-language date="2017/11/28" version="10.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
+<ew-language date="2017/11/30" version="10.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
   <!-- 
 	*** Important Notes:
 	1. Language ID should follow: https://developers.google.com/recaptcha/docs/language,
@@ -2737,9 +2737,6 @@
       <field id="gjbln_id">
         <phrase id="fldcaption" value="gjbln id" />
       </field>
-      <field id="rec_no">
-        <phrase id="fldcaption" value="No. Urut" />
-      </field>
       <field id="bagian">
         <phrase id="fldcaption" value="bagian" />
       </field>
@@ -2790,6 +2787,12 @@
       </field>
       <field id="end">
         <phrase id="fldcaption" value="end" />
+      </field>
+      <field id="lapgroup_index">
+        <phrase id="fldcaption" value="lapgroup index" />
+      </field>
+      <field id="rec_no">
+        <phrase id="fldcaption" value="No. Urut" />
       </field>
     </table>
     <table id="r_lapgjbln">
@@ -2850,6 +2853,9 @@
       </field>
       <field id="end">
         <phrase id="fldcaption" value="end" />
+      </field>
+      <field id="lapgroup_index">
+        <phrase id="fldcaption" value="lapgroup index" />
       </field>
     </table>
     <table id="t_harilibur">
