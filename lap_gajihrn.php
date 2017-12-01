@@ -93,6 +93,7 @@ while (!$rs->EOF) {
 			$mjml_premi_malam = 0;
 			$mabsen           = 0;
 			$mterlambat       = 0;
+			$mflag_S1         = 0;
 			while ($mpegawai_id == $rs->fields["pegawai_id"] and !$rs->EOF) {
 				
 				// check data valid
@@ -185,6 +186,7 @@ while (!$rs->EOF) {
 						or $kode_pengecualian == "HD") {
 							
 						$mpremi_hadir = 0;
+						$mflag_S1 = 1;
 					}
 					
 					/*
@@ -198,13 +200,23 @@ while (!$rs->EOF) {
 					}
 				}
 				
+				/*if ($mpegawai_nip == '2821') { // checking per pegawai
+					echo $mpegawai_nama;
+					echo " - ".$rs->fields["tgl"];
+					echo " - ".$mpremi_hadir;
+					echo "</br>";
+					//exit;
+				}*/
+				
 				$rs->MoveNext();
 			}
 			
 			//echo $mpegawai_nip."<br>";
-			if ($mpegawai_nip == '2930') {
+			if ($mpegawai_nip == '2821') {
 				//echo $mpegawai_nama;
-				//echo "1";
+				//echo " - ".$rs->fields["tgl"];
+				//echo " - ".$mpremi_hadir;
+				//echo "</br>";
 				//exit;
 			}
 			
@@ -212,7 +224,7 @@ while (!$rs->EOF) {
 				$mupah += $mt_jabatan;
 			}
 			
-			if ($mabsen == 1 or $mterlambat == 1) $mpremi_hadir = 0; //$t_hadir = 0;
+			if ($mabsen == 1 or $mterlambat == 1 or $mflag_S1 == 1) $mpremi_hadir = 0; //$t_hadir = 0;
 			
 			$mtotal = $mupah + $mpremi_malam + $mpremi_hadir - $mpot_absen;
 			//$mpegawai_nama = mysql_real_escape_string($mpegawai_nama);
