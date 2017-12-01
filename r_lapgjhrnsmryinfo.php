@@ -16,6 +16,7 @@ class crr_lapgjhrn extends crTableBase {
 	var $nama;
 	var $nip;
 	var $upah;
+	var $t_jabatan;
 	var $premi_malam;
 	var $premi_hadir;
 	var $pot_absen;
@@ -105,6 +106,15 @@ class crr_lapgjhrn extends crTableBase {
 		$this->upah->DateFilter = "";
 		$this->upah->SqlSelect = "";
 		$this->upah->SqlOrderBy = "";
+
+		// t_jabatan
+		$this->t_jabatan = new crField('r_lapgjhrn', 'r_lapgjhrn', 'x_t_jabatan', 't_jabatan', '`t_jabatan`', 4, EWR_DATATYPE_NUMBER, -1);
+		$this->t_jabatan->Sortable = TRUE; // Allow sort
+		$this->t_jabatan->FldDefaultErrMsg = $ReportLanguage->Phrase("IncorrectFloat");
+		$this->fields['t_jabatan'] = &$this->t_jabatan;
+		$this->t_jabatan->DateFilter = "";
+		$this->t_jabatan->SqlSelect = "";
+		$this->t_jabatan->SqlOrderBy = "";
 
 		// premi_malam
 		$this->premi_malam = new crField('r_lapgjhrn', 'r_lapgjhrn', 'x_premi_malam', 'premi_malam', '`premi_malam`', 4, EWR_DATATYPE_NUMBER, -1);
@@ -383,7 +393,7 @@ class crr_lapgjhrn extends crTableBase {
 	var $_SqlSelectAgg = "";
 
 	function getSqlSelectAgg() {
-		return ($this->_SqlSelectAgg <> "") ? $this->_SqlSelectAgg : "SELECT SUM(`upah`) AS `sum_upah`, SUM(`premi_malam`) AS `sum_premi_malam`, SUM(`premi_hadir`) AS `sum_premi_hadir`, SUM(`pot_absen`) AS `sum_pot_absen`, SUM(`total`) AS `sum_total` FROM " . $this->getSqlFrom();
+		return ($this->_SqlSelectAgg <> "") ? $this->_SqlSelectAgg : "SELECT SUM(`upah`) AS `sum_upah`, SUM(`t_jabatan`) AS `sum_t_jabatan`, SUM(`premi_malam`) AS `sum_premi_malam`, SUM(`premi_hadir`) AS `sum_premi_hadir`, SUM(`pot_absen`) AS `sum_pot_absen`, SUM(`total`) AS `sum_total` FROM " . $this->getSqlFrom();
 	}
 
 	function SqlSelectAgg() { // For backward compatibility

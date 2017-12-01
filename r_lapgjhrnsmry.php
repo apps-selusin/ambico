@@ -541,6 +541,7 @@ class crr_lapgjhrn_summary extends crr_lapgjhrn {
 		$this->nama->SetVisibility();
 		$this->nip->SetVisibility();
 		$this->upah->SetVisibility();
+		$this->t_jabatan->SetVisibility();
 		$this->premi_malam->SetVisibility();
 		$this->premi_hadir->SetVisibility();
 		$this->pot_absen->SetVisibility();
@@ -550,7 +551,7 @@ class crr_lapgjhrn_summary extends crr_lapgjhrn {
 		// 1st dimension = no of groups (level 0 used for grand total)
 		// 2nd dimension = no of fields
 
-		$nDtls = 9;
+		$nDtls = 10;
 		$nGrps = 4;
 		$this->Val = &ewr_InitArray($nDtls, 0);
 		$this->Cnt = &ewr_Init2DArray($nGrps, $nDtls, 0);
@@ -563,7 +564,7 @@ class crr_lapgjhrn_summary extends crr_lapgjhrn {
 		$this->GrandMx = &ewr_InitArray($nDtls, NULL);
 
 		// Set up array if accumulation required: array(Accum, SkipNullOrZero)
-		$this->Col = array(array(FALSE, FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(TRUE,FALSE), array(TRUE,FALSE), array(TRUE,FALSE), array(TRUE,FALSE), array(TRUE,FALSE));
+		$this->Col = array(array(FALSE, FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(FALSE,FALSE), array(TRUE,FALSE), array(TRUE,FALSE), array(TRUE,FALSE), array(TRUE,FALSE), array(TRUE,FALSE), array(TRUE,FALSE));
 
 		// Set up groups per page dynamically
 		$this->SetUpDisplayGrps();
@@ -864,6 +865,7 @@ class crr_lapgjhrn_summary extends crr_lapgjhrn {
 				$this->FirstRowData['nama'] = ewr_Conv($rs->fields('nama'), 200);
 				$this->FirstRowData['nip'] = ewr_Conv($rs->fields('nip'), 200);
 				$this->FirstRowData['upah'] = ewr_Conv($rs->fields('upah'), 4);
+				$this->FirstRowData['t_jabatan'] = ewr_Conv($rs->fields('t_jabatan'), 4);
 				$this->FirstRowData['premi_malam'] = ewr_Conv($rs->fields('premi_malam'), 4);
 				$this->FirstRowData['premi_hadir'] = ewr_Conv($rs->fields('premi_hadir'), 4);
 				$this->FirstRowData['pot_absen'] = ewr_Conv($rs->fields('pot_absen'), 4);
@@ -883,6 +885,7 @@ class crr_lapgjhrn_summary extends crr_lapgjhrn {
 			$this->nama->setDbValue($rs->fields('nama'));
 			$this->nip->setDbValue($rs->fields('nip'));
 			$this->upah->setDbValue($rs->fields('upah'));
+			$this->t_jabatan->setDbValue($rs->fields('t_jabatan'));
 			$this->premi_malam->setDbValue($rs->fields('premi_malam'));
 			$this->premi_hadir->setDbValue($rs->fields('premi_hadir'));
 			$this->pot_absen->setDbValue($rs->fields('pot_absen'));
@@ -899,10 +902,11 @@ class crr_lapgjhrn_summary extends crr_lapgjhrn {
 			$this->Val[2] = $this->nama->CurrentValue;
 			$this->Val[3] = $this->nip->CurrentValue;
 			$this->Val[4] = $this->upah->CurrentValue;
-			$this->Val[5] = $this->premi_malam->CurrentValue;
-			$this->Val[6] = $this->premi_hadir->CurrentValue;
-			$this->Val[7] = $this->pot_absen->CurrentValue;
-			$this->Val[8] = $this->total->CurrentValue;
+			$this->Val[5] = $this->t_jabatan->CurrentValue;
+			$this->Val[6] = $this->premi_malam->CurrentValue;
+			$this->Val[7] = $this->premi_hadir->CurrentValue;
+			$this->Val[8] = $this->pot_absen->CurrentValue;
+			$this->Val[9] = $this->total->CurrentValue;
 		} else {
 			$this->gjhrn_id->setDbValue("");
 			$this->rec_no->setDbValue("");
@@ -911,6 +915,7 @@ class crr_lapgjhrn_summary extends crr_lapgjhrn {
 			$this->nama->setDbValue("");
 			$this->nip->setDbValue("");
 			$this->upah->setDbValue("");
+			$this->t_jabatan->setDbValue("");
 			$this->premi_malam->setDbValue("");
 			$this->premi_hadir->setDbValue("");
 			$this->pot_absen->setDbValue("");
@@ -1089,13 +1094,15 @@ class crr_lapgjhrn_summary extends crr_lapgjhrn {
 				$this->GrandCnt[4] = $this->TotCount;
 				$this->GrandSmry[4] = $rsagg->fields("sum_upah");
 				$this->GrandCnt[5] = $this->TotCount;
-				$this->GrandSmry[5] = $rsagg->fields("sum_premi_malam");
+				$this->GrandSmry[5] = $rsagg->fields("sum_t_jabatan");
 				$this->GrandCnt[6] = $this->TotCount;
-				$this->GrandSmry[6] = $rsagg->fields("sum_premi_hadir");
+				$this->GrandSmry[6] = $rsagg->fields("sum_premi_malam");
 				$this->GrandCnt[7] = $this->TotCount;
-				$this->GrandSmry[7] = $rsagg->fields("sum_pot_absen");
+				$this->GrandSmry[7] = $rsagg->fields("sum_premi_hadir");
 				$this->GrandCnt[8] = $this->TotCount;
-				$this->GrandSmry[8] = $rsagg->fields("sum_total");
+				$this->GrandSmry[8] = $rsagg->fields("sum_pot_absen");
+				$this->GrandCnt[9] = $this->TotCount;
+				$this->GrandSmry[9] = $rsagg->fields("sum_total");
 				$rsagg->Close();
 				$bGotSummary = TRUE;
 			}
@@ -1159,6 +1166,12 @@ class crr_lapgjhrn_summary extends crr_lapgjhrn {
 			$this->upah->CellAttrs["style"] = "text-align:right;";
 			$this->upah->CellAttrs["class"] = ($this->RowTotalType == EWR_ROWTOTAL_PAGE || $this->RowTotalType == EWR_ROWTOTAL_GRAND) ? "ewRptGrpAggregate" : "ewRptGrpSummary" . $this->RowGroupLevel;
 
+			// t_jabatan
+			$this->t_jabatan->SumViewValue = $this->t_jabatan->SumValue;
+			$this->t_jabatan->SumViewValue = ewr_FormatNumber($this->t_jabatan->SumViewValue, 0, -2, -2, -2);
+			$this->t_jabatan->CellAttrs["style"] = "text-align:right;";
+			$this->t_jabatan->CellAttrs["class"] = ($this->RowTotalType == EWR_ROWTOTAL_PAGE || $this->RowTotalType == EWR_ROWTOTAL_GRAND) ? "ewRptGrpAggregate" : "ewRptGrpSummary" . $this->RowGroupLevel;
+
 			// premi_malam
 			$this->premi_malam->SumViewValue = $this->premi_malam->SumValue;
 			$this->premi_malam->SumViewValue = ewr_FormatNumber($this->premi_malam->SumViewValue, 0, -2, -2, -2);
@@ -1203,6 +1216,9 @@ class crr_lapgjhrn_summary extends crr_lapgjhrn {
 
 			// upah
 			$this->upah->HrefValue = "";
+
+			// t_jabatan
+			$this->t_jabatan->HrefValue = "";
 
 			// premi_malam
 			$this->premi_malam->HrefValue = "";
@@ -1265,6 +1281,12 @@ class crr_lapgjhrn_summary extends crr_lapgjhrn {
 			$this->upah->CellAttrs["class"] = ($this->RecCount % 2 <> 1) ? "ewTableAltRow" : "ewTableRow";
 			$this->upah->CellAttrs["style"] = "text-align:right;";
 
+			// t_jabatan
+			$this->t_jabatan->ViewValue = $this->t_jabatan->CurrentValue;
+			$this->t_jabatan->ViewValue = ewr_FormatNumber($this->t_jabatan->ViewValue, 0, -2, -2, -2);
+			$this->t_jabatan->CellAttrs["class"] = ($this->RecCount % 2 <> 1) ? "ewTableAltRow" : "ewTableRow";
+			$this->t_jabatan->CellAttrs["style"] = "text-align:right;";
+
 			// premi_malam
 			$this->premi_malam->ViewValue = $this->premi_malam->CurrentValue;
 			$this->premi_malam->ViewValue = ewr_FormatNumber($this->premi_malam->ViewValue, 0, -2, -2, -2);
@@ -1309,6 +1331,9 @@ class crr_lapgjhrn_summary extends crr_lapgjhrn {
 
 			// upah
 			$this->upah->HrefValue = "";
+
+			// t_jabatan
+			$this->t_jabatan->HrefValue = "";
 
 			// premi_malam
 			$this->premi_malam->HrefValue = "";
@@ -1361,6 +1386,15 @@ class crr_lapgjhrn_summary extends crr_lapgjhrn {
 			$HrefValue = &$this->upah->HrefValue;
 			$LinkAttrs = &$this->upah->LinkAttrs;
 			$this->Cell_Rendered($this->upah, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
+
+			// t_jabatan
+			$CurrentValue = $this->t_jabatan->SumValue;
+			$ViewValue = &$this->t_jabatan->SumViewValue;
+			$ViewAttrs = &$this->t_jabatan->ViewAttrs;
+			$CellAttrs = &$this->t_jabatan->CellAttrs;
+			$HrefValue = &$this->t_jabatan->HrefValue;
+			$LinkAttrs = &$this->t_jabatan->LinkAttrs;
+			$this->Cell_Rendered($this->t_jabatan, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
 
 			// premi_malam
 			$CurrentValue = $this->premi_malam->SumValue;
@@ -1462,6 +1496,15 @@ class crr_lapgjhrn_summary extends crr_lapgjhrn {
 			$LinkAttrs = &$this->upah->LinkAttrs;
 			$this->Cell_Rendered($this->upah, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
 
+			// t_jabatan
+			$CurrentValue = $this->t_jabatan->CurrentValue;
+			$ViewValue = &$this->t_jabatan->ViewValue;
+			$ViewAttrs = &$this->t_jabatan->ViewAttrs;
+			$CellAttrs = &$this->t_jabatan->CellAttrs;
+			$HrefValue = &$this->t_jabatan->HrefValue;
+			$LinkAttrs = &$this->t_jabatan->LinkAttrs;
+			$this->Cell_Rendered($this->t_jabatan, $CurrentValue, $ViewValue, $ViewAttrs, $CellAttrs, $HrefValue, $LinkAttrs);
+
 			// premi_malam
 			$CurrentValue = $this->premi_malam->CurrentValue;
 			$ViewValue = &$this->premi_malam->ViewValue;
@@ -1516,6 +1559,7 @@ class crr_lapgjhrn_summary extends crr_lapgjhrn {
 		if ($this->nama->Visible) $this->DtlColumnCount += 1;
 		if ($this->nip->Visible) $this->DtlColumnCount += 1;
 		if ($this->upah->Visible) $this->DtlColumnCount += 1;
+		if ($this->t_jabatan->Visible) $this->DtlColumnCount += 1;
 		if ($this->premi_malam->Visible) $this->DtlColumnCount += 1;
 		if ($this->premi_hadir->Visible) $this->DtlColumnCount += 1;
 		if ($this->pot_absen->Visible) $this->DtlColumnCount += 1;
@@ -1577,6 +1621,7 @@ class crr_lapgjhrn_summary extends crr_lapgjhrn {
 			$this->nama->setSort("");
 			$this->nip->setSort("");
 			$this->upah->setSort("");
+			$this->t_jabatan->setSort("");
 			$this->premi_malam->setSort("");
 			$this->premi_hadir->setSort("");
 			$this->pot_absen->setSort("");
@@ -1593,6 +1638,7 @@ class crr_lapgjhrn_summary extends crr_lapgjhrn {
 			$this->UpdateSort($this->nama, $bCtrl); // nama
 			$this->UpdateSort($this->nip, $bCtrl); // nip
 			$this->UpdateSort($this->upah, $bCtrl); // upah
+			$this->UpdateSort($this->t_jabatan, $bCtrl); // t_jabatan
 			$this->UpdateSort($this->premi_malam, $bCtrl); // premi_malam
 			$this->UpdateSort($this->premi_hadir, $bCtrl); // premi_hadir
 			$this->UpdateSort($this->pot_absen, $bCtrl); // pot_absen
@@ -2188,6 +2234,24 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 	</td>
 <?php } ?>
 <?php } ?>
+<?php if ($Page->t_jabatan->Visible) { ?>
+<?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
+	<td data-field="t_jabatan"><div class="r_lapgjhrn_t_jabatan" style="text-align: right;"><span class="ewTableHeaderCaption"><?php echo $Page->t_jabatan->FldCaption() ?></span></div></td>
+<?php } else { ?>
+	<td data-field="t_jabatan">
+<?php if ($Page->SortUrl($Page->t_jabatan) == "") { ?>
+		<div class="ewTableHeaderBtn r_lapgjhrn_t_jabatan" style="text-align: right;">
+			<span class="ewTableHeaderCaption"><?php echo $Page->t_jabatan->FldCaption() ?></span>
+		</div>
+<?php } else { ?>
+		<div class="ewTableHeaderBtn ewPointer r_lapgjhrn_t_jabatan" onclick="ewr_Sort(event,'<?php echo $Page->SortUrl($Page->t_jabatan) ?>',2);" style="text-align: right;">
+			<span class="ewTableHeaderCaption"><?php echo $Page->t_jabatan->FldCaption() ?></span>
+			<span class="ewTableHeaderSort"><?php if ($Page->t_jabatan->getSort() == "ASC") { ?><span class="caret ewSortUp"></span><?php } elseif ($Page->t_jabatan->getSort() == "DESC") { ?><span class="caret"></span><?php } ?></span>
+		</div>
+<?php } ?>
+	</td>
+<?php } ?>
+<?php } ?>
 <?php if ($Page->premi_malam->Visible) { ?>
 <?php if ($Page->Export <> "" || $Page->DrillDown) { ?>
 	<td data-field="premi_malam"><div class="r_lapgjhrn_premi_malam" style="text-align: right;"><span class="ewTableHeaderCaption"><?php echo $Page->premi_malam->FldCaption() ?></span></div></td>
@@ -2453,6 +2517,10 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 		<td data-field="upah"<?php echo $Page->upah->CellAttributes() ?>>
 <span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->GrpCounter[1] ?>_<?php echo $Page->RecCount ?>_r_lapgjhrn_upah"<?php echo $Page->upah->ViewAttributes() ?>><?php echo $Page->upah->ListViewValue() ?></span></td>
 <?php } ?>
+<?php if ($Page->t_jabatan->Visible) { ?>
+		<td data-field="t_jabatan"<?php echo $Page->t_jabatan->CellAttributes() ?>>
+<span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->GrpCounter[1] ?>_<?php echo $Page->RecCount ?>_r_lapgjhrn_t_jabatan"<?php echo $Page->t_jabatan->ViewAttributes() ?>><?php echo $Page->t_jabatan->ListViewValue() ?></span></td>
+<?php } ?>
 <?php if ($Page->premi_malam->Visible) { ?>
 		<td data-field="premi_malam"<?php echo $Page->premi_malam->CellAttributes() ?>>
 <span data-class="tpx<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->GrpCounter[1] ?>_<?php echo $Page->RecCount ?>_r_lapgjhrn_premi_malam"<?php echo $Page->premi_malam->ViewAttributes() ?>><?php echo $Page->premi_malam->ListViewValue() ?></span></td>
@@ -2493,14 +2561,16 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 			$Page->divisi->Count = $Page->GetSummaryCount(3, FALSE);
 			$Page->upah->Count = $Page->Cnt[3][4];
 			$Page->upah->SumValue = $Page->Smry[3][4]; // Load SUM
-			$Page->premi_malam->Count = $Page->Cnt[3][5];
-			$Page->premi_malam->SumValue = $Page->Smry[3][5]; // Load SUM
-			$Page->premi_hadir->Count = $Page->Cnt[3][6];
-			$Page->premi_hadir->SumValue = $Page->Smry[3][6]; // Load SUM
-			$Page->pot_absen->Count = $Page->Cnt[3][7];
-			$Page->pot_absen->SumValue = $Page->Smry[3][7]; // Load SUM
-			$Page->total->Count = $Page->Cnt[3][8];
-			$Page->total->SumValue = $Page->Smry[3][8]; // Load SUM
+			$Page->t_jabatan->Count = $Page->Cnt[3][5];
+			$Page->t_jabatan->SumValue = $Page->Smry[3][5]; // Load SUM
+			$Page->premi_malam->Count = $Page->Cnt[3][6];
+			$Page->premi_malam->SumValue = $Page->Smry[3][6]; // Load SUM
+			$Page->premi_hadir->Count = $Page->Cnt[3][7];
+			$Page->premi_hadir->SumValue = $Page->Smry[3][7]; // Load SUM
+			$Page->pot_absen->Count = $Page->Cnt[3][8];
+			$Page->pot_absen->SumValue = $Page->Smry[3][8]; // Load SUM
+			$Page->total->Count = $Page->Cnt[3][9];
+			$Page->total->SumValue = $Page->Smry[3][9]; // Load SUM
 			$Page->ResetAttrs();
 			$Page->RowType = EWR_ROWTYPE_TOTAL;
 			$Page->RowTotalType = EWR_ROWTOTAL_GROUP;
@@ -2555,6 +2625,9 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 <?php if ($Page->upah->Visible) { ?>
 		<td data-field="upah"<?php echo $Page->divisi->CellAttributes() ?>><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptSum") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><span data-class="tpgs<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->GrpCounter[1] ?>_r_lapgjhrn_upah"<?php echo $Page->upah->ViewAttributes() ?>><?php echo $Page->upah->SumViewValue ?></span></span></td>
 <?php } ?>
+<?php if ($Page->t_jabatan->Visible) { ?>
+		<td data-field="t_jabatan"<?php echo $Page->divisi->CellAttributes() ?>><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptSum") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><span data-class="tpgs<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->GrpCounter[1] ?>_r_lapgjhrn_t_jabatan"<?php echo $Page->t_jabatan->ViewAttributes() ?>><?php echo $Page->t_jabatan->SumViewValue ?></span></span></td>
+<?php } ?>
 <?php if ($Page->premi_malam->Visible) { ?>
 		<td data-field="premi_malam"<?php echo $Page->divisi->CellAttributes() ?>><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptSum") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><span data-class="tpgs<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->GrpCounter[1] ?>_r_lapgjhrn_premi_malam"<?php echo $Page->premi_malam->ViewAttributes() ?>><?php echo $Page->premi_malam->SumViewValue ?></span></span></td>
 <?php } ?>
@@ -2603,6 +2676,10 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 		<td data-field="upah"<?php echo $Page->total->CellAttributes() ?>>
 <span data-class="tpgs<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->GrpCounter[1] ?>_r_lapgjhrn_upah"<?php echo $Page->upah->ViewAttributes() ?>><?php echo $Page->upah->SumViewValue ?></span></td>
 <?php } ?>
+<?php if ($Page->t_jabatan->Visible) { ?>
+		<td data-field="t_jabatan"<?php echo $Page->total->CellAttributes() ?>>
+<span data-class="tpgs<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->GrpCounter[1] ?>_r_lapgjhrn_t_jabatan"<?php echo $Page->t_jabatan->ViewAttributes() ?>><?php echo $Page->t_jabatan->SumViewValue ?></span></td>
+<?php } ?>
 <?php if ($Page->premi_malam->Visible) { ?>
 		<td data-field="premi_malam"<?php echo $Page->total->CellAttributes() ?>>
 <span data-class="tpgs<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_<?php echo $Page->GrpCounter[1] ?>_r_lapgjhrn_premi_malam"<?php echo $Page->premi_malam->ViewAttributes() ?>><?php echo $Page->premi_malam->SumViewValue ?></span></td>
@@ -2639,14 +2716,16 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 			$Page->divisi->Count = $Page->GetSummaryCount(3, FALSE);
 			$Page->upah->Count = $Page->Cnt[2][4];
 			$Page->upah->SumValue = $Page->Smry[2][4]; // Load SUM
-			$Page->premi_malam->Count = $Page->Cnt[2][5];
-			$Page->premi_malam->SumValue = $Page->Smry[2][5]; // Load SUM
-			$Page->premi_hadir->Count = $Page->Cnt[2][6];
-			$Page->premi_hadir->SumValue = $Page->Smry[2][6]; // Load SUM
-			$Page->pot_absen->Count = $Page->Cnt[2][7];
-			$Page->pot_absen->SumValue = $Page->Smry[2][7]; // Load SUM
-			$Page->total->Count = $Page->Cnt[2][8];
-			$Page->total->SumValue = $Page->Smry[2][8]; // Load SUM
+			$Page->t_jabatan->Count = $Page->Cnt[2][5];
+			$Page->t_jabatan->SumValue = $Page->Smry[2][5]; // Load SUM
+			$Page->premi_malam->Count = $Page->Cnt[2][6];
+			$Page->premi_malam->SumValue = $Page->Smry[2][6]; // Load SUM
+			$Page->premi_hadir->Count = $Page->Cnt[2][7];
+			$Page->premi_hadir->SumValue = $Page->Smry[2][7]; // Load SUM
+			$Page->pot_absen->Count = $Page->Cnt[2][8];
+			$Page->pot_absen->SumValue = $Page->Smry[2][8]; // Load SUM
+			$Page->total->Count = $Page->Cnt[2][9];
+			$Page->total->SumValue = $Page->Smry[2][9]; // Load SUM
 			$Page->ResetAttrs();
 			$Page->RowType = EWR_ROWTYPE_TOTAL;
 			$Page->RowTotalType = EWR_ROWTOTAL_GROUP;
@@ -2701,6 +2780,9 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 <?php if ($Page->upah->Visible) { ?>
 		<td data-field="upah"<?php echo $Page->bagian->CellAttributes() ?>><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptSum") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><span data-class="tpgs<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_r_lapgjhrn_upah"<?php echo $Page->upah->ViewAttributes() ?>><?php echo $Page->upah->SumViewValue ?></span></span></td>
 <?php } ?>
+<?php if ($Page->t_jabatan->Visible) { ?>
+		<td data-field="t_jabatan"<?php echo $Page->bagian->CellAttributes() ?>><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptSum") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><span data-class="tpgs<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_r_lapgjhrn_t_jabatan"<?php echo $Page->t_jabatan->ViewAttributes() ?>><?php echo $Page->t_jabatan->SumViewValue ?></span></span></td>
+<?php } ?>
 <?php if ($Page->premi_malam->Visible) { ?>
 		<td data-field="premi_malam"<?php echo $Page->bagian->CellAttributes() ?>><span class="ewAggregateCaption"><?php echo $ReportLanguage->Phrase("RptSum") ?></span><?php echo $ReportLanguage->Phrase("AggregateEqual") ?><span class="ewAggregateValue"><span data-class="tpgs<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_r_lapgjhrn_premi_malam"<?php echo $Page->premi_malam->ViewAttributes() ?>><?php echo $Page->premi_malam->SumViewValue ?></span></span></td>
 <?php } ?>
@@ -2742,6 +2824,10 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 <?php if ($Page->upah->Visible) { ?>
 		<td data-field="upah"<?php echo $Page->total->CellAttributes() ?>>
 <span data-class="tpgs<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_r_lapgjhrn_upah"<?php echo $Page->upah->ViewAttributes() ?>><?php echo $Page->upah->SumViewValue ?></span></td>
+<?php } ?>
+<?php if ($Page->t_jabatan->Visible) { ?>
+		<td data-field="t_jabatan"<?php echo $Page->total->CellAttributes() ?>>
+<span data-class="tpgs<?php echo $Page->GrpCount ?>_<?php echo $Page->GrpCounter[0] ?>_r_lapgjhrn_t_jabatan"<?php echo $Page->t_jabatan->ViewAttributes() ?>><?php echo $Page->t_jabatan->SumViewValue ?></span></td>
 <?php } ?>
 <?php if ($Page->premi_malam->Visible) { ?>
 		<td data-field="premi_malam"<?php echo $Page->total->CellAttributes() ?>>
@@ -2803,14 +2889,16 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 <?php
 	$Page->upah->Count = $Page->GrandCnt[4];
 	$Page->upah->SumValue = $Page->GrandSmry[4]; // Load SUM
-	$Page->premi_malam->Count = $Page->GrandCnt[5];
-	$Page->premi_malam->SumValue = $Page->GrandSmry[5]; // Load SUM
-	$Page->premi_hadir->Count = $Page->GrandCnt[6];
-	$Page->premi_hadir->SumValue = $Page->GrandSmry[6]; // Load SUM
-	$Page->pot_absen->Count = $Page->GrandCnt[7];
-	$Page->pot_absen->SumValue = $Page->GrandSmry[7]; // Load SUM
-	$Page->total->Count = $Page->GrandCnt[8];
-	$Page->total->SumValue = $Page->GrandSmry[8]; // Load SUM
+	$Page->t_jabatan->Count = $Page->GrandCnt[5];
+	$Page->t_jabatan->SumValue = $Page->GrandSmry[5]; // Load SUM
+	$Page->premi_malam->Count = $Page->GrandCnt[6];
+	$Page->premi_malam->SumValue = $Page->GrandSmry[6]; // Load SUM
+	$Page->premi_hadir->Count = $Page->GrandCnt[7];
+	$Page->premi_hadir->SumValue = $Page->GrandSmry[7]; // Load SUM
+	$Page->pot_absen->Count = $Page->GrandCnt[8];
+	$Page->pot_absen->SumValue = $Page->GrandSmry[8]; // Load SUM
+	$Page->total->Count = $Page->GrandCnt[9];
+	$Page->total->SumValue = $Page->GrandSmry[9]; // Load SUM
 	$Page->ResetAttrs();
 	$Page->RowType = EWR_ROWTYPE_TOTAL;
 	$Page->RowTotalType = EWR_ROWTOTAL_GRAND;
@@ -2835,6 +2923,9 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 <?php } ?>
 <?php if ($Page->upah->Visible) { ?>
 		<td data-field="upah"<?php echo $Page->upah->CellAttributes() ?>><?php echo $ReportLanguage->Phrase("RptSum") ?>=<span data-class="tpts_r_lapgjhrn_upah"<?php echo $Page->upah->ViewAttributes() ?>><?php echo $Page->upah->SumViewValue ?></span></td>
+<?php } ?>
+<?php if ($Page->t_jabatan->Visible) { ?>
+		<td data-field="t_jabatan"<?php echo $Page->t_jabatan->CellAttributes() ?>><?php echo $ReportLanguage->Phrase("RptSum") ?>=<span data-class="tpts_r_lapgjhrn_t_jabatan"<?php echo $Page->t_jabatan->ViewAttributes() ?>><?php echo $Page->t_jabatan->SumViewValue ?></span></td>
 <?php } ?>
 <?php if ($Page->premi_malam->Visible) { ?>
 		<td data-field="premi_malam"<?php echo $Page->premi_malam->CellAttributes() ?>><?php echo $ReportLanguage->Phrase("RptSum") ?>=<span data-class="tpts_r_lapgjhrn_premi_malam"<?php echo $Page->premi_malam->ViewAttributes() ?>><?php echo $Page->premi_malam->SumViewValue ?></span></td>
@@ -2867,6 +2958,10 @@ while ($rsgrp && !$rsgrp->EOF && $Page->GrpCount <= $Page->DisplayGrps || $Page-
 <?php if ($Page->upah->Visible) { ?>
 		<td data-field="upah"<?php echo $Page->upah->CellAttributes() ?>>
 <span data-class="tpts_r_lapgjhrn_upah"<?php echo $Page->upah->ViewAttributes() ?>><?php echo $Page->upah->SumViewValue ?></span></td>
+<?php } ?>
+<?php if ($Page->t_jabatan->Visible) { ?>
+		<td data-field="t_jabatan"<?php echo $Page->t_jabatan->CellAttributes() ?>>
+<span data-class="tpts_r_lapgjhrn_t_jabatan"<?php echo $Page->t_jabatan->ViewAttributes() ?>><?php echo $Page->t_jabatan->SumViewValue ?></span></td>
 <?php } ?>
 <?php if ($Page->premi_malam->Visible) { ?>
 		<td data-field="premi_malam"<?php echo $Page->premi_malam->CellAttributes() ?>>

@@ -221,12 +221,12 @@ while (!$rs->EOF) {
 			}
 			
 			if ($_POST["radio_proses"]) {
-				$mupah += $mt_jabatan;
+				//$mupah += $mt_jabatan;
 			}
 			
 			if ($mabsen == 1 or $mterlambat == 1 or $mflag_S1 == 1) $mpremi_hadir = 0; //$t_hadir = 0;
 			
-			$mtotal = $mupah + $mpremi_malam + $mpremi_hadir - $mpot_absen;
+			$mtotal = $mupah + $mt_jabatan + $mpremi_malam + $mpremi_hadir - $mpot_absen;
 			//$mpegawai_nama = mysql_real_escape_string($mpegawai_nama);
 			$mpegawai_nama = addslashes($mpegawai_nama);
 			$msql = "
@@ -237,6 +237,7 @@ while (!$rs->EOF) {
 				, '".$mpegawai_nama."'
 				, '".$mpegawai_nip."'
 				, ".$mupah."
+				, ".$mt_jabatan."
 				, ".$mpremi_malam."
 				, ".$mpremi_hadir."
 				, ".$mpot_absen."
