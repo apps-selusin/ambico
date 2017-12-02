@@ -172,7 +172,13 @@ while (!$rs->EOF) {
 				
 				if ($data_valid) {
 					// upah
-					$mupah += $rs->fields["upah"];
+					if (substr($rs->fields["jk_kd"], -1) == "L" or f_harilibur($rs->fields["tgl"], $conn) == 1) {
+					}
+					else {
+						$mupah += $rs->fields["upah"];
+					}
+					//$mupah += $rs->fields["upah"];
+					
 					// premi hadir
 					$mpremi_hadir = $rs->fields["premi_hadir"]; // 10:03 PM 8/28/2017
 					
