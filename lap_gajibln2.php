@@ -211,6 +211,10 @@ while (!$rs->EOF) {
 						$mt_malam += $t_malam;
 					}
 					
+					if (substr($jk_kd, -1) == "L" or f_harilibur($tgl, $conn) == 1) {
+						$t_hadir = 0;
+					}
+					
 					// hitung tunjangan uang makan
 					$mt_um += $t_um;
 					
