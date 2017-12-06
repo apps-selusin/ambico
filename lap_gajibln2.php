@@ -211,7 +211,9 @@ while (!$rs->EOF) {
 						$mt_malam += $t_malam;
 					}
 					
-					if (substr($jk_kd, -1) == "L" or f_harilibur($tgl, $conn) == 1) {
+					$kode_pengecualian = f_carikodepengecualian($pegawai_id, $tgl, $conn); // test
+					
+					if (substr($jk_kd, -1) == "L" or f_harilibur($tgl, $conn) == 1 or f_carikodepengecualian($pegawai_id, $tgl, $conn) == "S1") {
 						$t_hadir = 0;
 					}
 					
