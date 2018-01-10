@@ -35,7 +35,7 @@ while (!$rs->EOF) {
 		$rs->MoveNext();
 	}
 	$mtgl_start = date("Y-m-d", strtotime("+1 day", strtotime($mtgl_terakhir)));
-	while (date("Y", strtotime($mtgl_start)) < "2018") {
+	while (date("Y", strtotime($mtgl_start)) < "2019") {
 		$msql = "select jk_id,datediff(tgl2, tgl1)+1 as jk_id_count, hk from t_jdw_krj_peg where pegawai_id = ".$mpegawai_id." order by tgl1";
 		$rs2 = $conn->Execute($msql);
 		while (!$rs2->EOF) {
