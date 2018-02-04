@@ -39,7 +39,8 @@ function f_carilamakerja($p_pegawai_id, $p_tgl, $p_conn) {
 	$rs = $p_conn->Execute($query);
 	if (!$rs->EOF) {
 		$lama_kerja = strtotime($rs->fields["jam_keluar"]) - strtotime($rs->fields["jam_masuk"]);
-		$lama_kerja = floor($lama_kerja / (60 * 60));
+		//$lama_kerja = floor($lama_kerja / (60 * 60));
+		$lama_kerja = floor($lama_kerja / 60);
 		return $lama_kerja;
 		/*$awal  = strtotime('2017-08-10 10:05:25');
 		$akhir = strtotime('2017-08-11 11:07:33');
@@ -146,7 +147,8 @@ while (!$rs->EOF) {
 			$mt_um      = 0;
 			$mt_fork    = 0;
 			$mabsen     = 0;
-			$mterlambat = 0;			
+			$mterlambat = 0;
+			$dapat_premi = 1;
 			
 			while (!$rs2->EOF) {
 				
@@ -193,10 +195,16 @@ while (!$rs->EOF) {
 						// HD
 						if ($kode_pengecualian == "HD") {
 							$lama_kerja = f_carilamakerja($pegawai_id, $tgl, $conn);
-							if ($lama_kerja != null and $lama_kerja >= 3) {
+							if ($lama_kerja != null and $lama_kerja >= 60 and $lama_kerja < 120) {
+								$dapat_premi = 0;
+							}
+							else if ($lama_kerja != null and $lama_kerja >= 120 and $lama_kerja < 240) {
+							//if ($lama_kerja != null and $lama_kerja >= 3) {
+								$dapat_premi = 0;
 								$mp_absen += ($hk_def == 5 ? $p_absen5 : $p_absen6) / 2;
 							}
 							else {
+								$dapat_premi = 0;
 								$mp_absen += ($hk_def == 5 ? $p_absen5 : $p_absen6);
 							}
 						}
@@ -230,8 +238,8 @@ while (!$rs->EOF) {
 				
 				$rs2->MoveNext(); // go to next record on data rekonsiliasi
 			}
-			
-			if ($mabsen == 1 or $mterlambat == 1) $t_hadir = 0;
+
+			if ($mabsen == 1 or $mterlambat == 1 or $dapat_premi == 0) $t_hadir = 0;
 			$bruto = $gp + $t_jbtn - $mp_absen + $mt_malam + $t_hadir + $mt_um; //+ $mt_fork;
 			$netto = $bruto - $p_aspen - $p_bpjs;
 			//$mpegawai_nama = addslashes($mpegawai_nama);

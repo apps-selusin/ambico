@@ -26,6 +26,23 @@ function f_carilamakerja($p_pegawai_id, $p_tgl, $p_conn) {
 	}
 }
 
+function f_carilamaijin($p_pegawai_id, $p_tgl, $p_conn) {
+	$query = "select * from t_pengecualian_peg where pegawai_id = ".$p_pegawai_id." and tgl = '".$p_tgl."'";
+	$rs = $p_conn->Execute($query);
+	if (!$rs->EOF) {
+		$lama_ijin = strtotime($rs->fields["jam_keluar"]) - strtotime($rs->fields["jam_masuk"]);
+		$lama_ijin = floor($lama_ijin / 60);
+		return $lama_ijin;
+		/*$awal  = strtotime('2017-08-10 10:05:25');
+		$akhir = strtotime('2017-08-11 11:07:33');
+		$diff  = $akhir - $awal;
+
+		$jam   = floor($diff / (60 * 60));
+		$menit = $diff - $jam * (60 * 60);
+		echo 'Waktu tinggal: ' . $jam .  ' jam, ' . floor( $menit / 60 ) . ' menit';*/
+	}
+}
+
 function f_carikodepengecualian($mpegawai_id, $mtgl, $mconn) {
 	$msql = "select f_carikodepengecualian(".$mpegawai_id.", '".$mtgl."') as r_kode";
 	$rsf = $mconn->Execute($msql);
@@ -94,6 +111,7 @@ while (!$rs->EOF) {
 			$mabsen           = 0;
 			$mterlambat       = 0;
 			$mflag_S1         = 0;
+			$dapat_premi      = 1;
 			while ($mpegawai_id == $rs->fields["pegawai_id"] and !$rs->EOF) {
 				
 				// check data valid
@@ -157,16 +175,36 @@ while (!$rs->EOF) {
 					}
 
 					// HD => half day;
-					if ($kode_pengecualian == "HD") {
-						$lama_kerja = f_carilamakerja($mpegawai_id, $rs->fields["tgl"], $conn);
-						if ($lama_kerja != null and $lama_kerja >= 3) {
+					if ($kode_pengecualian == "HD") { // 1:14 PM 2/4/2018
+						//$lama_kerja = f_carilamakerja($mpegawai_id, $rs->fields["tgl"], $conn);
+						$lama_ijin = f_carilamaijin($mpegawai_id, $rs->fields["tgl"], $conn);
+						
+						$lama_ijin060119 = 0;
+						$lama_ijin120239 = 0;
+						$lama_ijin240480 = 0;
+						if ($lama_ijin != null and $lama_ijin >= 60 and $lama_ijin < 120) {
+							$lama_ijin060119 = 1;
+							$dapat_premi = 0;
+						}
+						else if ($lama_ijin != null and $lama_ijin >= 120 and $lama_ijin < 240) {
+							$lama_ijin120239 = 1;
+							$dapat_premi = 0;
+							$mpot_absen += $rs->fields["pot_absen"] / 2;
+						}
+						else {
+							$lama_ijin240480 = 1;
+							$dapat_premi = 0;
+							$mpot_absen += $rs->fields["pot_absen"];
+						}
+						
+						/*if ($lama_kerja != null and $lama_kerja >= 3) {
 							//$mp_absen += ($hk_def == 5 ? $p_absen5 : $p_absen6) / 2;
 							$mpot_absen += $rs->fields["pot_absen"] / 2;
 						}
 						else {
 							$mpot_absen += $rs->fields["pot_absen"];
 							//$mp_absen += ($hk_def == 5 ? $p_absen5 : $p_absen6);
-						}
+						}*/
 					}
 				}
 				
@@ -189,10 +227,21 @@ while (!$rs->EOF) {
 					if ($kode_pengecualian == "S1" 
 						or $kode_pengecualian == "P4" 
 						or $kode_pengecualian == "TL"
-						or $kode_pengecualian == "HD") {
+						//or $kode_pengecualian == "HD" 1:21 PM 2/4/2018
+						) {
 							
 						$mpremi_hadir = 0;
 						$mflag_S1 = 1;
+					}
+					
+					
+					/*
+					1:22 PM 2/4/2018
+					*/
+					if ($kode_pengecualian == "HD") {
+						if ($dapat_premi == 0) {
+							$mpremi_hadir = 0;
+						}
 					}
 					
 					/*
