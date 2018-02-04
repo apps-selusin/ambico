@@ -377,7 +377,7 @@ class crr_rekon_brngan extends crTableCrosstab {
 			if (is_null($rscol->fields[0])) {
 				$wrkValue = EWR_NULL_VALUE;
 				$wrkCaption = $ReportLanguage->Phrase("NullLabel");
-			} elseif ($rscol->fields[0] == "") {
+			} elseif (strval($rscol->fields[0]) == "") {
 				$wrkValue = EWR_EMPTY_VALUE;
 				$wrkCaption = $ReportLanguage->Phrase("EmptyLabel");
 			} else {

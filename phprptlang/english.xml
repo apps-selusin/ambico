@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<ew-language date="2017/12/1" version="10.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
+<ew-language date="2018/2/4" version="10.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
   <!-- 
 	*** Important Notes:
 	1. Language ID should follow: https://developers.google.com/recaptcha/docs/language,
@@ -349,7 +349,7 @@
   </global>
   <project>
     <phrase id="bodytitle" value="AMBICO" />
-    <phrase id="footertext" value="&amp;copy;2017 AMBICO. All rights reserved." />
+    <phrase id="footertext" value="&amp;copy;2018 AMBICO. All rights reserved." />
     <menu id="102">
       <phrase id="menutext" value="t laplemburh" />
     </menu>
