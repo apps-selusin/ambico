@@ -141,14 +141,15 @@ while (!$rs->EOF) {
 			$pegawai_nip     = $rs2->fields["pegawai_nip"];
 			$pegawai_pin     = $rs2->fields["pegawai_pin"];
 			
-			$mp_absen   = 0;
-			$mt_malam   = 0;
-			$mt_lembur  = 0;
-			$mt_um      = 0;
-			$mt_fork    = 0;
-			$mabsen     = 0;
-			$mterlambat = 0;
+			$mp_absen    = 0;
+			$mt_malam    = 0;
+			$mt_lembur   = 0;
+			$mt_um       = 0;
+			$mt_fork     = 0;
+			$mabsen      = 0;
+			$mterlambat  = 0;
 			$dapat_premi = 1;
+			$dapat_tm    = 1;
 			
 			while (!$rs2->EOF) {
 				
@@ -186,6 +187,12 @@ while (!$rs->EOF) {
 						// IS => tidak diproses; tidak ada potongan absen; invalid scan;
 						// TS => tidak diproses; tidak ada potongan absen; tukar shift;
 						// LB => tidak diproses; tidak ada potongan absen; lembur;
+						
+						/*
+						4.	Khusus satpam ( keamanan)
+							- S1 tetap dibayar, tidak dapat lauk pauk
+							- Ijin diatas 1 jam keatas tidak dapat lauk pauk
+						*/
 
 						// TL
 						if ($kode_pengecualian == "TL") {
@@ -196,6 +203,10 @@ while (!$rs->EOF) {
 						if ($kode_pengecualian == "HD") {
 							$lama_kerja = f_carilamakerja($pegawai_id, $tgl, $conn);
 							if ($lama_kerja != null and $lama_kerja >= 60 and $lama_kerja < 120) {
+								//$dapat_um = 0;
+								if ($bagian == "KEAMANAN") {
+									$mt_um -= $t_um;
+								}
 								$dapat_premi = 0;
 							}
 							else if ($lama_kerja != null and $lama_kerja >= 120 and $lama_kerja < 240) {
