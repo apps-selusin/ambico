@@ -106,7 +106,8 @@ while (!$rs->EOF) {
 	
 	$a[ 0][$i] = $rs->fields["nama"];
 	$a[ 1][$i] = $rs->fields["nip"];
-	$a[ 2][$i] = $rs->fields["bagian"];
+	//$a[ 2][$i] = $rs->fields["bagian"];
+	$a[ 2][$i] = $rs->fields["divisi"];
 	$a[ 3][$i] = "BULANAN";
 	$a[ 4][$i] = tgl_indo_header($rs->fields["end"]); //date("F - Y", strtotime($rs->fields["end"]));
 	$a[ 5][$i] = $rs->fields["gp"];
@@ -150,9 +151,9 @@ while (!$rs->EOF) {
 		$excelku->getActiveSheet()->getStyle('Q'.$baris)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
 		
 		$baris++; // $baris = 5
-		$SI->setCellValue("B".$baris, "BAGIAN"); $SI->setCellValue("C".$baris, ":"); $SI->setCellValue("D".$baris, $a[2][$i-3]);
-		$SI->setCellValue("I".$baris, "BAGIAN"); $SI->setCellValue("J".$baris, ":"); $SI->setCellValue("K".$baris, $a[2][$i-2]);
-		$SI->setCellValue("P".$baris, "BAGIAN"); $SI->setCellValue("Q".$baris, ":"); $SI->setCellValue("R".$baris, $a[2][$i-1]);
+		$SI->setCellValue("B".$baris, "DIVISI"); $SI->setCellValue("C".$baris, ":"); $SI->setCellValue("D".$baris, $a[2][$i-3]);
+		$SI->setCellValue("I".$baris, "DIVISI"); $SI->setCellValue("J".$baris, ":"); $SI->setCellValue("K".$baris, $a[2][$i-2]);
+		$SI->setCellValue("P".$baris, "DIVISI"); $SI->setCellValue("Q".$baris, ":"); $SI->setCellValue("R".$baris, $a[2][$i-1]);
 		$excelku->getActiveSheet()->getStyle('C'.$baris)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
 		$excelku->getActiveSheet()->getStyle('J'.$baris)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
 		$excelku->getActiveSheet()->getStyle('Q'.$baris)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
@@ -324,7 +325,7 @@ while (!$rs->EOF) {
 		$excelku->getActiveSheet()->getStyle('C'.$baris)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
 		
 		$baris++; // $baris = 5
-		$SI->setCellValue("B".$baris, "BAGIAN"); $SI->setCellValue("C".$baris, ":"); $SI->setCellValue("D".$baris, $a[2][$i-1]);
+		$SI->setCellValue("B".$baris, "DIVISI"); $SI->setCellValue("C".$baris, ":"); $SI->setCellValue("D".$baris, $a[2][$i-1]);
 		$excelku->getActiveSheet()->getStyle('C'.$baris)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
 		
 		$baris++; // $baris = 6
@@ -427,8 +428,8 @@ while (!$rs->EOF) {
 		$excelku->getActiveSheet()->getStyle('J'.$baris)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
 
 		$baris++; // $baris = 5
-		$SI->setCellValue("B".$baris, "BAGIAN"); $SI->setCellValue("C".$baris, ":"); $SI->setCellValue("D".$baris, $a[2][$i-2]);
-		$SI->setCellValue("I".$baris, "BAGIAN"); $SI->setCellValue("J".$baris, ":"); $SI->setCellValue("K".$baris, $a[2][$i-1]);
+		$SI->setCellValue("B".$baris, "DIVISI"); $SI->setCellValue("C".$baris, ":"); $SI->setCellValue("D".$baris, $a[2][$i-2]);
+		$SI->setCellValue("I".$baris, "DIVISI"); $SI->setCellValue("J".$baris, ":"); $SI->setCellValue("K".$baris, $a[2][$i-1]);
 		$excelku->getActiveSheet()->getStyle('C'.$baris)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
 		$excelku->getActiveSheet()->getStyle('J'.$baris)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
 		

@@ -317,7 +317,7 @@ Page_Rendering();
 		</title>
 	</head>
 	<body>
-&copy;2017 AMBICO. All rights reserved.
+&copy;2018 AMBICO. All rights reserved.
 	</body>
 </html>
 <?php if (EW_DEBUG_ENABLED) echo ew_DebugMsg(); ?>
