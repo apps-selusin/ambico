@@ -193,6 +193,13 @@ while (!$rs->EOF) {
 							- S1 tetap dibayar, tidak dapat lauk pauk
 							- Ijin diatas 1 jam keatas tidak dapat lauk pauk
 						*/
+						
+						if ($kode_pengecualian == "S1") {
+							//$mterlambat = 1; // untuk acuan perhitungan tunjangan hadir
+							if ($bagian == "KEAMANAN") {
+								$mt_um -= $t_um;
+							}
+						}
 
 						// TL
 						if ($kode_pengecualian == "TL") {
@@ -205,7 +212,7 @@ while (!$rs->EOF) {
 							if ($lama_kerja != null and $lama_kerja >= 60 and $lama_kerja < 120) {
 								//$dapat_um = 0;
 								if ($bagian == "KEAMANAN") {
-									$mt_um -= $t_um;
+									//$mt_um -= $t_um;
 								}
 								$dapat_premi = 0;
 							}
