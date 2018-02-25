@@ -1694,6 +1694,7 @@ class crr_laplembur_summary extends crr_laplembur {
 	function Page_Load() {
 
 		//echo "Page Load";
+		$this->lapgroup_index->Visible = FALSE;
 	}
 
 	// Page Unload event

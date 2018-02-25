@@ -1705,6 +1705,12 @@ function Page_Load() {
 	$this->lapgroup_index->Visible = FALSE;
 }
 ]]></CustomScript>
+  <CustomScript ScriptType="Server" ScriptCodeType="Table" ScriptName="Page_Load" ScriptCtrlID="summary" ScriptL1Key="r_laplembur" ScriptL2Key=""><![CDATA[// Page Load event
+function Page_Load() {
+	//echo "Page Load";
+	$this->lapgroup_index->Visible = FALSE;
+}
+]]></CustomScript>
   <Menu MenuID="102" MenuText="t laplemburh" MenuParentID="-1" MenuGroup="0" MenuSource="" MenuExtUrl="" MenuAnonymous="0" MenuSecurity="" MenuUrl="t_laplemburh" MenuType="Table" MenuCustomUrl="0" MenuLevel="0" MenuShow="0" MenuDisplayOrder="100" />
   <Menu MenuID="103" MenuText="Lembur (Harian)" MenuParentID="-1" MenuGroup="0" MenuSource="" MenuExtUrl="" MenuAnonymous="0" MenuSecurity="" MenuUrl="r_laplemburh" MenuType="Table" MenuCustomUrl="0" MenuLevel="0" MenuShow="1" MenuDisplayOrder="200" />
   <Menu MenuID="104" MenuText="v keg hasil" MenuParentID="-1" MenuGroup="0" MenuSource="" MenuExtUrl="" MenuAnonymous="0" MenuSecurity="" MenuUrl="v_keg_hasil" MenuType="Table" MenuCustomUrl="0" MenuLevel="0" MenuShow="0" MenuDisplayOrder="300" />
