@@ -129,6 +129,7 @@ $mno = 1;
 
 while (!$rs->EOF) {
 	$mlapgroup_nama = $rs->fields["lapgroup_nama"];
+	$mlapgroup_index = $rs->fields["lapgroup_index"];
 	while ($rs->fields["lapgroup_nama"] == $mlapgroup_nama and !$rs->EOF) {
 		$mpembagian2_nama = $rs->fields["pembagian2_nama"];
 		while ($rs->fields["pembagian2_nama"] == $mpembagian2_nama and !$rs->EOF) {
@@ -161,7 +162,8 @@ while (!$rs->EOF) {
 			
 			if ($mjml_jam <> 0) {
 				$query = "
-					insert into t_laplembur values (null
+					insert into t_laplembur values (null,
+					".$mlapgroup_index."
 					, ".$mno."
 					, '".$mlapgroup_nama."'
 					, '".$mpembagian2_nama."'
