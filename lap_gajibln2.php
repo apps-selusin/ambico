@@ -209,7 +209,7 @@ while (!$rs->EOF) {
 						// HD
 						if ($kode_pengecualian == "HD") {
 							$lama_kerja = f_carilamakerja($pegawai_id, $tgl, $conn);
-							if ($lama_kerja != null and $lama_kerja >= 60 and $lama_kerja < 120) {
+							/*if ($lama_kerja != null and $lama_kerja >= 60 and $lama_kerja < 120) {
 								//$dapat_um = 0;
 								if ($bagian == "KEAMANAN") {
 									//$mt_um -= $t_um;
@@ -218,6 +218,14 @@ while (!$rs->EOF) {
 							}
 							else if ($lama_kerja != null and $lama_kerja >= 120 and $lama_kerja < 240) {
 							//if ($lama_kerja != null and $lama_kerja >= 3) {
+								$dapat_premi = 0;
+								$mp_absen += ($hk_def == 5 ? $p_absen5 : $p_absen6) / 2;
+							}
+							else {
+								$dapat_premi = 0;
+								$mp_absen += ($hk_def == 5 ? $p_absen5 : $p_absen6);
+							}*/
+							if ($lama_kerja != null and $lama_kerja >= 240) {
 								$dapat_premi = 0;
 								$mp_absen += ($hk_def == 5 ? $p_absen5 : $p_absen6) / 2;
 							}
