@@ -105,6 +105,7 @@ $conn->Execute($msql);
 $msql = "
 	select
 		f.lapgroup_nama
+		, f.lapgroup_index
 		, d.pembagian2_nama
 		, c.pegawai_nama
 		, c.pegawai_nip
