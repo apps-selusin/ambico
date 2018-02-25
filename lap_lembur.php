@@ -121,7 +121,7 @@ $msql = "
 		left join t_lapgroup f on e.lapgroup_id = f.lapgroup_id
 	order by
 		f.lapgroup_index,
-		e.lapsubgroup_index, c.nip
+		e.lapsubgroup_index, c.pegawai_nip
 	"; //echo $msql; exit;
 $rs = $conn->Execute($msql);
 
