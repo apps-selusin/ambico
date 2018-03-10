@@ -170,7 +170,7 @@ while (!$rs->EOF) {
 						
 						// check hari libur
 						if (substr($jk_kd, -1) == "L" or f_harilibur($tgl, $conn) == 1) {
-							if ($bagian == "KEAMANAN" or $bagian == "KENDARAAN") {
+							if ($bagian == "KEAMANAN") {//or $bagian == "KENDARAAN") {
 								$mt_um += $t_um;
 							}
 						}
