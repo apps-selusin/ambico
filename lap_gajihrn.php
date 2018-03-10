@@ -179,7 +179,7 @@ while (!$rs->EOF) {
 						//$lama_kerja = f_carilamakerja($mpegawai_id, $rs->fields["tgl"], $conn);
 						$lama_ijin = f_carilamaijin($mpegawai_id, $rs->fields["tgl"], $conn);
 						
-						$lama_ijin060119 = 0;
+						/*$lama_ijin060119 = 0;
 						$lama_ijin120239 = 0;
 						$lama_ijin240480 = 0;
 						if ($lama_ijin != null and $lama_ijin >= 60 and $lama_ijin < 120) {
@@ -187,6 +187,17 @@ while (!$rs->EOF) {
 							$dapat_premi = 0;
 						}
 						else if ($lama_ijin != null and $lama_ijin >= 120 and $lama_ijin < 240) {
+							$lama_ijin120239 = 1;
+							$dapat_premi = 0;
+							$mpot_absen += $rs->fields["pot_absen"] / 2;
+						}
+						else {
+							$lama_ijin240480 = 1;
+							$dapat_premi = 0;
+							$mpot_absen += $rs->fields["pot_absen"];
+						}*/
+						
+						if ($lama_ijin != null and $lama_ijin >= 240) {
 							$lama_ijin120239 = 1;
 							$dapat_premi = 0;
 							$mpot_absen += $rs->fields["pot_absen"] / 2;
