@@ -11,6 +11,11 @@ else {
 	$conn =& DbHelper();
 }
 
+function f_sesuaikanjam($jam_selesai, $jam_mulai) {
+	$lama_lembur = strtotime("+12 hours", strtotime($jam_selesai)) - strtotime("-12 hours", strtotime($jam_mulai));
+	return $lama_lembur;
+}
+
 function f_hitungjamlembur_staf($p_conn, $p_pegawai_id) {
 	$query = "select * from t_lembur where pegawai_id = ".$p_pegawai_id." order by tgl_mulai";
 	$rs = $p_conn->Execute($query);
@@ -27,7 +32,13 @@ function f_hitungjamlembur_staf($p_conn, $p_pegawai_id) {
 			// cek apakah hari lembur masuk dalam range input laporan gaji
 			if ($mtgl_mulai >= $_POST["start"] and $mtgl_mulai <= $_POST["end"]) {
 				// hitung jam lembur
-				$lama_lembur = strtotime($rs->fields["jam_selesai"]) - strtotime($rs->fields["jam_mulai"]);
+				if (strtotime($rs->fields["jam_selesai"]) < strtotime($rs->fields["jam_mulai"])) {
+					$lama_lembur = f_sesuaikanjam($rs->fields["jam_selesai"], $rs->fields["jam_mulai"]);
+				}
+				else {
+					$lama_lembur = strtotime($rs->fields["jam_selesai"]) - strtotime($rs->fields["jam_mulai"]);
+				}
+				//$lama_lembur = strtotime($rs->fields["jam_selesai"]) - strtotime($rs->fields["jam_mulai"]);
 				//$mlama_lembur += floor($lama_lembur / (60 * 60));
 				$lama_lembur = floor($lama_lembur / (60 * 60));
 				if ($lama_lembur == 1) {
@@ -46,7 +57,12 @@ function f_hitungjamlembur_staf($p_conn, $p_pegawai_id) {
 			while (strtotime($mtgl_mulai) <= strtotime($mtgl_selesai)) {
 				if ($mtgl_mulai >= $_POST["start"] and $mtgl_mulai <= $_POST["end"]) {
 					// hitung jam lembur
-					$lama_lembur = strtotime($rs->fields["jam_selesai"]) - strtotime($rs->fields["jam_mulai"]);
+					if (strtotime($rs->fields["jam_selesai"]) < strtotime($rs->fields["jam_mulai"])) {
+						$lama_lembur = f_sesuaikanjam($rs->fields["jam_selesai"], $rs->fields["jam_mulai"]);
+					}
+					else {
+						$lama_lembur = strtotime($rs->fields["jam_selesai"]) - strtotime($rs->fields["jam_mulai"]);
+					}
 					$lama_lembur = floor($lama_lembur / (60 * 60));
 					if ($lama_lembur == 1) {
 						$mlama_lembur1_5 += 1;
@@ -79,7 +95,12 @@ function f_hitungjamlembur($p_conn, $p_pegawai_id) {
 			// cek apakah hari lembur masuk dalam range input laporan gaji
 			if ($mtgl_mulai >= $_POST["start"] and $mtgl_mulai <= $_POST["end"]) {
 				// hitung jam lembur
-				$lama_lembur = strtotime($rs->fields["jam_selesai"]) - strtotime($rs->fields["jam_mulai"]);
+				if (strtotime($rs->fields["jam_selesai"]) < strtotime($rs->fields["jam_mulai"])) {
+					$lama_lembur = f_sesuaikanjam($rs->fields["jam_selesai"], $rs->fields["jam_mulai"]);
+				}
+				else {
+					$lama_lembur = strtotime($rs->fields["jam_selesai"]) - strtotime($rs->fields["jam_mulai"]);
+				}
 				$mlama_lembur += floor($lama_lembur / (60 * 60));
 			}
 		}
@@ -88,7 +109,12 @@ function f_hitungjamlembur($p_conn, $p_pegawai_id) {
 			while (strtotime($mtgl_mulai) <= strtotime($mtgl_selesai)) {
 				if ($mtgl_mulai >= $_POST["start"] and $mtgl_mulai <= $_POST["end"]) {
 					// hitung jam lembur
-					$lama_lembur = strtotime($rs->fields["jam_selesai"]) - strtotime($rs->fields["jam_mulai"]);
+					if (strtotime($rs->fields["jam_selesai"]) < strtotime($rs->fields["jam_mulai"])) {
+						$lama_lembur = f_sesuaikanjam($rs->fields["jam_selesai"], $rs->fields["jam_mulai"]);
+					}
+					else {
+						$lama_lembur = strtotime($rs->fields["jam_selesai"]) - strtotime($rs->fields["jam_mulai"]);
+					}
 					$mlama_lembur += floor($lama_lembur / (60 * 60));
 				}
 				$mtgl_mulai = date("Y-m-d", strtotime("+1 day", strtotime($mtgl_mulai)));

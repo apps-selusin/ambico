@@ -9,6 +9,11 @@ else {
 	$conn =& DbHelper();
 }
 
+function f_sesuaikanjam($jam_selesai, $jam_mulai) {
+	$lama_lembur = strtotime("+12 hours", strtotime($jam_selesai)) - strtotime("-12 hours", strtotime($jam_mulai));
+	return $lama_lembur;
+}
+
 function f_carilamakerja($p_pegawai_id, $p_tgl, $p_conn) {
 	$query = "select * from t_pengecualian_peg where pegawai_id = ".$p_pegawai_id." and tgl = '".$p_tgl."'";
 	$rs = $p_conn->Execute($query);
@@ -31,11 +36,7 @@ function f_carilamaijin($p_pegawai_id, $p_tgl, $p_conn) {
 	$rs = $p_conn->Execute($query);
 	if (!$rs->EOF) {
 		if (strtotime($rs->fields["jam_keluar"]) < strtotime($rs->fields["jam_masuk"])) {
-			$lama_ijin = 
-				(strtotime($rs->fields["jam_keluar"]) + strtotime("12:00")) 
-				- 
-				(strtotime($rs->fields["jam_masuk"]) - strtotime("12:00"))
-				;
+			$lama_ijin = f_sesuaikanjam($rs->fields["jam_keluar"], $rs->fields["jam_masuk"]);
 		}
 		else {
 			$lama_ijin = strtotime($rs->fields["jam_keluar"]) - strtotime($rs->fields["jam_masuk"]);
