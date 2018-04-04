@@ -30,7 +30,16 @@ function f_carilamaijin($p_pegawai_id, $p_tgl, $p_conn) {
 	$query = "select * from t_pengecualian_peg where pegawai_id = ".$p_pegawai_id." and tgl = '".$p_tgl."'";
 	$rs = $p_conn->Execute($query);
 	if (!$rs->EOF) {
-		$lama_ijin = strtotime($rs->fields["jam_keluar"]) - strtotime($rs->fields["jam_masuk"]);
+		if (strtotime($rs->fields["jam_keluar"]) < strtotime($rs->fields["jam_masuk"])) {
+			$lama_ijin = 
+				(strtotime($rs->fields["jam_keluar"]) + strtotime("12:00")) 
+				- 
+				(strtotime($rs->fields["jam_masuk"]) - strtotime("12:00"))
+				;
+		}
+		else {
+			$lama_ijin = strtotime($rs->fields["jam_keluar"]) - strtotime($rs->fields["jam_masuk"]);
+		}
 		$lama_ijin = floor($lama_ijin / 60);
 		return $lama_ijin;
 		/*$awal  = strtotime('2017-08-10 10:05:25');
@@ -252,6 +261,7 @@ while (!$rs->EOF) {
 					if ($kode_pengecualian == "HD") {
 						if ($dapat_premi == 0) {
 							$mpremi_hadir = 0;
+							$mflag_S1 = 1;
 						}
 					}
 					
