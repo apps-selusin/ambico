@@ -111,7 +111,7 @@ while (!$rs->EOF) {
 	$a[ 3][$i] = "HARIAN";
 	$a[ 4][$i] = tgl_indo_header($rs->fields["start"])." - ".tgl_indo_header($rs->fields["end"]); //tgl_indo_header($rs->fields["end"]); //date("F - Y", strtotime($rs->fields["end"]));
 	$a[ 5][$i] = $rs->fields["upah"]; //$rs->fields["gp"];
-	//$a[ 6][$i] = $rs->fields["t_jbtn"];
+	$a[ 6][$i] = $rs->fields["t_jbtn"];
 	$a[ 7][$i] = $rs->fields["premi_hadir"]; //
 	$a[ 8][$i] = $rs->fields["premi_malam"]; //
 	$a[ 9][$i] = $rs->fields["pot_absen"]; //
@@ -193,7 +193,7 @@ while (!$rs->EOF) {
 		$excelku->getActiveSheet()->getStyle('l'.$baris)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
 		$excelku->getActiveSheet()->getStyle('s'.$baris)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
 		
-		/*
+		
 		$baris++; // $baris = 9
 		$excelku->getActiveSheet()->getStyle('f'.$baris)->getNumberFormat()->setFormatCode('_("Rp"* #,##0_);_("Rp"* \(#,##0\);_("Rp"* "-"??_);_(@_)');
 		$excelku->getActiveSheet()->getStyle('m'.$baris)->getNumberFormat()->setFormatCode('_("Rp"* #,##0_);_("Rp"* \(#,##0\);_("Rp"* "-"??_);_(@_)');
@@ -204,7 +204,7 @@ while (!$rs->EOF) {
 		$excelku->getActiveSheet()->getStyle('e'.$baris)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
 		$excelku->getActiveSheet()->getStyle('l'.$baris)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
 		$excelku->getActiveSheet()->getStyle('s'.$baris)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
-		*/
+		
 		
 		$baris++; // $baris = 10
 		$excelku->getActiveSheet()->getStyle('f'.$baris)->getNumberFormat()->setFormatCode('_("Rp"* #,##0_);_("Rp"* \(#,##0\);_("Rp"* "-"??_);_(@_)');
@@ -228,7 +228,7 @@ while (!$rs->EOF) {
 		$excelku->getActiveSheet()->getStyle('l'.$baris)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
 		$excelku->getActiveSheet()->getStyle('s'.$baris)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
 		
-		$baris++; // $baris = 12
+		//$baris++; // $baris = 12
 		
 		$baris++; // $baris = 13
 		$excelku->getActiveSheet()->mergeCells('b'.$baris.':d'.$baris); $excelku->getActiveSheet()->mergeCells('i'.$baris.':k'.$baris); $excelku->getActiveSheet()->mergeCells('p'.$baris.':r'.$baris);

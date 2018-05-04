@@ -297,7 +297,7 @@ while (!$rs->EOF) {
 				//exit;
 			}
 			
-			if ($_POST["radio_proses"]) {
+			if (isset($_POST["radio_proses"]) and $_POST["radio_proses"]) {
 				//$mupah += $mt_jabatan;
 			}
 			
@@ -325,7 +325,7 @@ while (!$rs->EOF) {
 				"; //if ($mpegawai_nip == '2930') {echo $msql; exit;}
 			$conn->Execute($msql);
 			$mtotal2 += $mupah;
-			$mno++;			
+			//$mno++;
 		}
 		$mtotal1 += $mtotal2;
 	}

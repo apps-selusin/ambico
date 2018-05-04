@@ -1394,7 +1394,7 @@ function Database_Connecting(&$info) {
 </html>
 ]]></CustomScript>
   <CustomScript ScriptType="Template" ScriptCodeType="Table" ScriptName="Content" ScriptCtrlID="custom" ScriptL1Key="lap_gaji_.php" ScriptL2Key=""><![CDATA[<?php
-if ($_GET["ok"] == "1") {
+if (isset($_GET["ok"]) and $_GET["ok"] == "1") {
 	echo "Selesai";
 }
 else {
@@ -1436,7 +1436,7 @@ else {
 ?>
 ]]></CustomScript>
   <CustomScript ScriptType="Template" ScriptCodeType="Table" ScriptName="Content" ScriptCtrlID="custom" ScriptL1Key="lap_gaji2_.php" ScriptL2Key=""><![CDATA[<?php
-if ($_GET["ok"] == "1") {
+if (isset($_GET["ok"]) and $_GET["ok"] == "1") {
 	echo "Selesai";
 }
 else {
