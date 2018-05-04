@@ -111,7 +111,7 @@ while (!$rs->EOF) {
 	$a[ 3][$i] = "HARIAN";
 	$a[ 4][$i] = tgl_indo_header($rs->fields["start"])." - ".tgl_indo_header($rs->fields["end"]); //tgl_indo_header($rs->fields["end"]); //date("F - Y", strtotime($rs->fields["end"]));
 	$a[ 5][$i] = $rs->fields["upah"]; //$rs->fields["gp"];
-	$a[ 6][$i] = $rs->fields["t_jbtn"];
+	$a[ 6][$i] = $rs->fields["t_jabatan"];
 	$a[ 7][$i] = $rs->fields["premi_hadir"]; //
 	$a[ 8][$i] = $rs->fields["premi_malam"]; //
 	$a[ 9][$i] = $rs->fields["pot_absen"]; //
@@ -302,9 +302,10 @@ while (!$rs->EOF) {
 		$excelku->getActiveSheet()->getStyle('l'.$baris)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
 		$excelku->getActiveSheet()->getStyle('s'.$baris)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
 		
+		$makhir_kotak = $baris;
 		$baris++; // $baris = 19
 		
-		$makhir_kotak = $baris;
+		//$makhir_kotak = $baris;
 		
 		$excelku->getActiveSheet()->getStyle("a".$mawal_kotak.":g".$makhir_kotak)->applyFromArray($outline);
 		$excelku->getActiveSheet()->getStyle("h".$mawal_kotak.":n".$makhir_kotak)->applyFromArray($outline);
@@ -407,9 +408,10 @@ while (!$rs->EOF) {
 		$SI->setCellValue("B".$baris, "JML TERIMA"); $SI->setCellValue("e".$baris, ":"); $SI->setCellValue("f".$baris, $a[13][$i-1]);
 		$excelku->getActiveSheet()->getStyle('e'.$baris)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
 		
+		$makhir_kotak = $baris;
 		$baris++; // $baris = 19
 		
-		$makhir_kotak = $baris;
+		//$makhir_kotak = $baris;
 		
 		$excelku->getActiveSheet()->getStyle("a".$mawal_kotak.":g".$makhir_kotak)->applyFromArray($outline);
 		
@@ -550,9 +552,10 @@ while (!$rs->EOF) {
 		$excelku->getActiveSheet()->getStyle('e'.$baris)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
 		$excelku->getActiveSheet()->getStyle('l'.$baris)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
 		
+		$makhir_kotak = $baris;
 		$baris++; // $baris = 19
 		
-		$makhir_kotak = $baris;
+		//$makhir_kotak = $baris;
 		
 		$excelku->getActiveSheet()->getStyle("a".$mawal_kotak.":g".$makhir_kotak)->applyFromArray($outline);
 		$excelku->getActiveSheet()->getStyle("h".$mawal_kotak.":n".$makhir_kotak)->applyFromArray($outline);
