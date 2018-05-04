@@ -150,9 +150,14 @@ $query = "
 		and a.tgl_mulai between '".$_POST["start"]."' and '".$_POST["end"]."'
 	group by
 		f.lapgroup_index,
-		e.lapsubgroup_index
+		e.lapsubgroup_index,
+		a.pegawai_id
+	order by
+		f.lapgroup_index,
+		e.lapsubgroup_index,
+		b.pegawai_nip
 		
-	"; //echo $query; //a.pegawai_id
+	"; //echo $query; exit; //a.pegawai_id
 $rs = $conn->Execute($query);
 
 while (!$rs->EOF) {
