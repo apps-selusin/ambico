@@ -182,7 +182,7 @@ while (!$rs->EOF) {
 					, ".$mno."
 					, '".$mlapgroup_nama."'
 					, '".$mpembagian2_nama."'
-					, '".mysql_real_escape_string($mpegawai_nama)."'
+					, '".addslashes($mpegawai_nama)."'
 					, '".$mpegawai_nip."'
 					, ".$mjml_jam."
 					, ".$mt_lembur."
