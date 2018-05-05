@@ -257,7 +257,7 @@ while (!$rs->EOF) {
 					// hitung tunjangan uang makan
 					$mt_um += $t_um;
 					
-					if (substr($jk_kd, -1) == "L" or f_harilibur($tgl, $conn) == 1 or $bagian == "KENDARAAN") {
+					if ((substr($jk_kd, -1) == "L" or f_harilibur($tgl, $conn) == 1) and $bagian == "KENDARAAN") {
 						$mt_um -= $t_um;
 					}
 					
