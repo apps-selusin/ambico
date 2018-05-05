@@ -312,7 +312,7 @@ Page_Rendering();
 </div>
 <?php } ?>
 <?php
-if ($_GET["ok"] == "1") {
+if (isset($_GET["ok"]) and $_GET["ok"] == "1") {
 	echo "Selesai";
 }
 else {

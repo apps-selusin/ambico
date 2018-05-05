@@ -569,13 +569,19 @@ $excelku->getActiveSheet()->setTitle('Slip Gaji Harian');
 
 $excelku->setActiveSheetIndex(0);
 
-// untuk excel 2007 atau yang berekstensi .xlsx
+/*// untuk excel 2007 atau yang berekstensi .xlsx
 header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 header('Content-Disposition: attachment;filename='.$mnama_file.'.xlsx');
 header('Cache-Control: max-age=0');
  
 $objWriter = PHPExcel_IOFactory::createWriter($excelku, 'Excel2007');
-$objWriter->save('php://output');
+$objWriter->save('php://output');*/
+
+
+$objWriter = PHPExcel_IOFactory::createWriter($excelku, 'Excel2007');
+$objWriter->save($mnama_file.'.xlsx');
+header("Location: ".$mnama_file.".xlsx");
+
 exit;
 
 ?>
