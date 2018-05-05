@@ -293,9 +293,10 @@ while (!$rs->EOF) {
 		$excelku->getActiveSheet()->getStyle('l'.$baris)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
 		$excelku->getActiveSheet()->getStyle('s'.$baris)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
 		
+		$makhir_kotak = $baris;
 		$baris++; // $baris = 19
 		
-		$makhir_kotak = $baris;
+		//$makhir_kotak = $baris;
 		
 		$excelku->getActiveSheet()->getStyle("a".$mawal_kotak.":g".$makhir_kotak)->applyFromArray($outline);
 		$excelku->getActiveSheet()->getStyle("h".$mawal_kotak.":n".$makhir_kotak)->applyFromArray($outline);
@@ -395,9 +396,10 @@ while (!$rs->EOF) {
 		$SI->setCellValue("B".$baris, "JML TERIMA"); $SI->setCellValue("e".$baris, ":"); $SI->setCellValue("f".$baris, $a[13][$i-1]);
 		$excelku->getActiveSheet()->getStyle('e'.$baris)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
 		
+		$makhir_kotak = $baris;
 		$baris++; // $baris = 19
 		
-		$makhir_kotak = $baris;
+		//$makhir_kotak = $baris;
 		
 		$excelku->getActiveSheet()->getStyle("a".$mawal_kotak.":g".$makhir_kotak)->applyFromArray($outline);
 		
@@ -534,9 +536,10 @@ while (!$rs->EOF) {
 		$excelku->getActiveSheet()->getStyle('e'.$baris)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
 		$excelku->getActiveSheet()->getStyle('l'.$baris)->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
 		
+		$makhir_kotak = $baris;
 		$baris++; // $baris = 19
 		
-		$makhir_kotak = $baris;
+		//$makhir_kotak = $baris;
 		
 		$excelku->getActiveSheet()->getStyle("a".$mawal_kotak.":g".$makhir_kotak)->applyFromArray($outline);
 		$excelku->getActiveSheet()->getStyle("h".$mawal_kotak.":n".$makhir_kotak)->applyFromArray($outline);
@@ -550,13 +553,18 @@ $excelku->getActiveSheet()->setTitle('Slip Gaji Bulanan');
 
 $excelku->setActiveSheetIndex(0);
 
-// untuk excel 2007 atau yang berekstensi .xlsx
+/*// untuk excel 2007 atau yang berekstensi .xlsx
 header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 header('Content-Disposition: attachment;filename='.$mnama_file.'.xlsx');
 header('Cache-Control: max-age=0');
  
 $objWriter = PHPExcel_IOFactory::createWriter($excelku, 'Excel2007');
-$objWriter->save('php://output');
+$objWriter->save('php://output');*/
+
+$objWriter = PHPExcel_IOFactory::createWriter($excelku, 'Excel2007');
+$objWriter->save($mnama_file.'.xlsx');
+header("Location: ".$mnama_file.".xlsx");
+
 exit;
 
 ?>
