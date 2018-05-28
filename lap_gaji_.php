@@ -340,13 +340,13 @@ else {
 		  </span>
 		</div>
 	</div>
-	<!--<div id="cmb_proses" class="form-group">
+	<div id="cmb_proses" class="form-group">
 		<label for="cmb_proses" class="col-sm-2 control-label ewLabel">Dengan T. Jabatan</label>
 		<div class="col-sm-10">
 		  <label class="radio-inline"><input type="radio" name="radio_proses" id="x1_hk_0" value="1">Ya</label>
 		  <label class="radio-inline"><input type="radio" name="radio_proses" id="x1_hk_1" value="0" checked="checked">Tidak</label>
 		</div>
-	</div>-->
+	</div>
 	<button class="btn btn-primary ewButton" name="btnsubmit" id="btnsubmit" type="submit">Submit</button>
 </form>
 <?php
