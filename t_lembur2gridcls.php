@@ -1,4 +1,4 @@
-<?php include_once "t_pengecualian_peginfo.php" ?>
+<?php include_once "t_lembur2info.php" ?>
 <?php include_once "t_userinfo.php" ?>
 <?php
 
@@ -6,9 +6,9 @@
 // Page class
 //
 
-$t_pengecualian_peg_grid = NULL; // Initialize page object first
+$t_lembur2_grid = NULL; // Initialize page object first
 
-class ct_pengecualian_peg_grid extends ct_pengecualian_peg {
+class ct_lembur2_grid extends ct_lembur2 {
 
 	// Page ID
 	var $PageID = 'grid';
@@ -17,13 +17,13 @@ class ct_pengecualian_peg_grid extends ct_pengecualian_peg {
 	var $ProjectID = "{9712DCF3-D9FD-406D-93E5-FEA5020667C8}";
 
 	// Table name
-	var $TableName = 't_pengecualian_peg';
+	var $TableName = 't_lembur2';
 
 	// Page object name
-	var $PageObjName = 't_pengecualian_peg_grid';
+	var $PageObjName = 't_lembur2_grid';
 
 	// Grid form hidden field names
-	var $FormName = 'ft_pengecualian_peggrid';
+	var $FormName = 'ft_lembur2grid';
 	var $FormActionName = 'k_action';
 	var $FormKeyName = 'k_key';
 	var $FormOldKeyName = 'k_oldkey';
@@ -239,15 +239,15 @@ class ct_pengecualian_peg_grid extends ct_pengecualian_peg {
 		// Parent constuctor
 		parent::__construct();
 
-		// Table object (t_pengecualian_peg)
-		if (!isset($GLOBALS["t_pengecualian_peg"]) || get_class($GLOBALS["t_pengecualian_peg"]) == "ct_pengecualian_peg") {
-			$GLOBALS["t_pengecualian_peg"] = &$this;
+		// Table object (t_lembur2)
+		if (!isset($GLOBALS["t_lembur2"]) || get_class($GLOBALS["t_lembur2"]) == "ct_lembur2") {
+			$GLOBALS["t_lembur2"] = &$this;
 
 //			$GLOBALS["MasterTable"] = &$GLOBALS["Table"];
-//			if (!isset($GLOBALS["Table"])) $GLOBALS["Table"] = &$GLOBALS["t_pengecualian_peg"];
+//			if (!isset($GLOBALS["Table"])) $GLOBALS["Table"] = &$GLOBALS["t_lembur2"];
 
 		}
-		$this->AddUrl = "t_pengecualian_pegadd.php";
+		$this->AddUrl = "t_lembur2add.php";
 
 		// Table object (t_user)
 		if (!isset($GLOBALS['t_user'])) $GLOBALS['t_user'] = new ct_user();
@@ -258,7 +258,7 @@ class ct_pengecualian_peg_grid extends ct_pengecualian_peg {
 
 		// Table name (for backward compatibility)
 		if (!defined("EW_TABLE_NAME"))
-			define("EW_TABLE_NAME", 't_pengecualian_peg', TRUE);
+			define("EW_TABLE_NAME", 't_lembur2', TRUE);
 
 		// Start timer
 		if (!isset($GLOBALS["gTimer"])) $GLOBALS["gTimer"] = new cTimer();
@@ -313,13 +313,8 @@ class ct_pengecualian_peg_grid extends ct_pengecualian_peg {
 		// Set up list options
 		$this->SetupListOptions();
 		$this->pegawai_id->SetVisibility();
-		$this->jns_id->SetVisibility();
 		$this->tgl->SetVisibility();
-		$this->tgl2->SetVisibility();
-		$this->jam_masuk->SetVisibility();
-		$this->jam_keluar->SetVisibility();
-		$this->pegawai_id2->SetVisibility();
-		$this->pegawai_id3->SetVisibility();
+		$this->lama_lembur->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -365,13 +360,13 @@ class ct_pengecualian_peg_grid extends ct_pengecualian_peg {
 		global $gsExportFile, $gTmpImages;
 
 		// Export
-		global $EW_EXPORT, $t_pengecualian_peg;
+		global $EW_EXPORT, $t_lembur2;
 		if ($this->CustomExport <> "" && $this->CustomExport == $this->Export && array_key_exists($this->CustomExport, $EW_EXPORT)) {
 				$sContent = ob_get_contents();
 			if ($gsExportFile == "") $gsExportFile = $this->TableVar;
 			$class = $EW_EXPORT[$this->CustomExport];
 			if (class_exists($class)) {
-				$doc = new $class($t_pengecualian_peg);
+				$doc = new $class($t_lembur2);
 				$doc->Text = $sContent;
 				if ($this->Export == "email")
 					echo $this->ExportEmail($doc->Text);
@@ -561,6 +556,7 @@ class ct_pengecualian_peg_grid extends ct_pengecualian_peg {
 
 	//  Exit inline mode
 	function ClearInlineMode() {
+		$this->lama_lembur->FormValue = ""; // Clear form value
 		$this->LastAction = $this->CurrentAction; // Save last action
 		$this->CurrentAction = ""; // Clear action
 		$_SESSION[EW_SESSION_INLINE_MODE] = ""; // Clear inline mode
@@ -705,8 +701,8 @@ class ct_pengecualian_peg_grid extends ct_pengecualian_peg {
 	function SetupKeyValues($key) {
 		$arrKeyFlds = explode($GLOBALS["EW_COMPOSITE_KEY_SEPARATOR"], $key);
 		if (count($arrKeyFlds) >= 1) {
-			$this->pengecualian_id->setFormValue($arrKeyFlds[0]);
-			if (!is_numeric($this->pengecualian_id->FormValue))
+			$this->lembur_id->setFormValue($arrKeyFlds[0]);
+			if (!is_numeric($this->lembur_id->FormValue))
 				return FALSE;
 		}
 		return TRUE;
@@ -765,7 +761,7 @@ class ct_pengecualian_peg_grid extends ct_pengecualian_peg {
 				}
 				if ($bGridInsert) {
 					if ($sKey <> "") $sKey .= $GLOBALS["EW_COMPOSITE_KEY_SEPARATOR"];
-					$sKey .= $this->pengecualian_id->CurrentValue;
+					$sKey .= $this->lembur_id->CurrentValue;
 
 					// Add filter for this record
 					$sFilter = $this->KeyFilter();
@@ -808,19 +804,9 @@ class ct_pengecualian_peg_grid extends ct_pengecualian_peg {
 		global $objForm;
 		if ($objForm->HasValue("x_pegawai_id") && $objForm->HasValue("o_pegawai_id") && $this->pegawai_id->CurrentValue <> $this->pegawai_id->OldValue)
 			return FALSE;
-		if ($objForm->HasValue("x_jns_id") && $objForm->HasValue("o_jns_id") && $this->jns_id->CurrentValue <> $this->jns_id->OldValue)
-			return FALSE;
 		if ($objForm->HasValue("x_tgl") && $objForm->HasValue("o_tgl") && $this->tgl->CurrentValue <> $this->tgl->OldValue)
 			return FALSE;
-		if ($objForm->HasValue("x_tgl2") && $objForm->HasValue("o_tgl2") && $this->tgl2->CurrentValue <> $this->tgl2->OldValue)
-			return FALSE;
-		if ($objForm->HasValue("x_jam_masuk") && $objForm->HasValue("o_jam_masuk") && $this->jam_masuk->CurrentValue <> $this->jam_masuk->OldValue)
-			return FALSE;
-		if ($objForm->HasValue("x_jam_keluar") && $objForm->HasValue("o_jam_keluar") && $this->jam_keluar->CurrentValue <> $this->jam_keluar->OldValue)
-			return FALSE;
-		if ($objForm->HasValue("x_pegawai_id2") && $objForm->HasValue("o_pegawai_id2") && $this->pegawai_id2->CurrentValue <> $this->pegawai_id2->OldValue)
-			return FALSE;
-		if ($objForm->HasValue("x_pegawai_id3") && $objForm->HasValue("o_pegawai_id3") && $this->pegawai_id3->CurrentValue <> $this->pegawai_id3->OldValue)
+		if ($objForm->HasValue("x_lama_lembur") && $objForm->HasValue("o_lama_lembur") && $this->lama_lembur->CurrentValue <> $this->lama_lembur->OldValue)
 			return FALSE;
 		return TRUE;
 	}
@@ -936,7 +922,6 @@ class ct_pengecualian_peg_grid extends ct_pengecualian_peg {
 			if ($this->Command == "resetsort") {
 				$sOrderBy = "";
 				$this->setSessionOrderBy($sOrderBy);
-				$this->setSessionOrderByList($sOrderBy);
 			}
 
 			// Reset start position
@@ -1075,7 +1060,7 @@ class ct_pengecualian_peg_grid extends ct_pengecualian_peg {
 		}
 		} // End View mode
 		if ($this->CurrentMode == "edit" && is_numeric($this->RowIndex)) {
-			$this->MultiSelectKey .= "<input type=\"hidden\" name=\"" . $KeyName . "\" id=\"" . $KeyName . "\" value=\"" . $this->pengecualian_id->CurrentValue . "\">";
+			$this->MultiSelectKey .= "<input type=\"hidden\" name=\"" . $KeyName . "\" id=\"" . $KeyName . "\" value=\"" . $this->lembur_id->CurrentValue . "\">";
 		}
 		$this->RenderListOptionsExt();
 	}
@@ -1084,7 +1069,7 @@ class ct_pengecualian_peg_grid extends ct_pengecualian_peg {
 	function SetRecordKey(&$key, $rs) {
 		$key = "";
 		if ($key <> "") $key .= $GLOBALS["EW_COMPOSITE_KEY_SEPARATOR"];
-		$key .= $rs->fields('pengecualian_id');
+		$key .= $rs->fields('lembur_id');
 	}
 
 	// Set up other options
@@ -1181,20 +1166,10 @@ class ct_pengecualian_peg_grid extends ct_pengecualian_peg {
 	function LoadDefaultValues() {
 		$this->pegawai_id->CurrentValue = NULL;
 		$this->pegawai_id->OldValue = $this->pegawai_id->CurrentValue;
-		$this->jns_id->CurrentValue = NULL;
-		$this->jns_id->OldValue = $this->jns_id->CurrentValue;
 		$this->tgl->CurrentValue = NULL;
 		$this->tgl->OldValue = $this->tgl->CurrentValue;
-		$this->tgl2->CurrentValue = NULL;
-		$this->tgl2->OldValue = $this->tgl2->CurrentValue;
-		$this->jam_masuk->CurrentValue = NULL;
-		$this->jam_masuk->OldValue = $this->jam_masuk->CurrentValue;
-		$this->jam_keluar->CurrentValue = NULL;
-		$this->jam_keluar->OldValue = $this->jam_keluar->CurrentValue;
-		$this->pegawai_id2->CurrentValue = NULL;
-		$this->pegawai_id2->OldValue = $this->pegawai_id2->CurrentValue;
-		$this->pegawai_id3->CurrentValue = NULL;
-		$this->pegawai_id3->OldValue = $this->pegawai_id3->CurrentValue;
+		$this->lama_lembur->CurrentValue = NULL;
+		$this->lama_lembur->OldValue = $this->lama_lembur->CurrentValue;
 	}
 
 	// Load form values
@@ -1207,59 +1182,28 @@ class ct_pengecualian_peg_grid extends ct_pengecualian_peg {
 			$this->pegawai_id->setFormValue($objForm->GetValue("x_pegawai_id"));
 		}
 		$this->pegawai_id->setOldValue($objForm->GetValue("o_pegawai_id"));
-		if (!$this->jns_id->FldIsDetailKey) {
-			$this->jns_id->setFormValue($objForm->GetValue("x_jns_id"));
-		}
-		$this->jns_id->setOldValue($objForm->GetValue("o_jns_id"));
 		if (!$this->tgl->FldIsDetailKey) {
 			$this->tgl->setFormValue($objForm->GetValue("x_tgl"));
 			$this->tgl->CurrentValue = ew_UnFormatDateTime($this->tgl->CurrentValue, 0);
 		}
 		$this->tgl->setOldValue($objForm->GetValue("o_tgl"));
-		if (!$this->tgl2->FldIsDetailKey) {
-			$this->tgl2->setFormValue($objForm->GetValue("x_tgl2"));
-			$this->tgl2->CurrentValue = ew_UnFormatDateTime($this->tgl2->CurrentValue, 0);
+		if (!$this->lama_lembur->FldIsDetailKey) {
+			$this->lama_lembur->setFormValue($objForm->GetValue("x_lama_lembur"));
 		}
-		$this->tgl2->setOldValue($objForm->GetValue("o_tgl2"));
-		if (!$this->jam_masuk->FldIsDetailKey) {
-			$this->jam_masuk->setFormValue($objForm->GetValue("x_jam_masuk"));
-			$this->jam_masuk->CurrentValue = ew_UnFormatDateTime($this->jam_masuk->CurrentValue, 4);
-		}
-		$this->jam_masuk->setOldValue($objForm->GetValue("o_jam_masuk"));
-		if (!$this->jam_keluar->FldIsDetailKey) {
-			$this->jam_keluar->setFormValue($objForm->GetValue("x_jam_keluar"));
-			$this->jam_keluar->CurrentValue = ew_UnFormatDateTime($this->jam_keluar->CurrentValue, 4);
-		}
-		$this->jam_keluar->setOldValue($objForm->GetValue("o_jam_keluar"));
-		if (!$this->pegawai_id2->FldIsDetailKey) {
-			$this->pegawai_id2->setFormValue($objForm->GetValue("x_pegawai_id2"));
-		}
-		$this->pegawai_id2->setOldValue($objForm->GetValue("o_pegawai_id2"));
-		if (!$this->pegawai_id3->FldIsDetailKey) {
-			$this->pegawai_id3->setFormValue($objForm->GetValue("x_pegawai_id3"));
-		}
-		$this->pegawai_id3->setOldValue($objForm->GetValue("o_pegawai_id3"));
-		if (!$this->pengecualian_id->FldIsDetailKey && $this->CurrentAction <> "gridadd" && $this->CurrentAction <> "add")
-			$this->pengecualian_id->setFormValue($objForm->GetValue("x_pengecualian_id"));
+		$this->lama_lembur->setOldValue($objForm->GetValue("o_lama_lembur"));
+		if (!$this->lembur_id->FldIsDetailKey && $this->CurrentAction <> "gridadd" && $this->CurrentAction <> "add")
+			$this->lembur_id->setFormValue($objForm->GetValue("x_lembur_id"));
 	}
 
 	// Restore form values
 	function RestoreFormValues() {
 		global $objForm;
 		if ($this->CurrentAction <> "gridadd" && $this->CurrentAction <> "add")
-			$this->pengecualian_id->CurrentValue = $this->pengecualian_id->FormValue;
+			$this->lembur_id->CurrentValue = $this->lembur_id->FormValue;
 		$this->pegawai_id->CurrentValue = $this->pegawai_id->FormValue;
-		$this->jns_id->CurrentValue = $this->jns_id->FormValue;
 		$this->tgl->CurrentValue = $this->tgl->FormValue;
 		$this->tgl->CurrentValue = ew_UnFormatDateTime($this->tgl->CurrentValue, 0);
-		$this->tgl2->CurrentValue = $this->tgl2->FormValue;
-		$this->tgl2->CurrentValue = ew_UnFormatDateTime($this->tgl2->CurrentValue, 0);
-		$this->jam_masuk->CurrentValue = $this->jam_masuk->FormValue;
-		$this->jam_masuk->CurrentValue = ew_UnFormatDateTime($this->jam_masuk->CurrentValue, 4);
-		$this->jam_keluar->CurrentValue = $this->jam_keluar->FormValue;
-		$this->jam_keluar->CurrentValue = ew_UnFormatDateTime($this->jam_keluar->CurrentValue, 4);
-		$this->pegawai_id2->CurrentValue = $this->pegawai_id2->FormValue;
-		$this->pegawai_id3->CurrentValue = $this->pegawai_id3->FormValue;
+		$this->lama_lembur->CurrentValue = $this->lama_lembur->FormValue;
 	}
 
 	// Load recordset
@@ -1274,7 +1218,7 @@ class ct_pengecualian_peg_grid extends ct_pengecualian_peg {
 		if ($this->UseSelectLimit) {
 			$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
 			if ($dbtype == "MSSQL") {
-				$rs = $conn->SelectLimit($sSql, $rowcnt, $offset, array("_hasOrderBy" => trim($this->getOrderBy()) || trim($this->getSessionOrderByList())));
+				$rs = $conn->SelectLimit($sSql, $rowcnt, $offset, array("_hasOrderBy" => trim($this->getOrderBy()) || trim($this->getSessionOrderBy())));
 			} else {
 				$rs = $conn->SelectLimit($sSql, $rowcnt, $offset);
 			}
@@ -1317,50 +1261,20 @@ class ct_pengecualian_peg_grid extends ct_pengecualian_peg {
 		// Call Row Selected event
 		$row = &$rs->fields;
 		$this->Row_Selected($row);
-		$this->pengecualian_id->setDbValue($rs->fields('pengecualian_id'));
+		$this->lembur_id->setDbValue($rs->fields('lembur_id'));
 		$this->pegawai_id->setDbValue($rs->fields('pegawai_id'));
-		if (array_key_exists('EV__pegawai_id', $rs->fields)) {
-			$this->pegawai_id->VirtualValue = $rs->fields('EV__pegawai_id'); // Set up virtual field value
-		} else {
-			$this->pegawai_id->VirtualValue = ""; // Clear value
-		}
-		$this->jns_id->setDbValue($rs->fields('jns_id'));
-		if (array_key_exists('EV__jns_id', $rs->fields)) {
-			$this->jns_id->VirtualValue = $rs->fields('EV__jns_id'); // Set up virtual field value
-		} else {
-			$this->jns_id->VirtualValue = ""; // Clear value
-		}
 		$this->tgl->setDbValue($rs->fields('tgl'));
-		$this->tgl2->setDbValue($rs->fields('tgl2'));
-		$this->jam_masuk->setDbValue($rs->fields('jam_masuk'));
-		$this->jam_keluar->setDbValue($rs->fields('jam_keluar'));
-		$this->pegawai_id2->setDbValue($rs->fields('pegawai_id2'));
-		if (array_key_exists('EV__pegawai_id2', $rs->fields)) {
-			$this->pegawai_id2->VirtualValue = $rs->fields('EV__pegawai_id2'); // Set up virtual field value
-		} else {
-			$this->pegawai_id2->VirtualValue = ""; // Clear value
-		}
-		$this->pegawai_id3->setDbValue($rs->fields('pegawai_id3'));
-		if (array_key_exists('EV__pegawai_id3', $rs->fields)) {
-			$this->pegawai_id3->VirtualValue = $rs->fields('EV__pegawai_id3'); // Set up virtual field value
-		} else {
-			$this->pegawai_id3->VirtualValue = ""; // Clear value
-		}
+		$this->lama_lembur->setDbValue($rs->fields('lama_lembur'));
 	}
 
 	// Load DbValue from recordset
 	function LoadDbValues(&$rs) {
 		if (!$rs || !is_array($rs) && $rs->EOF) return;
 		$row = is_array($rs) ? $rs : $rs->fields;
-		$this->pengecualian_id->DbValue = $row['pengecualian_id'];
+		$this->lembur_id->DbValue = $row['lembur_id'];
 		$this->pegawai_id->DbValue = $row['pegawai_id'];
-		$this->jns_id->DbValue = $row['jns_id'];
 		$this->tgl->DbValue = $row['tgl'];
-		$this->tgl2->DbValue = $row['tgl2'];
-		$this->jam_masuk->DbValue = $row['jam_masuk'];
-		$this->jam_keluar->DbValue = $row['jam_keluar'];
-		$this->pegawai_id2->DbValue = $row['pegawai_id2'];
-		$this->pegawai_id3->DbValue = $row['pegawai_id3'];
+		$this->lama_lembur->DbValue = $row['lama_lembur'];
 	}
 
 	// Load old record
@@ -1372,7 +1286,7 @@ class ct_pengecualian_peg_grid extends ct_pengecualian_peg {
 		$cnt = count($arKeys);
 		if ($cnt >= 1) {
 			if (strval($arKeys[0]) <> "")
-				$this->pengecualian_id->CurrentValue = strval($arKeys[0]); // pengecualian_id
+				$this->lembur_id->CurrentValue = strval($arKeys[0]); // lembur_id
 			else
 				$bValidKey = FALSE;
 		} else {
@@ -1402,348 +1316,82 @@ class ct_pengecualian_peg_grid extends ct_pengecualian_peg {
 		$this->CopyUrl = $this->GetCopyUrl();
 		$this->DeleteUrl = $this->GetDeleteUrl();
 
+		// Convert decimal values if posted back
+		if ($this->lama_lembur->FormValue == $this->lama_lembur->CurrentValue && is_numeric(ew_StrToFloat($this->lama_lembur->CurrentValue)))
+			$this->lama_lembur->CurrentValue = ew_StrToFloat($this->lama_lembur->CurrentValue);
+
 		// Call Row_Rendering event
 		$this->Row_Rendering();
 
 		// Common render codes for all row types
-		// pengecualian_id
+		// lembur_id
 		// pegawai_id
-		// jns_id
 		// tgl
-		// tgl2
-		// jam_masuk
-		// jam_keluar
-		// pegawai_id2
-		// pegawai_id3
+		// lama_lembur
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
-		// pengecualian_id
-		$this->pengecualian_id->ViewValue = $this->pengecualian_id->CurrentValue;
-		$this->pengecualian_id->ViewCustomAttributes = "";
+		// lembur_id
+		$this->lembur_id->ViewValue = $this->lembur_id->CurrentValue;
+		$this->lembur_id->ViewCustomAttributes = "";
 
 		// pegawai_id
-		if ($this->pegawai_id->VirtualValue <> "") {
-			$this->pegawai_id->ViewValue = $this->pegawai_id->VirtualValue;
-		} else {
-		if (strval($this->pegawai_id->CurrentValue) <> "") {
-			$sFilterWrk = "`pegawai_id`" . ew_SearchString("=", $this->pegawai_id->CurrentValue, EW_DATATYPE_NUMBER, "");
-		$sSqlWrk = "SELECT `pegawai_id`, `pegawai_nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `pegawai`";
-		$sWhereWrk = "";
-		$this->pegawai_id->LookupFilters = array("dx1" => '`pegawai_nama`');
-		ew_AddFilter($sWhereWrk, $sFilterWrk);
-		$this->Lookup_Selecting($this->pegawai_id, $sWhereWrk); // Call Lookup selecting
-		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			$rswrk = Conn()->Execute($sSqlWrk);
-			if ($rswrk && !$rswrk->EOF) { // Lookup values found
-				$arwrk = array();
-				$arwrk[1] = $rswrk->fields('DispFld');
-				$this->pegawai_id->ViewValue = $this->pegawai_id->DisplayValue($arwrk);
-				$rswrk->Close();
-			} else {
-				$this->pegawai_id->ViewValue = $this->pegawai_id->CurrentValue;
-			}
-		} else {
-			$this->pegawai_id->ViewValue = NULL;
-		}
-		}
+		$this->pegawai_id->ViewValue = $this->pegawai_id->CurrentValue;
 		$this->pegawai_id->ViewCustomAttributes = "";
-
-		// jns_id
-		if ($this->jns_id->VirtualValue <> "") {
-			$this->jns_id->ViewValue = $this->jns_id->VirtualValue;
-		} else {
-		if (strval($this->jns_id->CurrentValue) <> "") {
-			$sFilterWrk = "`jns_id`" . ew_SearchString("=", $this->jns_id->CurrentValue, EW_DATATYPE_NUMBER, "");
-		$sSqlWrk = "SELECT `jns_id`, `kode` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t_jns_pengecualian`";
-		$sWhereWrk = "";
-		$this->jns_id->LookupFilters = array("dx1" => '`kode`');
-		ew_AddFilter($sWhereWrk, $sFilterWrk);
-		$this->Lookup_Selecting($this->jns_id, $sWhereWrk); // Call Lookup selecting
-		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			$rswrk = Conn()->Execute($sSqlWrk);
-			if ($rswrk && !$rswrk->EOF) { // Lookup values found
-				$arwrk = array();
-				$arwrk[1] = $rswrk->fields('DispFld');
-				$this->jns_id->ViewValue = $this->jns_id->DisplayValue($arwrk);
-				$rswrk->Close();
-			} else {
-				$this->jns_id->ViewValue = $this->jns_id->CurrentValue;
-			}
-		} else {
-			$this->jns_id->ViewValue = NULL;
-		}
-		}
-		$this->jns_id->ViewCustomAttributes = "";
 
 		// tgl
 		$this->tgl->ViewValue = $this->tgl->CurrentValue;
-		$this->tgl->ViewValue = tgl_indo($this->tgl->ViewValue);
+		$this->tgl->ViewValue = ew_FormatDateTime($this->tgl->ViewValue, 0);
 		$this->tgl->ViewCustomAttributes = "";
 
-		// tgl2
-		$this->tgl2->ViewValue = $this->tgl2->CurrentValue;
-		$this->tgl2->ViewValue = tgl_indo($this->tgl2->ViewValue);
-		$this->tgl2->ViewCustomAttributes = "";
-
-		// jam_masuk
-		$this->jam_masuk->ViewValue = $this->jam_masuk->CurrentValue;
-		$this->jam_masuk->ViewValue = ew_FormatDateTime($this->jam_masuk->ViewValue, 4);
-		$this->jam_masuk->ViewCustomAttributes = "";
-
-		// jam_keluar
-		$this->jam_keluar->ViewValue = $this->jam_keluar->CurrentValue;
-		$this->jam_keluar->ViewValue = ew_FormatDateTime($this->jam_keluar->ViewValue, 4);
-		$this->jam_keluar->ViewCustomAttributes = "";
-
-		// pegawai_id2
-		if ($this->pegawai_id2->VirtualValue <> "") {
-			$this->pegawai_id2->ViewValue = $this->pegawai_id2->VirtualValue;
-		} else {
-		if (strval($this->pegawai_id2->CurrentValue) <> "") {
-			$sFilterWrk = "`pegawai_id`" . ew_SearchString("=", $this->pegawai_id2->CurrentValue, EW_DATATYPE_NUMBER, "");
-		$sSqlWrk = "SELECT `pegawai_id`, `pegawai_nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `pegawai`";
-		$sWhereWrk = "";
-		$this->pegawai_id2->LookupFilters = array("dx1" => '`pegawai_nama`');
-		ew_AddFilter($sWhereWrk, $sFilterWrk);
-		$this->Lookup_Selecting($this->pegawai_id2, $sWhereWrk); // Call Lookup selecting
-		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			$rswrk = Conn()->Execute($sSqlWrk);
-			if ($rswrk && !$rswrk->EOF) { // Lookup values found
-				$arwrk = array();
-				$arwrk[1] = $rswrk->fields('DispFld');
-				$this->pegawai_id2->ViewValue = $this->pegawai_id2->DisplayValue($arwrk);
-				$rswrk->Close();
-			} else {
-				$this->pegawai_id2->ViewValue = $this->pegawai_id2->CurrentValue;
-			}
-		} else {
-			$this->pegawai_id2->ViewValue = NULL;
-		}
-		}
-		$this->pegawai_id2->ViewCustomAttributes = "";
-
-		// pegawai_id3
-		if ($this->pegawai_id3->VirtualValue <> "") {
-			$this->pegawai_id3->ViewValue = $this->pegawai_id3->VirtualValue;
-		} else {
-		if (strval($this->pegawai_id3->CurrentValue) <> "") {
-			$sFilterWrk = "`pegawai_id`" . ew_SearchString("=", $this->pegawai_id3->CurrentValue, EW_DATATYPE_NUMBER, "");
-		$sSqlWrk = "SELECT `pegawai_id`, `pegawai_nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `pegawai`";
-		$sWhereWrk = "";
-		$this->pegawai_id3->LookupFilters = array("dx1" => '`pegawai_nama`');
-		ew_AddFilter($sWhereWrk, $sFilterWrk);
-		$this->Lookup_Selecting($this->pegawai_id3, $sWhereWrk); // Call Lookup selecting
-		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			$rswrk = Conn()->Execute($sSqlWrk);
-			if ($rswrk && !$rswrk->EOF) { // Lookup values found
-				$arwrk = array();
-				$arwrk[1] = $rswrk->fields('DispFld');
-				$this->pegawai_id3->ViewValue = $this->pegawai_id3->DisplayValue($arwrk);
-				$rswrk->Close();
-			} else {
-				$this->pegawai_id3->ViewValue = $this->pegawai_id3->CurrentValue;
-			}
-		} else {
-			$this->pegawai_id3->ViewValue = NULL;
-		}
-		}
-		$this->pegawai_id3->ViewCustomAttributes = "";
+		// lama_lembur
+		$this->lama_lembur->ViewValue = $this->lama_lembur->CurrentValue;
+		$this->lama_lembur->ViewCustomAttributes = "";
 
 			// pegawai_id
 			$this->pegawai_id->LinkCustomAttributes = "";
 			$this->pegawai_id->HrefValue = "";
 			$this->pegawai_id->TooltipValue = "";
 
-			// jns_id
-			$this->jns_id->LinkCustomAttributes = "";
-			$this->jns_id->HrefValue = "";
-			$this->jns_id->TooltipValue = "";
-
 			// tgl
 			$this->tgl->LinkCustomAttributes = "";
 			$this->tgl->HrefValue = "";
 			$this->tgl->TooltipValue = "";
 
-			// tgl2
-			$this->tgl2->LinkCustomAttributes = "";
-			$this->tgl2->HrefValue = "";
-			$this->tgl2->TooltipValue = "";
-
-			// jam_masuk
-			$this->jam_masuk->LinkCustomAttributes = "";
-			$this->jam_masuk->HrefValue = "";
-			$this->jam_masuk->TooltipValue = "";
-
-			// jam_keluar
-			$this->jam_keluar->LinkCustomAttributes = "";
-			$this->jam_keluar->HrefValue = "";
-			$this->jam_keluar->TooltipValue = "";
-
-			// pegawai_id2
-			$this->pegawai_id2->LinkCustomAttributes = "";
-			$this->pegawai_id2->HrefValue = "";
-			$this->pegawai_id2->TooltipValue = "";
-
-			// pegawai_id3
-			$this->pegawai_id3->LinkCustomAttributes = "";
-			$this->pegawai_id3->HrefValue = "";
-			$this->pegawai_id3->TooltipValue = "";
+			// lama_lembur
+			$this->lama_lembur->LinkCustomAttributes = "";
+			$this->lama_lembur->HrefValue = "";
+			$this->lama_lembur->TooltipValue = "";
 		} elseif ($this->RowType == EW_ROWTYPE_ADD) { // Add row
 
 			// pegawai_id
+			$this->pegawai_id->EditAttrs["class"] = "form-control";
 			$this->pegawai_id->EditCustomAttributes = "";
 			if ($this->pegawai_id->getSessionValue() <> "") {
 				$this->pegawai_id->CurrentValue = $this->pegawai_id->getSessionValue();
 				$this->pegawai_id->OldValue = $this->pegawai_id->CurrentValue;
-			if ($this->pegawai_id->VirtualValue <> "") {
-				$this->pegawai_id->ViewValue = $this->pegawai_id->VirtualValue;
-			} else {
-			if (strval($this->pegawai_id->CurrentValue) <> "") {
-				$sFilterWrk = "`pegawai_id`" . ew_SearchString("=", $this->pegawai_id->CurrentValue, EW_DATATYPE_NUMBER, "");
-			$sSqlWrk = "SELECT `pegawai_id`, `pegawai_nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `pegawai`";
-			$sWhereWrk = "";
-			$this->pegawai_id->LookupFilters = array("dx1" => '`pegawai_nama`');
-			ew_AddFilter($sWhereWrk, $sFilterWrk);
-			$this->Lookup_Selecting($this->pegawai_id, $sWhereWrk); // Call Lookup selecting
-			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-				$rswrk = Conn()->Execute($sSqlWrk);
-				if ($rswrk && !$rswrk->EOF) { // Lookup values found
-					$arwrk = array();
-					$arwrk[1] = $rswrk->fields('DispFld');
-					$this->pegawai_id->ViewValue = $this->pegawai_id->DisplayValue($arwrk);
-					$rswrk->Close();
-				} else {
-					$this->pegawai_id->ViewValue = $this->pegawai_id->CurrentValue;
-				}
-			} else {
-				$this->pegawai_id->ViewValue = NULL;
-			}
-			}
+			$this->pegawai_id->ViewValue = $this->pegawai_id->CurrentValue;
 			$this->pegawai_id->ViewCustomAttributes = "";
 			} else {
-			if (trim(strval($this->pegawai_id->CurrentValue)) == "") {
-				$sFilterWrk = "0=1";
-			} else {
-				$sFilterWrk = "`pegawai_id`" . ew_SearchString("=", $this->pegawai_id->CurrentValue, EW_DATATYPE_NUMBER, "");
+			$this->pegawai_id->EditValue = ew_HtmlEncode($this->pegawai_id->CurrentValue);
+			$this->pegawai_id->PlaceHolder = ew_RemoveHtml($this->pegawai_id->FldCaption());
 			}
-			$sSqlWrk = "SELECT `pegawai_id`, `pegawai_nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld`, '' AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `pegawai`";
-			$sWhereWrk = "";
-			$this->pegawai_id->LookupFilters = array("dx1" => '`pegawai_nama`');
-			ew_AddFilter($sWhereWrk, $sFilterWrk);
-			$this->Lookup_Selecting($this->pegawai_id, $sWhereWrk); // Call Lookup selecting
-			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			$rswrk = Conn()->Execute($sSqlWrk);
-			if ($rswrk && !$rswrk->EOF) { // Lookup values found
-				$arwrk = array();
-				$arwrk[1] = ew_HtmlEncode($rswrk->fields('DispFld'));
-				$this->pegawai_id->ViewValue = $this->pegawai_id->DisplayValue($arwrk);
-			} else {
-				$this->pegawai_id->ViewValue = $Language->Phrase("PleaseSelect");
-			}
-			$arwrk = ($rswrk) ? $rswrk->GetRows() : array();
-			if ($rswrk) $rswrk->Close();
-			$this->pegawai_id->EditValue = $arwrk;
-			}
-
-			// jns_id
-			$this->jns_id->EditCustomAttributes = "";
-			if (trim(strval($this->jns_id->CurrentValue)) == "") {
-				$sFilterWrk = "0=1";
-			} else {
-				$sFilterWrk = "`jns_id`" . ew_SearchString("=", $this->jns_id->CurrentValue, EW_DATATYPE_NUMBER, "");
-			}
-			$sSqlWrk = "SELECT `jns_id`, `kode` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld`, '' AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `t_jns_pengecualian`";
-			$sWhereWrk = "";
-			$this->jns_id->LookupFilters = array("dx1" => '`kode`');
-			ew_AddFilter($sWhereWrk, $sFilterWrk);
-			$this->Lookup_Selecting($this->jns_id, $sWhereWrk); // Call Lookup selecting
-			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			$rswrk = Conn()->Execute($sSqlWrk);
-			if ($rswrk && !$rswrk->EOF) { // Lookup values found
-				$arwrk = array();
-				$arwrk[1] = ew_HtmlEncode($rswrk->fields('DispFld'));
-				$this->jns_id->ViewValue = $this->jns_id->DisplayValue($arwrk);
-			} else {
-				$this->jns_id->ViewValue = $Language->Phrase("PleaseSelect");
-			}
-			$arwrk = ($rswrk) ? $rswrk->GetRows() : array();
-			if ($rswrk) $rswrk->Close();
-			$this->jns_id->EditValue = $arwrk;
 
 			// tgl
 			$this->tgl->EditAttrs["class"] = "form-control";
 			$this->tgl->EditCustomAttributes = "";
-			$this->tgl->EditValue = ew_HtmlEncode($this->tgl->CurrentValue);
+			$this->tgl->EditValue = ew_HtmlEncode(ew_FormatDateTime($this->tgl->CurrentValue, 8));
 			$this->tgl->PlaceHolder = ew_RemoveHtml($this->tgl->FldCaption());
 
-			// tgl2
-			$this->tgl2->EditAttrs["class"] = "form-control";
-			$this->tgl2->EditCustomAttributes = "";
-			$this->tgl2->EditValue = ew_HtmlEncode($this->tgl2->CurrentValue);
-			$this->tgl2->PlaceHolder = ew_RemoveHtml($this->tgl2->FldCaption());
-
-			// jam_masuk
-			$this->jam_masuk->EditAttrs["class"] = "form-control";
-			$this->jam_masuk->EditCustomAttributes = "";
-			$this->jam_masuk->EditValue = ew_HtmlEncode($this->jam_masuk->CurrentValue);
-			$this->jam_masuk->PlaceHolder = ew_RemoveHtml($this->jam_masuk->FldCaption());
-
-			// jam_keluar
-			$this->jam_keluar->EditAttrs["class"] = "form-control";
-			$this->jam_keluar->EditCustomAttributes = "";
-			$this->jam_keluar->EditValue = ew_HtmlEncode($this->jam_keluar->CurrentValue);
-			$this->jam_keluar->PlaceHolder = ew_RemoveHtml($this->jam_keluar->FldCaption());
-
-			// pegawai_id2
-			$this->pegawai_id2->EditCustomAttributes = "";
-			if (trim(strval($this->pegawai_id2->CurrentValue)) == "") {
-				$sFilterWrk = "0=1";
-			} else {
-				$sFilterWrk = "`pegawai_id`" . ew_SearchString("=", $this->pegawai_id2->CurrentValue, EW_DATATYPE_NUMBER, "");
+			// lama_lembur
+			$this->lama_lembur->EditAttrs["class"] = "form-control";
+			$this->lama_lembur->EditCustomAttributes = "";
+			$this->lama_lembur->EditValue = ew_HtmlEncode($this->lama_lembur->CurrentValue);
+			$this->lama_lembur->PlaceHolder = ew_RemoveHtml($this->lama_lembur->FldCaption());
+			if (strval($this->lama_lembur->EditValue) <> "" && is_numeric($this->lama_lembur->EditValue)) {
+			$this->lama_lembur->EditValue = ew_FormatNumber($this->lama_lembur->EditValue, -2, -1, -2, 0);
+			$this->lama_lembur->OldValue = $this->lama_lembur->EditValue;
 			}
-			$sSqlWrk = "SELECT `pegawai_id`, `pegawai_nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld`, '' AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `pegawai`";
-			$sWhereWrk = "";
-			$this->pegawai_id2->LookupFilters = array("dx1" => '`pegawai_nama`');
-			ew_AddFilter($sWhereWrk, $sFilterWrk);
-			$this->Lookup_Selecting($this->pegawai_id2, $sWhereWrk); // Call Lookup selecting
-			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			$rswrk = Conn()->Execute($sSqlWrk);
-			if ($rswrk && !$rswrk->EOF) { // Lookup values found
-				$arwrk = array();
-				$arwrk[1] = ew_HtmlEncode($rswrk->fields('DispFld'));
-				$this->pegawai_id2->ViewValue = $this->pegawai_id2->DisplayValue($arwrk);
-			} else {
-				$this->pegawai_id2->ViewValue = $Language->Phrase("PleaseSelect");
-			}
-			$arwrk = ($rswrk) ? $rswrk->GetRows() : array();
-			if ($rswrk) $rswrk->Close();
-			$this->pegawai_id2->EditValue = $arwrk;
-
-			// pegawai_id3
-			$this->pegawai_id3->EditCustomAttributes = "";
-			if (trim(strval($this->pegawai_id3->CurrentValue)) == "") {
-				$sFilterWrk = "0=1";
-			} else {
-				$sFilterWrk = "`pegawai_id`" . ew_SearchString("=", $this->pegawai_id3->CurrentValue, EW_DATATYPE_NUMBER, "");
-			}
-			$sSqlWrk = "SELECT `pegawai_id`, `pegawai_nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld`, '' AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `pegawai`";
-			$sWhereWrk = "";
-			$this->pegawai_id3->LookupFilters = array("dx1" => '`pegawai_nama`');
-			ew_AddFilter($sWhereWrk, $sFilterWrk);
-			$this->Lookup_Selecting($this->pegawai_id3, $sWhereWrk); // Call Lookup selecting
-			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			$rswrk = Conn()->Execute($sSqlWrk);
-			if ($rswrk && !$rswrk->EOF) { // Lookup values found
-				$arwrk = array();
-				$arwrk[1] = ew_HtmlEncode($rswrk->fields('DispFld'));
-				$this->pegawai_id3->ViewValue = $this->pegawai_id3->DisplayValue($arwrk);
-			} else {
-				$this->pegawai_id3->ViewValue = $Language->Phrase("PleaseSelect");
-			}
-			$arwrk = ($rswrk) ? $rswrk->GetRows() : array();
-			if ($rswrk) $rswrk->Close();
-			$this->pegawai_id3->EditValue = $arwrk;
 
 			// Add refer script
 			// pegawai_id
@@ -1751,188 +1399,43 @@ class ct_pengecualian_peg_grid extends ct_pengecualian_peg {
 			$this->pegawai_id->LinkCustomAttributes = "";
 			$this->pegawai_id->HrefValue = "";
 
-			// jns_id
-			$this->jns_id->LinkCustomAttributes = "";
-			$this->jns_id->HrefValue = "";
-
 			// tgl
 			$this->tgl->LinkCustomAttributes = "";
 			$this->tgl->HrefValue = "";
 
-			// tgl2
-			$this->tgl2->LinkCustomAttributes = "";
-			$this->tgl2->HrefValue = "";
-
-			// jam_masuk
-			$this->jam_masuk->LinkCustomAttributes = "";
-			$this->jam_masuk->HrefValue = "";
-
-			// jam_keluar
-			$this->jam_keluar->LinkCustomAttributes = "";
-			$this->jam_keluar->HrefValue = "";
-
-			// pegawai_id2
-			$this->pegawai_id2->LinkCustomAttributes = "";
-			$this->pegawai_id2->HrefValue = "";
-
-			// pegawai_id3
-			$this->pegawai_id3->LinkCustomAttributes = "";
-			$this->pegawai_id3->HrefValue = "";
+			// lama_lembur
+			$this->lama_lembur->LinkCustomAttributes = "";
+			$this->lama_lembur->HrefValue = "";
 		} elseif ($this->RowType == EW_ROWTYPE_EDIT) { // Edit row
 
 			// pegawai_id
+			$this->pegawai_id->EditAttrs["class"] = "form-control";
 			$this->pegawai_id->EditCustomAttributes = "";
 			if ($this->pegawai_id->getSessionValue() <> "") {
 				$this->pegawai_id->CurrentValue = $this->pegawai_id->getSessionValue();
 				$this->pegawai_id->OldValue = $this->pegawai_id->CurrentValue;
-			if ($this->pegawai_id->VirtualValue <> "") {
-				$this->pegawai_id->ViewValue = $this->pegawai_id->VirtualValue;
-			} else {
-			if (strval($this->pegawai_id->CurrentValue) <> "") {
-				$sFilterWrk = "`pegawai_id`" . ew_SearchString("=", $this->pegawai_id->CurrentValue, EW_DATATYPE_NUMBER, "");
-			$sSqlWrk = "SELECT `pegawai_id`, `pegawai_nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `pegawai`";
-			$sWhereWrk = "";
-			$this->pegawai_id->LookupFilters = array("dx1" => '`pegawai_nama`');
-			ew_AddFilter($sWhereWrk, $sFilterWrk);
-			$this->Lookup_Selecting($this->pegawai_id, $sWhereWrk); // Call Lookup selecting
-			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-				$rswrk = Conn()->Execute($sSqlWrk);
-				if ($rswrk && !$rswrk->EOF) { // Lookup values found
-					$arwrk = array();
-					$arwrk[1] = $rswrk->fields('DispFld');
-					$this->pegawai_id->ViewValue = $this->pegawai_id->DisplayValue($arwrk);
-					$rswrk->Close();
-				} else {
-					$this->pegawai_id->ViewValue = $this->pegawai_id->CurrentValue;
-				}
-			} else {
-				$this->pegawai_id->ViewValue = NULL;
-			}
-			}
+			$this->pegawai_id->ViewValue = $this->pegawai_id->CurrentValue;
 			$this->pegawai_id->ViewCustomAttributes = "";
 			} else {
-			if (trim(strval($this->pegawai_id->CurrentValue)) == "") {
-				$sFilterWrk = "0=1";
-			} else {
-				$sFilterWrk = "`pegawai_id`" . ew_SearchString("=", $this->pegawai_id->CurrentValue, EW_DATATYPE_NUMBER, "");
+			$this->pegawai_id->EditValue = ew_HtmlEncode($this->pegawai_id->CurrentValue);
+			$this->pegawai_id->PlaceHolder = ew_RemoveHtml($this->pegawai_id->FldCaption());
 			}
-			$sSqlWrk = "SELECT `pegawai_id`, `pegawai_nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld`, '' AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `pegawai`";
-			$sWhereWrk = "";
-			$this->pegawai_id->LookupFilters = array("dx1" => '`pegawai_nama`');
-			ew_AddFilter($sWhereWrk, $sFilterWrk);
-			$this->Lookup_Selecting($this->pegawai_id, $sWhereWrk); // Call Lookup selecting
-			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			$rswrk = Conn()->Execute($sSqlWrk);
-			if ($rswrk && !$rswrk->EOF) { // Lookup values found
-				$arwrk = array();
-				$arwrk[1] = ew_HtmlEncode($rswrk->fields('DispFld'));
-				$this->pegawai_id->ViewValue = $this->pegawai_id->DisplayValue($arwrk);
-			} else {
-				$this->pegawai_id->ViewValue = $Language->Phrase("PleaseSelect");
-			}
-			$arwrk = ($rswrk) ? $rswrk->GetRows() : array();
-			if ($rswrk) $rswrk->Close();
-			$this->pegawai_id->EditValue = $arwrk;
-			}
-
-			// jns_id
-			$this->jns_id->EditCustomAttributes = "";
-			if (trim(strval($this->jns_id->CurrentValue)) == "") {
-				$sFilterWrk = "0=1";
-			} else {
-				$sFilterWrk = "`jns_id`" . ew_SearchString("=", $this->jns_id->CurrentValue, EW_DATATYPE_NUMBER, "");
-			}
-			$sSqlWrk = "SELECT `jns_id`, `kode` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld`, '' AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `t_jns_pengecualian`";
-			$sWhereWrk = "";
-			$this->jns_id->LookupFilters = array("dx1" => '`kode`');
-			ew_AddFilter($sWhereWrk, $sFilterWrk);
-			$this->Lookup_Selecting($this->jns_id, $sWhereWrk); // Call Lookup selecting
-			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			$rswrk = Conn()->Execute($sSqlWrk);
-			if ($rswrk && !$rswrk->EOF) { // Lookup values found
-				$arwrk = array();
-				$arwrk[1] = ew_HtmlEncode($rswrk->fields('DispFld'));
-				$this->jns_id->ViewValue = $this->jns_id->DisplayValue($arwrk);
-			} else {
-				$this->jns_id->ViewValue = $Language->Phrase("PleaseSelect");
-			}
-			$arwrk = ($rswrk) ? $rswrk->GetRows() : array();
-			if ($rswrk) $rswrk->Close();
-			$this->jns_id->EditValue = $arwrk;
 
 			// tgl
 			$this->tgl->EditAttrs["class"] = "form-control";
 			$this->tgl->EditCustomAttributes = "";
-			$this->tgl->EditValue = ew_HtmlEncode($this->tgl->CurrentValue);
+			$this->tgl->EditValue = ew_HtmlEncode(ew_FormatDateTime($this->tgl->CurrentValue, 8));
 			$this->tgl->PlaceHolder = ew_RemoveHtml($this->tgl->FldCaption());
 
-			// tgl2
-			$this->tgl2->EditAttrs["class"] = "form-control";
-			$this->tgl2->EditCustomAttributes = "";
-			$this->tgl2->EditValue = ew_HtmlEncode($this->tgl2->CurrentValue);
-			$this->tgl2->PlaceHolder = ew_RemoveHtml($this->tgl2->FldCaption());
-
-			// jam_masuk
-			$this->jam_masuk->EditAttrs["class"] = "form-control";
-			$this->jam_masuk->EditCustomAttributes = "";
-			$this->jam_masuk->EditValue = ew_HtmlEncode($this->jam_masuk->CurrentValue);
-			$this->jam_masuk->PlaceHolder = ew_RemoveHtml($this->jam_masuk->FldCaption());
-
-			// jam_keluar
-			$this->jam_keluar->EditAttrs["class"] = "form-control";
-			$this->jam_keluar->EditCustomAttributes = "";
-			$this->jam_keluar->EditValue = ew_HtmlEncode($this->jam_keluar->CurrentValue);
-			$this->jam_keluar->PlaceHolder = ew_RemoveHtml($this->jam_keluar->FldCaption());
-
-			// pegawai_id2
-			$this->pegawai_id2->EditCustomAttributes = "";
-			if (trim(strval($this->pegawai_id2->CurrentValue)) == "") {
-				$sFilterWrk = "0=1";
-			} else {
-				$sFilterWrk = "`pegawai_id`" . ew_SearchString("=", $this->pegawai_id2->CurrentValue, EW_DATATYPE_NUMBER, "");
+			// lama_lembur
+			$this->lama_lembur->EditAttrs["class"] = "form-control";
+			$this->lama_lembur->EditCustomAttributes = "";
+			$this->lama_lembur->EditValue = ew_HtmlEncode($this->lama_lembur->CurrentValue);
+			$this->lama_lembur->PlaceHolder = ew_RemoveHtml($this->lama_lembur->FldCaption());
+			if (strval($this->lama_lembur->EditValue) <> "" && is_numeric($this->lama_lembur->EditValue)) {
+			$this->lama_lembur->EditValue = ew_FormatNumber($this->lama_lembur->EditValue, -2, -1, -2, 0);
+			$this->lama_lembur->OldValue = $this->lama_lembur->EditValue;
 			}
-			$sSqlWrk = "SELECT `pegawai_id`, `pegawai_nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld`, '' AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `pegawai`";
-			$sWhereWrk = "";
-			$this->pegawai_id2->LookupFilters = array("dx1" => '`pegawai_nama`');
-			ew_AddFilter($sWhereWrk, $sFilterWrk);
-			$this->Lookup_Selecting($this->pegawai_id2, $sWhereWrk); // Call Lookup selecting
-			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			$rswrk = Conn()->Execute($sSqlWrk);
-			if ($rswrk && !$rswrk->EOF) { // Lookup values found
-				$arwrk = array();
-				$arwrk[1] = ew_HtmlEncode($rswrk->fields('DispFld'));
-				$this->pegawai_id2->ViewValue = $this->pegawai_id2->DisplayValue($arwrk);
-			} else {
-				$this->pegawai_id2->ViewValue = $Language->Phrase("PleaseSelect");
-			}
-			$arwrk = ($rswrk) ? $rswrk->GetRows() : array();
-			if ($rswrk) $rswrk->Close();
-			$this->pegawai_id2->EditValue = $arwrk;
-
-			// pegawai_id3
-			$this->pegawai_id3->EditCustomAttributes = "";
-			if (trim(strval($this->pegawai_id3->CurrentValue)) == "") {
-				$sFilterWrk = "0=1";
-			} else {
-				$sFilterWrk = "`pegawai_id`" . ew_SearchString("=", $this->pegawai_id3->CurrentValue, EW_DATATYPE_NUMBER, "");
-			}
-			$sSqlWrk = "SELECT `pegawai_id`, `pegawai_nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld`, '' AS `SelectFilterFld`, '' AS `SelectFilterFld2`, '' AS `SelectFilterFld3`, '' AS `SelectFilterFld4` FROM `pegawai`";
-			$sWhereWrk = "";
-			$this->pegawai_id3->LookupFilters = array("dx1" => '`pegawai_nama`');
-			ew_AddFilter($sWhereWrk, $sFilterWrk);
-			$this->Lookup_Selecting($this->pegawai_id3, $sWhereWrk); // Call Lookup selecting
-			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			$rswrk = Conn()->Execute($sSqlWrk);
-			if ($rswrk && !$rswrk->EOF) { // Lookup values found
-				$arwrk = array();
-				$arwrk[1] = ew_HtmlEncode($rswrk->fields('DispFld'));
-				$this->pegawai_id3->ViewValue = $this->pegawai_id3->DisplayValue($arwrk);
-			} else {
-				$this->pegawai_id3->ViewValue = $Language->Phrase("PleaseSelect");
-			}
-			$arwrk = ($rswrk) ? $rswrk->GetRows() : array();
-			if ($rswrk) $rswrk->Close();
-			$this->pegawai_id3->EditValue = $arwrk;
 
 			// Edit refer script
 			// pegawai_id
@@ -1940,33 +1443,13 @@ class ct_pengecualian_peg_grid extends ct_pengecualian_peg {
 			$this->pegawai_id->LinkCustomAttributes = "";
 			$this->pegawai_id->HrefValue = "";
 
-			// jns_id
-			$this->jns_id->LinkCustomAttributes = "";
-			$this->jns_id->HrefValue = "";
-
 			// tgl
 			$this->tgl->LinkCustomAttributes = "";
 			$this->tgl->HrefValue = "";
 
-			// tgl2
-			$this->tgl2->LinkCustomAttributes = "";
-			$this->tgl2->HrefValue = "";
-
-			// jam_masuk
-			$this->jam_masuk->LinkCustomAttributes = "";
-			$this->jam_masuk->HrefValue = "";
-
-			// jam_keluar
-			$this->jam_keluar->LinkCustomAttributes = "";
-			$this->jam_keluar->HrefValue = "";
-
-			// pegawai_id2
-			$this->pegawai_id2->LinkCustomAttributes = "";
-			$this->pegawai_id2->HrefValue = "";
-
-			// pegawai_id3
-			$this->pegawai_id3->LinkCustomAttributes = "";
-			$this->pegawai_id3->HrefValue = "";
+			// lama_lembur
+			$this->lama_lembur->LinkCustomAttributes = "";
+			$this->lama_lembur->HrefValue = "";
 		}
 		if ($this->RowType == EW_ROWTYPE_ADD ||
 			$this->RowType == EW_ROWTYPE_EDIT ||
@@ -1989,8 +1472,8 @@ class ct_pengecualian_peg_grid extends ct_pengecualian_peg {
 		if (!$this->pegawai_id->FldIsDetailKey && !is_null($this->pegawai_id->FormValue) && $this->pegawai_id->FormValue == "") {
 			ew_AddMessage($gsFormError, str_replace("%s", $this->pegawai_id->FldCaption(), $this->pegawai_id->ReqErrMsg));
 		}
-		if (!$this->jns_id->FldIsDetailKey && !is_null($this->jns_id->FormValue) && $this->jns_id->FormValue == "") {
-			ew_AddMessage($gsFormError, str_replace("%s", $this->jns_id->FldCaption(), $this->jns_id->ReqErrMsg));
+		if (!ew_CheckInteger($this->pegawai_id->FormValue)) {
+			ew_AddMessage($gsFormError, $this->pegawai_id->FldErrMsg());
 		}
 		if (!$this->tgl->FldIsDetailKey && !is_null($this->tgl->FormValue) && $this->tgl->FormValue == "") {
 			ew_AddMessage($gsFormError, str_replace("%s", $this->tgl->FldCaption(), $this->tgl->ReqErrMsg));
@@ -1998,17 +1481,11 @@ class ct_pengecualian_peg_grid extends ct_pengecualian_peg {
 		if (!ew_CheckDateDef($this->tgl->FormValue)) {
 			ew_AddMessage($gsFormError, $this->tgl->FldErrMsg());
 		}
-		if (!$this->tgl2->FldIsDetailKey && !is_null($this->tgl2->FormValue) && $this->tgl2->FormValue == "") {
-			ew_AddMessage($gsFormError, str_replace("%s", $this->tgl2->FldCaption(), $this->tgl2->ReqErrMsg));
+		if (!$this->lama_lembur->FldIsDetailKey && !is_null($this->lama_lembur->FormValue) && $this->lama_lembur->FormValue == "") {
+			ew_AddMessage($gsFormError, str_replace("%s", $this->lama_lembur->FldCaption(), $this->lama_lembur->ReqErrMsg));
 		}
-		if (!ew_CheckDateDef($this->tgl2->FormValue)) {
-			ew_AddMessage($gsFormError, $this->tgl2->FldErrMsg());
-		}
-		if (!ew_CheckTime($this->jam_masuk->FormValue)) {
-			ew_AddMessage($gsFormError, $this->jam_masuk->FldErrMsg());
-		}
-		if (!ew_CheckTime($this->jam_keluar->FormValue)) {
-			ew_AddMessage($gsFormError, $this->jam_keluar->FldErrMsg());
+		if (!ew_CheckNumber($this->lama_lembur->FormValue)) {
+			ew_AddMessage($gsFormError, $this->lama_lembur->FldErrMsg());
 		}
 
 		// Return validate result
@@ -2069,7 +1546,7 @@ class ct_pengecualian_peg_grid extends ct_pengecualian_peg {
 			foreach ($rsold as $row) {
 				$sThisKey = "";
 				if ($sThisKey <> "") $sThisKey .= $GLOBALS["EW_COMPOSITE_KEY_SEPARATOR"];
-				$sThisKey .= $row['pengecualian_id'];
+				$sThisKey .= $row['lembur_id'];
 				$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
 				$DeleteRows = $this->Delete($row); // Delete
 				$conn->raiseErrorFn = '';
@@ -2131,26 +1608,11 @@ class ct_pengecualian_peg_grid extends ct_pengecualian_peg {
 			// pegawai_id
 			$this->pegawai_id->SetDbValueDef($rsnew, $this->pegawai_id->CurrentValue, 0, $this->pegawai_id->ReadOnly);
 
-			// jns_id
-			$this->jns_id->SetDbValueDef($rsnew, $this->jns_id->CurrentValue, 0, $this->jns_id->ReadOnly);
-
 			// tgl
-			$this->tgl->SetDbValueDef($rsnew, $this->tgl->CurrentValue, ew_CurrentDate(), $this->tgl->ReadOnly);
+			$this->tgl->SetDbValueDef($rsnew, ew_UnFormatDateTime($this->tgl->CurrentValue, 0), ew_CurrentDate(), $this->tgl->ReadOnly);
 
-			// tgl2
-			$this->tgl2->SetDbValueDef($rsnew, $this->tgl2->CurrentValue, ew_CurrentDate(), $this->tgl2->ReadOnly);
-
-			// jam_masuk
-			$this->jam_masuk->SetDbValueDef($rsnew, $this->jam_masuk->CurrentValue, NULL, $this->jam_masuk->ReadOnly);
-
-			// jam_keluar
-			$this->jam_keluar->SetDbValueDef($rsnew, $this->jam_keluar->CurrentValue, NULL, $this->jam_keluar->ReadOnly);
-
-			// pegawai_id2
-			$this->pegawai_id2->SetDbValueDef($rsnew, $this->pegawai_id2->CurrentValue, NULL, $this->pegawai_id2->ReadOnly);
-
-			// pegawai_id3
-			$this->pegawai_id3->SetDbValueDef($rsnew, $this->pegawai_id3->CurrentValue, NULL, $this->pegawai_id3->ReadOnly);
+			// lama_lembur
+			$this->lama_lembur->SetDbValueDef($rsnew, $this->lama_lembur->CurrentValue, 0, $this->lama_lembur->ReadOnly);
 
 			// Call Row Updating event
 			$bUpdateRow = $this->Row_Updating($rsold, $rsnew);
@@ -2203,26 +1665,11 @@ class ct_pengecualian_peg_grid extends ct_pengecualian_peg {
 		// pegawai_id
 		$this->pegawai_id->SetDbValueDef($rsnew, $this->pegawai_id->CurrentValue, 0, FALSE);
 
-		// jns_id
-		$this->jns_id->SetDbValueDef($rsnew, $this->jns_id->CurrentValue, 0, FALSE);
-
 		// tgl
-		$this->tgl->SetDbValueDef($rsnew, $this->tgl->CurrentValue, ew_CurrentDate(), FALSE);
+		$this->tgl->SetDbValueDef($rsnew, ew_UnFormatDateTime($this->tgl->CurrentValue, 0), ew_CurrentDate(), FALSE);
 
-		// tgl2
-		$this->tgl2->SetDbValueDef($rsnew, $this->tgl2->CurrentValue, ew_CurrentDate(), FALSE);
-
-		// jam_masuk
-		$this->jam_masuk->SetDbValueDef($rsnew, $this->jam_masuk->CurrentValue, NULL, FALSE);
-
-		// jam_keluar
-		$this->jam_keluar->SetDbValueDef($rsnew, $this->jam_keluar->CurrentValue, NULL, FALSE);
-
-		// pegawai_id2
-		$this->pegawai_id2->SetDbValueDef($rsnew, $this->pegawai_id2->CurrentValue, NULL, FALSE);
-
-		// pegawai_id3
-		$this->pegawai_id3->SetDbValueDef($rsnew, $this->pegawai_id3->CurrentValue, NULL, FALSE);
+		// lama_lembur
+		$this->lama_lembur->SetDbValueDef($rsnew, $this->lama_lembur->CurrentValue, 0, FALSE);
 
 		// Call Row Inserting event
 		$rs = ($rsold == NULL) ? NULL : $rsold->fields;
@@ -2272,54 +1719,6 @@ class ct_pengecualian_peg_grid extends ct_pengecualian_peg {
 		global $gsLanguage;
 		$pageId = $pageId ?: $this->PageID;
 		switch ($fld->FldVar) {
-		case "x_pegawai_id":
-			$sSqlWrk = "";
-			$sSqlWrk = "SELECT `pegawai_id` AS `LinkFld`, `pegawai_nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `pegawai`";
-			$sWhereWrk = "{filter}";
-			$this->pegawai_id->LookupFilters = array("dx1" => '`pegawai_nama`');
-			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "", "f0" => '`pegawai_id` = {filter_value}', "t0" => "3", "fn0" => "");
-			$sSqlWrk = "";
-			$this->Lookup_Selecting($this->pegawai_id, $sWhereWrk); // Call Lookup selecting
-			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			if ($sSqlWrk <> "")
-				$fld->LookupFilters["s"] .= $sSqlWrk;
-			break;
-		case "x_jns_id":
-			$sSqlWrk = "";
-			$sSqlWrk = "SELECT `jns_id` AS `LinkFld`, `kode` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `t_jns_pengecualian`";
-			$sWhereWrk = "{filter}";
-			$this->jns_id->LookupFilters = array("dx1" => '`kode`');
-			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "", "f0" => '`jns_id` = {filter_value}', "t0" => "3", "fn0" => "");
-			$sSqlWrk = "";
-			$this->Lookup_Selecting($this->jns_id, $sWhereWrk); // Call Lookup selecting
-			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			if ($sSqlWrk <> "")
-				$fld->LookupFilters["s"] .= $sSqlWrk;
-			break;
-		case "x_pegawai_id2":
-			$sSqlWrk = "";
-			$sSqlWrk = "SELECT `pegawai_id` AS `LinkFld`, `pegawai_nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `pegawai`";
-			$sWhereWrk = "{filter}";
-			$this->pegawai_id2->LookupFilters = array("dx1" => '`pegawai_nama`');
-			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "", "f0" => '`pegawai_id` = {filter_value}', "t0" => "3", "fn0" => "");
-			$sSqlWrk = "";
-			$this->Lookup_Selecting($this->pegawai_id2, $sWhereWrk); // Call Lookup selecting
-			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			if ($sSqlWrk <> "")
-				$fld->LookupFilters["s"] .= $sSqlWrk;
-			break;
-		case "x_pegawai_id3":
-			$sSqlWrk = "";
-			$sSqlWrk = "SELECT `pegawai_id` AS `LinkFld`, `pegawai_nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `pegawai`";
-			$sWhereWrk = "{filter}";
-			$this->pegawai_id3->LookupFilters = array("dx1" => '`pegawai_nama`');
-			$fld->LookupFilters += array("s" => $sSqlWrk, "d" => "", "f0" => '`pegawai_id` = {filter_value}', "t0" => "3", "fn0" => "");
-			$sSqlWrk = "";
-			$this->Lookup_Selecting($this->pegawai_id3, $sWhereWrk); // Call Lookup selecting
-			if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			if ($sSqlWrk <> "")
-				$fld->LookupFilters["s"] .= $sSqlWrk;
-			break;
 		}
 	}
 

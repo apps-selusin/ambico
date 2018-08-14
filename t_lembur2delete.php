@@ -5,8 +5,8 @@ ob_start(); // Turn on output buffering
 <?php include_once "ewcfg13.php" ?>
 <?php include_once ((EW_USE_ADODB) ? "adodb5/adodb.inc.php" : "ewmysql13.php") ?>
 <?php include_once "phpfn13.php" ?>
-<?php include_once "t_keg_detailinfo.php" ?>
-<?php include_once "t_keg_masterinfo.php" ?>
+<?php include_once "t_lembur2info.php" ?>
+<?php include_once "pegawaiinfo.php" ?>
 <?php include_once "t_userinfo.php" ?>
 <?php include_once "userfn13.php" ?>
 <?php
@@ -15,9 +15,9 @@ ob_start(); // Turn on output buffering
 // Page class
 //
 
-$t_keg_detail_delete = NULL; // Initialize page object first
+$t_lembur2_delete = NULL; // Initialize page object first
 
-class ct_keg_detail_delete extends ct_keg_detail {
+class ct_lembur2_delete extends ct_lembur2 {
 
 	// Page ID
 	var $PageID = 'delete';
@@ -26,10 +26,10 @@ class ct_keg_detail_delete extends ct_keg_detail {
 	var $ProjectID = "{9712DCF3-D9FD-406D-93E5-FEA5020667C8}";
 
 	// Table name
-	var $TableName = 't_keg_detail';
+	var $TableName = 't_lembur2';
 
 	// Page object name
-	var $PageObjName = 't_keg_detail_delete';
+	var $PageObjName = 't_lembur2_delete';
 
 	// Page name
 	function PageName() {
@@ -227,14 +227,14 @@ class ct_keg_detail_delete extends ct_keg_detail {
 		// Parent constuctor
 		parent::__construct();
 
-		// Table object (t_keg_detail)
-		if (!isset($GLOBALS["t_keg_detail"]) || get_class($GLOBALS["t_keg_detail"]) == "ct_keg_detail") {
-			$GLOBALS["t_keg_detail"] = &$this;
-			$GLOBALS["Table"] = &$GLOBALS["t_keg_detail"];
+		// Table object (t_lembur2)
+		if (!isset($GLOBALS["t_lembur2"]) || get_class($GLOBALS["t_lembur2"]) == "ct_lembur2") {
+			$GLOBALS["t_lembur2"] = &$this;
+			$GLOBALS["Table"] = &$GLOBALS["t_lembur2"];
 		}
 
-		// Table object (t_keg_master)
-		if (!isset($GLOBALS['t_keg_master'])) $GLOBALS['t_keg_master'] = new ct_keg_master();
+		// Table object (pegawai)
+		if (!isset($GLOBALS['pegawai'])) $GLOBALS['pegawai'] = new cpegawai();
 
 		// Table object (t_user)
 		if (!isset($GLOBALS['t_user'])) $GLOBALS['t_user'] = new ct_user();
@@ -245,7 +245,7 @@ class ct_keg_detail_delete extends ct_keg_detail {
 
 		// Table name (for backward compatibility)
 		if (!defined("EW_TABLE_NAME"))
-			define("EW_TABLE_NAME", 't_keg_detail', TRUE);
+			define("EW_TABLE_NAME", 't_lembur2', TRUE);
 
 		// Start timer
 		if (!isset($GLOBALS["gTimer"])) $GLOBALS["gTimer"] = new cTimer();
@@ -276,7 +276,7 @@ class ct_keg_detail_delete extends ct_keg_detail {
 			$Security->SaveLastUrl();
 			$this->setFailureMessage(ew_DeniedMsg()); // Set no permission
 			if ($Security->CanList())
-				$this->Page_Terminate(ew_GetUrl("t_keg_detaillist.php"));
+				$this->Page_Terminate(ew_GetUrl("t_lembur2list.php"));
 			else
 				$this->Page_Terminate(ew_GetUrl("login.php"));
 		}
@@ -287,8 +287,8 @@ class ct_keg_detail_delete extends ct_keg_detail {
 		}
 		$this->CurrentAction = (@$_GET["a"] <> "") ? $_GET["a"] : @$_POST["a_list"]; // Set up current action
 		$this->pegawai_id->SetVisibility();
-		$this->scan_masuk->SetVisibility();
-		$this->scan_keluar->SetVisibility();
+		$this->tgl->SetVisibility();
+		$this->lama_lembur->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -320,13 +320,13 @@ class ct_keg_detail_delete extends ct_keg_detail {
 		Page_Unloaded();
 
 		// Export
-		global $EW_EXPORT, $t_keg_detail;
+		global $EW_EXPORT, $t_lembur2;
 		if ($this->CustomExport <> "" && $this->CustomExport == $this->Export && array_key_exists($this->CustomExport, $EW_EXPORT)) {
 				$sContent = ob_get_contents();
 			if ($gsExportFile == "") $gsExportFile = $this->TableVar;
 			$class = $EW_EXPORT[$this->CustomExport];
 			if (class_exists($class)) {
-				$doc = new $class($t_keg_detail);
+				$doc = new $class($t_lembur2);
 				$doc->Text = $sContent;
 				if ($this->Export == "email")
 					echo $this->ExportEmail($doc->Text);
@@ -375,10 +375,10 @@ class ct_keg_detail_delete extends ct_keg_detail {
 		$this->RecKeys = $this->GetRecordKeys(); // Load record keys
 		$sFilter = $this->GetKeyFilter();
 		if ($sFilter == "")
-			$this->Page_Terminate("t_keg_detaillist.php"); // Prevent SQL injection, return to list
+			$this->Page_Terminate("t_lembur2list.php"); // Prevent SQL injection, return to list
 
 		// Set up filter (SQL WHHERE clause) and get return SQL
-		// SQL constructor in t_keg_detail class, t_keg_detailinfo.php
+		// SQL constructor in t_lembur2 class, t_lembur2info.php
 
 		$this->CurrentFilter = $sFilter;
 
@@ -406,7 +406,7 @@ class ct_keg_detail_delete extends ct_keg_detail {
 			if ($this->TotalRecs <= 0) { // No record found, exit
 				if ($this->Recordset)
 					$this->Recordset->Close();
-				$this->Page_Terminate("t_keg_detaillist.php"); // Return to list
+				$this->Page_Terminate("t_lembur2list.php"); // Return to list
 			}
 		}
 	}
@@ -423,7 +423,7 @@ class ct_keg_detail_delete extends ct_keg_detail {
 		if ($this->UseSelectLimit) {
 			$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
 			if ($dbtype == "MSSQL") {
-				$rs = $conn->SelectLimit($sSql, $rowcnt, $offset, array("_hasOrderBy" => trim($this->getOrderBy()) || trim($this->getSessionOrderByList())));
+				$rs = $conn->SelectLimit($sSql, $rowcnt, $offset, array("_hasOrderBy" => trim($this->getOrderBy()) || trim($this->getSessionOrderBy())));
 			} else {
 				$rs = $conn->SelectLimit($sSql, $rowcnt, $offset);
 			}
@@ -466,27 +466,20 @@ class ct_keg_detail_delete extends ct_keg_detail {
 		// Call Row Selected event
 		$row = &$rs->fields;
 		$this->Row_Selected($row);
-		$this->kegd_id->setDbValue($rs->fields('kegd_id'));
+		$this->lembur_id->setDbValue($rs->fields('lembur_id'));
 		$this->pegawai_id->setDbValue($rs->fields('pegawai_id'));
-		if (array_key_exists('EV__pegawai_id', $rs->fields)) {
-			$this->pegawai_id->VirtualValue = $rs->fields('EV__pegawai_id'); // Set up virtual field value
-		} else {
-			$this->pegawai_id->VirtualValue = ""; // Clear value
-		}
-		$this->kegm_id->setDbValue($rs->fields('kegm_id'));
-		$this->scan_masuk->setDbValue($rs->fields('scan_masuk'));
-		$this->scan_keluar->setDbValue($rs->fields('scan_keluar'));
+		$this->tgl->setDbValue($rs->fields('tgl'));
+		$this->lama_lembur->setDbValue($rs->fields('lama_lembur'));
 	}
 
 	// Load DbValue from recordset
 	function LoadDbValues(&$rs) {
 		if (!$rs || !is_array($rs) && $rs->EOF) return;
 		$row = is_array($rs) ? $rs : $rs->fields;
-		$this->kegd_id->DbValue = $row['kegd_id'];
+		$this->lembur_id->DbValue = $row['lembur_id'];
 		$this->pegawai_id->DbValue = $row['pegawai_id'];
-		$this->kegm_id->DbValue = $row['kegm_id'];
-		$this->scan_masuk->DbValue = $row['scan_masuk'];
-		$this->scan_keluar->DbValue = $row['scan_keluar'];
+		$this->tgl->DbValue = $row['tgl'];
+		$this->lama_lembur->DbValue = $row['lama_lembur'];
 	}
 
 	// Render row values based on field settings
@@ -494,78 +487,53 @@ class ct_keg_detail_delete extends ct_keg_detail {
 		global $Security, $Language, $gsLanguage;
 
 		// Initialize URLs
-		// Call Row_Rendering event
+		// Convert decimal values if posted back
 
+		if ($this->lama_lembur->FormValue == $this->lama_lembur->CurrentValue && is_numeric(ew_StrToFloat($this->lama_lembur->CurrentValue)))
+			$this->lama_lembur->CurrentValue = ew_StrToFloat($this->lama_lembur->CurrentValue);
+
+		// Call Row_Rendering event
 		$this->Row_Rendering();
 
 		// Common render codes for all row types
-		// kegd_id
+		// lembur_id
 		// pegawai_id
-		// kegm_id
-		// scan_masuk
-		// scan_keluar
+		// tgl
+		// lama_lembur
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
-		// kegd_id
-		$this->kegd_id->ViewValue = $this->kegd_id->CurrentValue;
-		$this->kegd_id->ViewCustomAttributes = "";
+		// lembur_id
+		$this->lembur_id->ViewValue = $this->lembur_id->CurrentValue;
+		$this->lembur_id->ViewCustomAttributes = "";
 
 		// pegawai_id
-		if ($this->pegawai_id->VirtualValue <> "") {
-			$this->pegawai_id->ViewValue = $this->pegawai_id->VirtualValue;
-		} else {
-		if (strval($this->pegawai_id->CurrentValue) <> "") {
-			$sFilterWrk = "`pegawai_id`" . ew_SearchString("=", $this->pegawai_id->CurrentValue, EW_DATATYPE_NUMBER, "");
-		$sSqlWrk = "SELECT `pegawai_id`, `pegawai_nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `pegawai`";
-		$sWhereWrk = "";
-		$this->pegawai_id->LookupFilters = array("dx1" => '`pegawai_nama`');
-		ew_AddFilter($sWhereWrk, $sFilterWrk);
-		$this->Lookup_Selecting($this->pegawai_id, $sWhereWrk); // Call Lookup selecting
-		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			$rswrk = Conn()->Execute($sSqlWrk);
-			if ($rswrk && !$rswrk->EOF) { // Lookup values found
-				$arwrk = array();
-				$arwrk[1] = $rswrk->fields('DispFld');
-				$this->pegawai_id->ViewValue = $this->pegawai_id->DisplayValue($arwrk);
-				$rswrk->Close();
-			} else {
-				$this->pegawai_id->ViewValue = $this->pegawai_id->CurrentValue;
-			}
-		} else {
-			$this->pegawai_id->ViewValue = NULL;
-		}
-		}
+		$this->pegawai_id->ViewValue = $this->pegawai_id->CurrentValue;
 		$this->pegawai_id->ViewCustomAttributes = "";
 
-		// kegm_id
-		$this->kegm_id->ViewValue = $this->kegm_id->CurrentValue;
-		$this->kegm_id->ViewCustomAttributes = "";
+		// tgl
+		$this->tgl->ViewValue = $this->tgl->CurrentValue;
+		$this->tgl->ViewValue = ew_FormatDateTime($this->tgl->ViewValue, 0);
+		$this->tgl->ViewCustomAttributes = "";
 
-		// scan_masuk
-		$this->scan_masuk->ViewValue = $this->scan_masuk->CurrentValue;
-		$this->scan_masuk->ViewValue = ew_FormatDateTime($this->scan_masuk->ViewValue, 17);
-		$this->scan_masuk->ViewCustomAttributes = "";
-
-		// scan_keluar
-		$this->scan_keluar->ViewValue = $this->scan_keluar->CurrentValue;
-		$this->scan_keluar->ViewValue = ew_FormatDateTime($this->scan_keluar->ViewValue, 17);
-		$this->scan_keluar->ViewCustomAttributes = "";
+		// lama_lembur
+		$this->lama_lembur->ViewValue = $this->lama_lembur->CurrentValue;
+		$this->lama_lembur->ViewCustomAttributes = "";
 
 			// pegawai_id
 			$this->pegawai_id->LinkCustomAttributes = "";
 			$this->pegawai_id->HrefValue = "";
 			$this->pegawai_id->TooltipValue = "";
 
-			// scan_masuk
-			$this->scan_masuk->LinkCustomAttributes = "";
-			$this->scan_masuk->HrefValue = "";
-			$this->scan_masuk->TooltipValue = "";
+			// tgl
+			$this->tgl->LinkCustomAttributes = "";
+			$this->tgl->HrefValue = "";
+			$this->tgl->TooltipValue = "";
 
-			// scan_keluar
-			$this->scan_keluar->LinkCustomAttributes = "";
-			$this->scan_keluar->HrefValue = "";
-			$this->scan_keluar->TooltipValue = "";
+			// lama_lembur
+			$this->lama_lembur->LinkCustomAttributes = "";
+			$this->lama_lembur->HrefValue = "";
+			$this->lama_lembur->TooltipValue = "";
 		}
 
 		// Call Row Rendered event
@@ -620,7 +588,7 @@ class ct_keg_detail_delete extends ct_keg_detail {
 			foreach ($rsold as $row) {
 				$sThisKey = "";
 				if ($sThisKey <> "") $sThisKey .= $GLOBALS["EW_COMPOSITE_KEY_SEPARATOR"];
-				$sThisKey .= $row['kegd_id'];
+				$sThisKey .= $row['lembur_id'];
 				$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
 				$DeleteRows = $this->Delete($row); // Delete
 				$conn->raiseErrorFn = '';
@@ -671,13 +639,13 @@ class ct_keg_detail_delete extends ct_keg_detail {
 				$this->DbMasterFilter = "";
 				$this->DbDetailFilter = "";
 			}
-			if ($sMasterTblVar == "t_keg_master") {
+			if ($sMasterTblVar == "pegawai") {
 				$bValidMaster = TRUE;
-				if (@$_GET["fk_kegm_id"] <> "") {
-					$GLOBALS["t_keg_master"]->kegm_id->setQueryStringValue($_GET["fk_kegm_id"]);
-					$this->kegm_id->setQueryStringValue($GLOBALS["t_keg_master"]->kegm_id->QueryStringValue);
-					$this->kegm_id->setSessionValue($this->kegm_id->QueryStringValue);
-					if (!is_numeric($GLOBALS["t_keg_master"]->kegm_id->QueryStringValue)) $bValidMaster = FALSE;
+				if (@$_GET["fk_pegawai_id"] <> "") {
+					$GLOBALS["pegawai"]->pegawai_id->setQueryStringValue($_GET["fk_pegawai_id"]);
+					$this->pegawai_id->setQueryStringValue($GLOBALS["pegawai"]->pegawai_id->QueryStringValue);
+					$this->pegawai_id->setSessionValue($this->pegawai_id->QueryStringValue);
+					if (!is_numeric($GLOBALS["pegawai"]->pegawai_id->QueryStringValue)) $bValidMaster = FALSE;
 				} else {
 					$bValidMaster = FALSE;
 				}
@@ -689,13 +657,13 @@ class ct_keg_detail_delete extends ct_keg_detail {
 				$this->DbMasterFilter = "";
 				$this->DbDetailFilter = "";
 			}
-			if ($sMasterTblVar == "t_keg_master") {
+			if ($sMasterTblVar == "pegawai") {
 				$bValidMaster = TRUE;
-				if (@$_POST["fk_kegm_id"] <> "") {
-					$GLOBALS["t_keg_master"]->kegm_id->setFormValue($_POST["fk_kegm_id"]);
-					$this->kegm_id->setFormValue($GLOBALS["t_keg_master"]->kegm_id->FormValue);
-					$this->kegm_id->setSessionValue($this->kegm_id->FormValue);
-					if (!is_numeric($GLOBALS["t_keg_master"]->kegm_id->FormValue)) $bValidMaster = FALSE;
+				if (@$_POST["fk_pegawai_id"] <> "") {
+					$GLOBALS["pegawai"]->pegawai_id->setFormValue($_POST["fk_pegawai_id"]);
+					$this->pegawai_id->setFormValue($GLOBALS["pegawai"]->pegawai_id->FormValue);
+					$this->pegawai_id->setSessionValue($this->pegawai_id->FormValue);
+					if (!is_numeric($GLOBALS["pegawai"]->pegawai_id->FormValue)) $bValidMaster = FALSE;
 				} else {
 					$bValidMaster = FALSE;
 				}
@@ -711,8 +679,8 @@ class ct_keg_detail_delete extends ct_keg_detail {
 			$this->setStartRecordNumber($this->StartRec);
 
 			// Clear previous master key from Session
-			if ($sMasterTblVar <> "t_keg_master") {
-				if ($this->kegm_id->CurrentValue == "") $this->kegm_id->setSessionValue("");
+			if ($sMasterTblVar <> "pegawai") {
+				if ($this->pegawai_id->CurrentValue == "") $this->pegawai_id->setSessionValue("");
 			}
 		}
 		$this->DbMasterFilter = $this->GetMasterFilter(); // Get master filter
@@ -724,7 +692,7 @@ class ct_keg_detail_delete extends ct_keg_detail {
 		global $Breadcrumb, $Language;
 		$Breadcrumb = new cBreadcrumb();
 		$url = substr(ew_CurrentUrl(), strrpos(ew_CurrentUrl(), "/")+1);
-		$Breadcrumb->Add("list", $this->TableVar, $this->AddMasterUrl("t_keg_detaillist.php"), "", $this->TableVar, TRUE);
+		$Breadcrumb->Add("list", $this->TableVar, $this->AddMasterUrl("t_lembur2list.php"), "", $this->TableVar, TRUE);
 		$PageId = "delete";
 		$Breadcrumb->Add("delete", $PageId, $url);
 	}
@@ -810,29 +778,29 @@ class ct_keg_detail_delete extends ct_keg_detail {
 <?php
 
 // Create page object
-if (!isset($t_keg_detail_delete)) $t_keg_detail_delete = new ct_keg_detail_delete();
+if (!isset($t_lembur2_delete)) $t_lembur2_delete = new ct_lembur2_delete();
 
 // Page init
-$t_keg_detail_delete->Page_Init();
+$t_lembur2_delete->Page_Init();
 
 // Page main
-$t_keg_detail_delete->Page_Main();
+$t_lembur2_delete->Page_Main();
 
 // Global Page Rendering event (in userfn*.php)
 Page_Rendering();
 
 // Page Rendering event
-$t_keg_detail_delete->Page_Render();
+$t_lembur2_delete->Page_Render();
 ?>
 <?php include_once "header.php" ?>
 <script type="text/javascript">
 
 // Form object
 var CurrentPageID = EW_PAGE_ID = "delete";
-var CurrentForm = ft_keg_detaildelete = new ew_Form("ft_keg_detaildelete", "delete");
+var CurrentForm = ft_lembur2delete = new ew_Form("ft_lembur2delete", "delete");
 
 // Form_CustomValidate event
-ft_keg_detaildelete.Form_CustomValidate = 
+ft_lembur2delete.Form_CustomValidate = 
  function(fobj) { // DO NOT CHANGE THIS LINE!
 
  	// Your custom validation code here, return false if invalid. 
@@ -841,15 +809,14 @@ ft_keg_detaildelete.Form_CustomValidate =
 
 // Use JavaScript validation or not
 <?php if (EW_CLIENT_VALIDATE) { ?>
-ft_keg_detaildelete.ValidateRequired = true;
+ft_lembur2delete.ValidateRequired = true;
 <?php } else { ?>
-ft_keg_detaildelete.ValidateRequired = false; 
+ft_lembur2delete.ValidateRequired = false; 
 <?php } ?>
 
 // Dynamic selection lists
-ft_keg_detaildelete.Lists["x_pegawai_id"] = {"LinkField":"x_pegawai_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_pegawai_nama","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"pegawai"};
-
 // Form object for search
+
 </script>
 <script type="text/javascript">
 
@@ -860,85 +827,85 @@ ft_keg_detaildelete.Lists["x_pegawai_id"] = {"LinkField":"x_pegawai_id","Ajax":t
 <?php echo $Language->SelectionForm(); ?>
 <div class="clearfix"></div>
 </div>
-<?php $t_keg_detail_delete->ShowPageHeader(); ?>
+<?php $t_lembur2_delete->ShowPageHeader(); ?>
 <?php
-$t_keg_detail_delete->ShowMessage();
+$t_lembur2_delete->ShowMessage();
 ?>
-<form name="ft_keg_detaildelete" id="ft_keg_detaildelete" class="form-inline ewForm ewDeleteForm" action="<?php echo ew_CurrentPage() ?>" method="post">
-<?php if ($t_keg_detail_delete->CheckToken) { ?>
-<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $t_keg_detail_delete->Token ?>">
+<form name="ft_lembur2delete" id="ft_lembur2delete" class="form-inline ewForm ewDeleteForm" action="<?php echo ew_CurrentPage() ?>" method="post">
+<?php if ($t_lembur2_delete->CheckToken) { ?>
+<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $t_lembur2_delete->Token ?>">
 <?php } ?>
-<input type="hidden" name="t" value="t_keg_detail">
+<input type="hidden" name="t" value="t_lembur2">
 <input type="hidden" name="a_delete" id="a_delete" value="D">
-<?php foreach ($t_keg_detail_delete->RecKeys as $key) { ?>
+<?php foreach ($t_lembur2_delete->RecKeys as $key) { ?>
 <?php $keyvalue = is_array($key) ? implode($EW_COMPOSITE_KEY_SEPARATOR, $key) : $key; ?>
 <input type="hidden" name="key_m[]" value="<?php echo ew_HtmlEncode($keyvalue) ?>">
 <?php } ?>
 <div class="ewGrid">
 <div class="<?php if (ew_IsResponsiveLayout()) { echo "table-responsive "; } ?>ewGridMiddlePanel">
 <table class="table ewTable">
-<?php echo $t_keg_detail->TableCustomInnerHtml ?>
+<?php echo $t_lembur2->TableCustomInnerHtml ?>
 	<thead>
 	<tr class="ewTableHeader">
-<?php if ($t_keg_detail->pegawai_id->Visible) { // pegawai_id ?>
-		<th><span id="elh_t_keg_detail_pegawai_id" class="t_keg_detail_pegawai_id"><?php echo $t_keg_detail->pegawai_id->FldCaption() ?></span></th>
+<?php if ($t_lembur2->pegawai_id->Visible) { // pegawai_id ?>
+		<th><span id="elh_t_lembur2_pegawai_id" class="t_lembur2_pegawai_id"><?php echo $t_lembur2->pegawai_id->FldCaption() ?></span></th>
 <?php } ?>
-<?php if ($t_keg_detail->scan_masuk->Visible) { // scan_masuk ?>
-		<th><span id="elh_t_keg_detail_scan_masuk" class="t_keg_detail_scan_masuk"><?php echo $t_keg_detail->scan_masuk->FldCaption() ?></span></th>
+<?php if ($t_lembur2->tgl->Visible) { // tgl ?>
+		<th><span id="elh_t_lembur2_tgl" class="t_lembur2_tgl"><?php echo $t_lembur2->tgl->FldCaption() ?></span></th>
 <?php } ?>
-<?php if ($t_keg_detail->scan_keluar->Visible) { // scan_keluar ?>
-		<th><span id="elh_t_keg_detail_scan_keluar" class="t_keg_detail_scan_keluar"><?php echo $t_keg_detail->scan_keluar->FldCaption() ?></span></th>
+<?php if ($t_lembur2->lama_lembur->Visible) { // lama_lembur ?>
+		<th><span id="elh_t_lembur2_lama_lembur" class="t_lembur2_lama_lembur"><?php echo $t_lembur2->lama_lembur->FldCaption() ?></span></th>
 <?php } ?>
 	</tr>
 	</thead>
 	<tbody>
 <?php
-$t_keg_detail_delete->RecCnt = 0;
+$t_lembur2_delete->RecCnt = 0;
 $i = 0;
-while (!$t_keg_detail_delete->Recordset->EOF) {
-	$t_keg_detail_delete->RecCnt++;
-	$t_keg_detail_delete->RowCnt++;
+while (!$t_lembur2_delete->Recordset->EOF) {
+	$t_lembur2_delete->RecCnt++;
+	$t_lembur2_delete->RowCnt++;
 
 	// Set row properties
-	$t_keg_detail->ResetAttrs();
-	$t_keg_detail->RowType = EW_ROWTYPE_VIEW; // View
+	$t_lembur2->ResetAttrs();
+	$t_lembur2->RowType = EW_ROWTYPE_VIEW; // View
 
 	// Get the field contents
-	$t_keg_detail_delete->LoadRowValues($t_keg_detail_delete->Recordset);
+	$t_lembur2_delete->LoadRowValues($t_lembur2_delete->Recordset);
 
 	// Render row
-	$t_keg_detail_delete->RenderRow();
+	$t_lembur2_delete->RenderRow();
 ?>
-	<tr<?php echo $t_keg_detail->RowAttributes() ?>>
-<?php if ($t_keg_detail->pegawai_id->Visible) { // pegawai_id ?>
-		<td<?php echo $t_keg_detail->pegawai_id->CellAttributes() ?>>
-<span id="el<?php echo $t_keg_detail_delete->RowCnt ?>_t_keg_detail_pegawai_id" class="t_keg_detail_pegawai_id">
-<span<?php echo $t_keg_detail->pegawai_id->ViewAttributes() ?>>
-<?php echo $t_keg_detail->pegawai_id->ListViewValue() ?></span>
+	<tr<?php echo $t_lembur2->RowAttributes() ?>>
+<?php if ($t_lembur2->pegawai_id->Visible) { // pegawai_id ?>
+		<td<?php echo $t_lembur2->pegawai_id->CellAttributes() ?>>
+<span id="el<?php echo $t_lembur2_delete->RowCnt ?>_t_lembur2_pegawai_id" class="t_lembur2_pegawai_id">
+<span<?php echo $t_lembur2->pegawai_id->ViewAttributes() ?>>
+<?php echo $t_lembur2->pegawai_id->ListViewValue() ?></span>
 </span>
 </td>
 <?php } ?>
-<?php if ($t_keg_detail->scan_masuk->Visible) { // scan_masuk ?>
-		<td<?php echo $t_keg_detail->scan_masuk->CellAttributes() ?>>
-<span id="el<?php echo $t_keg_detail_delete->RowCnt ?>_t_keg_detail_scan_masuk" class="t_keg_detail_scan_masuk">
-<span<?php echo $t_keg_detail->scan_masuk->ViewAttributes() ?>>
-<?php echo $t_keg_detail->scan_masuk->ListViewValue() ?></span>
+<?php if ($t_lembur2->tgl->Visible) { // tgl ?>
+		<td<?php echo $t_lembur2->tgl->CellAttributes() ?>>
+<span id="el<?php echo $t_lembur2_delete->RowCnt ?>_t_lembur2_tgl" class="t_lembur2_tgl">
+<span<?php echo $t_lembur2->tgl->ViewAttributes() ?>>
+<?php echo $t_lembur2->tgl->ListViewValue() ?></span>
 </span>
 </td>
 <?php } ?>
-<?php if ($t_keg_detail->scan_keluar->Visible) { // scan_keluar ?>
-		<td<?php echo $t_keg_detail->scan_keluar->CellAttributes() ?>>
-<span id="el<?php echo $t_keg_detail_delete->RowCnt ?>_t_keg_detail_scan_keluar" class="t_keg_detail_scan_keluar">
-<span<?php echo $t_keg_detail->scan_keluar->ViewAttributes() ?>>
-<?php echo $t_keg_detail->scan_keluar->ListViewValue() ?></span>
+<?php if ($t_lembur2->lama_lembur->Visible) { // lama_lembur ?>
+		<td<?php echo $t_lembur2->lama_lembur->CellAttributes() ?>>
+<span id="el<?php echo $t_lembur2_delete->RowCnt ?>_t_lembur2_lama_lembur" class="t_lembur2_lama_lembur">
+<span<?php echo $t_lembur2->lama_lembur->ViewAttributes() ?>>
+<?php echo $t_lembur2->lama_lembur->ListViewValue() ?></span>
 </span>
 </td>
 <?php } ?>
 	</tr>
 <?php
-	$t_keg_detail_delete->Recordset->MoveNext();
+	$t_lembur2_delete->Recordset->MoveNext();
 }
-$t_keg_detail_delete->Recordset->Close();
+$t_lembur2_delete->Recordset->Close();
 ?>
 </tbody>
 </table>
@@ -946,14 +913,14 @@ $t_keg_detail_delete->Recordset->Close();
 </div>
 <div>
 <button class="btn btn-primary ewButton" name="btnAction" id="btnAction" type="submit"><?php echo $Language->Phrase("DeleteBtn") ?></button>
-<button class="btn btn-default ewButton" name="btnCancel" id="btnCancel" type="button" data-href="<?php echo $t_keg_detail_delete->getReturnUrl() ?>"><?php echo $Language->Phrase("CancelBtn") ?></button>
+<button class="btn btn-default ewButton" name="btnCancel" id="btnCancel" type="button" data-href="<?php echo $t_lembur2_delete->getReturnUrl() ?>"><?php echo $Language->Phrase("CancelBtn") ?></button>
 </div>
 </form>
 <script type="text/javascript">
-ft_keg_detaildelete.Init();
+ft_lembur2delete.Init();
 </script>
 <?php
-$t_keg_detail_delete->ShowPageFooter();
+$t_lembur2_delete->ShowPageFooter();
 if (EW_DEBUG_ENABLED)
 	echo ew_DebugMsg();
 ?>
@@ -965,5 +932,5 @@ if (EW_DEBUG_ENABLED)
 </script>
 <?php include_once "footer.php" ?>
 <?php
-$t_keg_detail_delete->Page_Terminate();
+$t_lembur2_delete->Page_Terminate();
 ?>

@@ -6,8 +6,8 @@ ob_start(); // Turn on output buffering
 <?php include_once ((EW_USE_ADODB) ? "adodb5/adodb.inc.php" : "ewmysql13.php") ?>
 <?php include_once "phpfn13.php" ?>
 <?php include_once "t_keg_detailinfo.php" ?>
-<?php include_once "t_userinfo.php" ?>
 <?php include_once "t_keg_masterinfo.php" ?>
+<?php include_once "t_userinfo.php" ?>
 <?php include_once "userfn13.php" ?>
 <?php
 
@@ -288,11 +288,11 @@ class ct_keg_detail_list extends ct_keg_detail {
 		$this->MultiDeleteUrl = "t_keg_detaildelete.php";
 		$this->MultiUpdateUrl = "t_keg_detailupdate.php";
 
-		// Table object (t_user)
-		if (!isset($GLOBALS['t_user'])) $GLOBALS['t_user'] = new ct_user();
-
 		// Table object (t_keg_master)
 		if (!isset($GLOBALS['t_keg_master'])) $GLOBALS['t_keg_master'] = new ct_keg_master();
+
+		// Table object (t_user)
+		if (!isset($GLOBALS['t_user'])) $GLOBALS['t_user'] = new ct_user();
 
 		// Page ID
 		if (!defined("EW_PAGE_ID"))

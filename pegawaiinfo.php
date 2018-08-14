@@ -289,6 +289,10 @@ class cpegawai extends cTable {
 			$sDetailUrl = $GLOBALS["t_lembur"]->GetListUrl() . "?" . EW_TABLE_SHOW_MASTER . "=" . $this->TableVar;
 			$sDetailUrl .= "&fk_pegawai_id=" . urlencode($this->pegawai_id->CurrentValue);
 		}
+		if ($this->getCurrentDetailTable() == "t_lembur2") {
+			$sDetailUrl = $GLOBALS["t_lembur2"]->GetListUrl() . "?" . EW_TABLE_SHOW_MASTER . "=" . $this->TableVar;
+			$sDetailUrl .= "&fk_pegawai_id=" . urlencode($this->pegawai_id->CurrentValue);
+		}
 		if ($sDetailUrl == "") {
 			$sDetailUrl = "pegawailist.php";
 		}
@@ -604,86 +608,6 @@ class cpegawai extends cTable {
 	// Update
 	function Update(&$rs, $where = "", $rsold = NULL, $curfilter = TRUE) {
 		$conn = &$this->Connection();
-
-		// Cascade Update detail table 't_jdw_krj_peg'
-		$bCascadeUpdate = FALSE;
-		$rscascade = array();
-		if (!is_null($rsold) && (isset($rs['pegawai_id']) && $rsold['pegawai_id'] <> $rs['pegawai_id'])) { // Update detail field 'pegawai_id'
-			$bCascadeUpdate = TRUE;
-			$rscascade['pegawai_id'] = $rs['pegawai_id']; 
-		}
-		if ($bCascadeUpdate) {
-			if (!isset($GLOBALS["t_jdw_krj_peg"])) $GLOBALS["t_jdw_krj_peg"] = new ct_jdw_krj_peg();
-			$rswrk = $GLOBALS["t_jdw_krj_peg"]->LoadRs("`pegawai_id` = " . ew_QuotedValue($rsold['pegawai_id'], EW_DATATYPE_NUMBER, 'DB')); 
-			while ($rswrk && !$rswrk->EOF) {
-				$rskey = array();
-				$fldname = 'jdw_id';
-				$rskey[$fldname] = $rswrk->fields[$fldname];
-				$bUpdate = $GLOBALS["t_jdw_krj_peg"]->Update($rscascade, $rskey, $rswrk->fields);
-				if (!$bUpdate) return FALSE;
-				$rswrk->MoveNext();
-			}
-		}
-
-		// Cascade Update detail table 't_rumus2_peg'
-		$bCascadeUpdate = FALSE;
-		$rscascade = array();
-		if (!is_null($rsold) && (isset($rs['pegawai_id']) && $rsold['pegawai_id'] <> $rs['pegawai_id'])) { // Update detail field 'pegawai_id'
-			$bCascadeUpdate = TRUE;
-			$rscascade['pegawai_id'] = $rs['pegawai_id']; 
-		}
-		if ($bCascadeUpdate) {
-			if (!isset($GLOBALS["t_rumus2_peg"])) $GLOBALS["t_rumus2_peg"] = new ct_rumus2_peg();
-			$rswrk = $GLOBALS["t_rumus2_peg"]->LoadRs("`pegawai_id` = " . ew_QuotedValue($rsold['pegawai_id'], EW_DATATYPE_NUMBER, 'DB')); 
-			while ($rswrk && !$rswrk->EOF) {
-				$rskey = array();
-				$fldname = 'rumus2_peg_id';
-				$rskey[$fldname] = $rswrk->fields[$fldname];
-				$bUpdate = $GLOBALS["t_rumus2_peg"]->Update($rscascade, $rskey, $rswrk->fields);
-				if (!$bUpdate) return FALSE;
-				$rswrk->MoveNext();
-			}
-		}
-
-		// Cascade Update detail table 't_rumus_peg'
-		$bCascadeUpdate = FALSE;
-		$rscascade = array();
-		if (!is_null($rsold) && (isset($rs['pegawai_id']) && $rsold['pegawai_id'] <> $rs['pegawai_id'])) { // Update detail field 'pegawai_id'
-			$bCascadeUpdate = TRUE;
-			$rscascade['pegawai_id'] = $rs['pegawai_id']; 
-		}
-		if ($bCascadeUpdate) {
-			if (!isset($GLOBALS["t_rumus_peg"])) $GLOBALS["t_rumus_peg"] = new ct_rumus_peg();
-			$rswrk = $GLOBALS["t_rumus_peg"]->LoadRs("`pegawai_id` = " . ew_QuotedValue($rsold['pegawai_id'], EW_DATATYPE_NUMBER, 'DB')); 
-			while ($rswrk && !$rswrk->EOF) {
-				$rskey = array();
-				$fldname = 'rumus_peg_id';
-				$rskey[$fldname] = $rswrk->fields[$fldname];
-				$bUpdate = $GLOBALS["t_rumus_peg"]->Update($rscascade, $rskey, $rswrk->fields);
-				if (!$bUpdate) return FALSE;
-				$rswrk->MoveNext();
-			}
-		}
-
-		// Cascade Update detail table 't_pengecualian_peg'
-		$bCascadeUpdate = FALSE;
-		$rscascade = array();
-		if (!is_null($rsold) && (isset($rs['pegawai_id']) && $rsold['pegawai_id'] <> $rs['pegawai_id'])) { // Update detail field 'pegawai_id'
-			$bCascadeUpdate = TRUE;
-			$rscascade['pegawai_id'] = $rs['pegawai_id']; 
-		}
-		if ($bCascadeUpdate) {
-			if (!isset($GLOBALS["t_pengecualian_peg"])) $GLOBALS["t_pengecualian_peg"] = new ct_pengecualian_peg();
-			$rswrk = $GLOBALS["t_pengecualian_peg"]->LoadRs("`pegawai_id` = " . ew_QuotedValue($rsold['pegawai_id'], EW_DATATYPE_NUMBER, 'DB')); 
-			while ($rswrk && !$rswrk->EOF) {
-				$rskey = array();
-				$fldname = 'pengecualian_id';
-				$rskey[$fldname] = $rswrk->fields[$fldname];
-				$bUpdate = $GLOBALS["t_pengecualian_peg"]->Update($rscascade, $rskey, $rswrk->fields);
-				if (!$bUpdate) return FALSE;
-				$rswrk->MoveNext();
-			}
-		}
 		$bUpdate = $conn->Execute($this->UpdateSQL($rs, $where, $curfilter));
 		if ($bUpdate && $this->AuditTrailOnEdit) {
 			$rsaudit = $rs;
@@ -715,38 +639,6 @@ class cpegawai extends cTable {
 	// Delete
 	function Delete(&$rs, $where = "", $curfilter = TRUE) {
 		$conn = &$this->Connection();
-
-		// Cascade delete detail table 't_jdw_krj_peg'
-		if (!isset($GLOBALS["t_jdw_krj_peg"])) $GLOBALS["t_jdw_krj_peg"] = new ct_jdw_krj_peg();
-		$rscascade = $GLOBALS["t_jdw_krj_peg"]->LoadRs("`pegawai_id` = " . ew_QuotedValue($rs['pegawai_id'], EW_DATATYPE_NUMBER, "DB")); 
-		while ($rscascade && !$rscascade->EOF) {
-			$GLOBALS["t_jdw_krj_peg"]->Delete($rscascade->fields);
-			$rscascade->MoveNext();
-		}
-
-		// Cascade delete detail table 't_rumus2_peg'
-		if (!isset($GLOBALS["t_rumus2_peg"])) $GLOBALS["t_rumus2_peg"] = new ct_rumus2_peg();
-		$rscascade = $GLOBALS["t_rumus2_peg"]->LoadRs("`pegawai_id` = " . ew_QuotedValue($rs['pegawai_id'], EW_DATATYPE_NUMBER, "DB")); 
-		while ($rscascade && !$rscascade->EOF) {
-			$GLOBALS["t_rumus2_peg"]->Delete($rscascade->fields);
-			$rscascade->MoveNext();
-		}
-
-		// Cascade delete detail table 't_rumus_peg'
-		if (!isset($GLOBALS["t_rumus_peg"])) $GLOBALS["t_rumus_peg"] = new ct_rumus_peg();
-		$rscascade = $GLOBALS["t_rumus_peg"]->LoadRs("`pegawai_id` = " . ew_QuotedValue($rs['pegawai_id'], EW_DATATYPE_NUMBER, "DB")); 
-		while ($rscascade && !$rscascade->EOF) {
-			$GLOBALS["t_rumus_peg"]->Delete($rscascade->fields);
-			$rscascade->MoveNext();
-		}
-
-		// Cascade delete detail table 't_pengecualian_peg'
-		if (!isset($GLOBALS["t_pengecualian_peg"])) $GLOBALS["t_pengecualian_peg"] = new ct_pengecualian_peg();
-		$rscascade = $GLOBALS["t_pengecualian_peg"]->LoadRs("`pegawai_id` = " . ew_QuotedValue($rs['pegawai_id'], EW_DATATYPE_NUMBER, "DB")); 
-		while ($rscascade && !$rscascade->EOF) {
-			$GLOBALS["t_pengecualian_peg"]->Delete($rscascade->fields);
-			$rscascade->MoveNext();
-		}
 		$bDelete = $conn->Execute($this->DeleteSQL($rs, $where, $curfilter));
 		if ($bDelete && $this->AuditTrailOnDelete)
 			$this->WriteAuditTrailOnDelete($rs);

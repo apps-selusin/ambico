@@ -5,8 +5,8 @@ ob_start(); // Turn on output buffering
 <?php include_once "ewcfg13.php" ?>
 <?php include_once ((EW_USE_ADODB) ? "adodb5/adodb.inc.php" : "ewmysql13.php") ?>
 <?php include_once "phpfn13.php" ?>
-<?php include_once "t_keg_detailinfo.php" ?>
-<?php include_once "t_keg_masterinfo.php" ?>
+<?php include_once "t_lembur2info.php" ?>
+<?php include_once "pegawaiinfo.php" ?>
 <?php include_once "t_userinfo.php" ?>
 <?php include_once "userfn13.php" ?>
 <?php
@@ -15,9 +15,9 @@ ob_start(); // Turn on output buffering
 // Page class
 //
 
-$t_keg_detail_view = NULL; // Initialize page object first
+$t_lembur2_view = NULL; // Initialize page object first
 
-class ct_keg_detail_view extends ct_keg_detail {
+class ct_lembur2_view extends ct_lembur2 {
 
 	// Page ID
 	var $PageID = 'view';
@@ -26,10 +26,10 @@ class ct_keg_detail_view extends ct_keg_detail {
 	var $ProjectID = "{9712DCF3-D9FD-406D-93E5-FEA5020667C8}";
 
 	// Table name
-	var $TableName = 't_keg_detail';
+	var $TableName = 't_lembur2';
 
 	// Page object name
-	var $PageObjName = 't_keg_detail_view';
+	var $PageObjName = 't_lembur2_view';
 
 	// Page name
 	function PageName() {
@@ -259,15 +259,15 @@ class ct_keg_detail_view extends ct_keg_detail {
 		// Parent constuctor
 		parent::__construct();
 
-		// Table object (t_keg_detail)
-		if (!isset($GLOBALS["t_keg_detail"]) || get_class($GLOBALS["t_keg_detail"]) == "ct_keg_detail") {
-			$GLOBALS["t_keg_detail"] = &$this;
-			$GLOBALS["Table"] = &$GLOBALS["t_keg_detail"];
+		// Table object (t_lembur2)
+		if (!isset($GLOBALS["t_lembur2"]) || get_class($GLOBALS["t_lembur2"]) == "ct_lembur2") {
+			$GLOBALS["t_lembur2"] = &$this;
+			$GLOBALS["Table"] = &$GLOBALS["t_lembur2"];
 		}
 		$KeyUrl = "";
-		if (@$_GET["kegd_id"] <> "") {
-			$this->RecKey["kegd_id"] = $_GET["kegd_id"];
-			$KeyUrl .= "&amp;kegd_id=" . urlencode($this->RecKey["kegd_id"]);
+		if (@$_GET["lembur_id"] <> "") {
+			$this->RecKey["lembur_id"] = $_GET["lembur_id"];
+			$KeyUrl .= "&amp;lembur_id=" . urlencode($this->RecKey["lembur_id"]);
 		}
 		$this->ExportPrintUrl = $this->PageUrl() . "export=print" . $KeyUrl;
 		$this->ExportHtmlUrl = $this->PageUrl() . "export=html" . $KeyUrl;
@@ -277,8 +277,8 @@ class ct_keg_detail_view extends ct_keg_detail {
 		$this->ExportCsvUrl = $this->PageUrl() . "export=csv" . $KeyUrl;
 		$this->ExportPdfUrl = $this->PageUrl() . "export=pdf" . $KeyUrl;
 
-		// Table object (t_keg_master)
-		if (!isset($GLOBALS['t_keg_master'])) $GLOBALS['t_keg_master'] = new ct_keg_master();
+		// Table object (pegawai)
+		if (!isset($GLOBALS['pegawai'])) $GLOBALS['pegawai'] = new cpegawai();
 
 		// Table object (t_user)
 		if (!isset($GLOBALS['t_user'])) $GLOBALS['t_user'] = new ct_user();
@@ -289,7 +289,7 @@ class ct_keg_detail_view extends ct_keg_detail {
 
 		// Table name (for backward compatibility)
 		if (!defined("EW_TABLE_NAME"))
-			define("EW_TABLE_NAME", 't_keg_detail', TRUE);
+			define("EW_TABLE_NAME", 't_lembur2', TRUE);
 
 		// Start timer
 		if (!isset($GLOBALS["gTimer"])) $GLOBALS["gTimer"] = new cTimer();
@@ -333,7 +333,7 @@ class ct_keg_detail_view extends ct_keg_detail {
 			$Security->SaveLastUrl();
 			$this->setFailureMessage(ew_DeniedMsg()); // Set no permission
 			if ($Security->CanList())
-				$this->Page_Terminate(ew_GetUrl("t_keg_detaillist.php"));
+				$this->Page_Terminate(ew_GetUrl("t_lembur2list.php"));
 			else
 				$this->Page_Terminate(ew_GetUrl("login.php"));
 		}
@@ -359,9 +359,9 @@ class ct_keg_detail_view extends ct_keg_detail {
 			$this->setExportReturnUrl(ew_CurrentUrl());
 		}
 		$gsExportFile = $this->TableVar; // Get export file, used in header
-		if (@$_GET["kegd_id"] <> "") {
+		if (@$_GET["lembur_id"] <> "") {
 			if ($gsExportFile <> "") $gsExportFile .= "_";
-			$gsExportFile .= ew_StripSlashes($_GET["kegd_id"]);
+			$gsExportFile .= ew_StripSlashes($_GET["lembur_id"]);
 		}
 
 		// Get custom export parameters
@@ -388,8 +388,8 @@ class ct_keg_detail_view extends ct_keg_detail {
 		// Setup export options
 		$this->SetupExportOptions();
 		$this->pegawai_id->SetVisibility();
-		$this->scan_masuk->SetVisibility();
-		$this->scan_keluar->SetVisibility();
+		$this->tgl->SetVisibility();
+		$this->lama_lembur->SetVisibility();
 
 		// Global Page Loading event (in userfn*.php)
 		Page_Loading();
@@ -421,13 +421,13 @@ class ct_keg_detail_view extends ct_keg_detail {
 		Page_Unloaded();
 
 		// Export
-		global $EW_EXPORT, $t_keg_detail;
+		global $EW_EXPORT, $t_lembur2;
 		if ($this->CustomExport <> "" && $this->CustomExport == $this->Export && array_key_exists($this->CustomExport, $EW_EXPORT)) {
 				$sContent = ob_get_contents();
 			if ($gsExportFile == "") $gsExportFile = $this->TableVar;
 			$class = $EW_EXPORT[$this->CustomExport];
 			if (class_exists($class)) {
-				$doc = new $class($t_keg_detail);
+				$doc = new $class($t_lembur2);
 				$doc->Text = $sContent;
 				if ($this->Export == "email")
 					echo $this->ExportEmail($doc->Text);
@@ -493,12 +493,12 @@ class ct_keg_detail_view extends ct_keg_detail {
 		// Set up master/detail parameters
 		$this->SetUpMasterParms();
 		if ($this->IsPageRequest()) { // Validate request
-			if (@$_GET["kegd_id"] <> "") {
-				$this->kegd_id->setQueryStringValue($_GET["kegd_id"]);
-				$this->RecKey["kegd_id"] = $this->kegd_id->QueryStringValue;
-			} elseif (@$_POST["kegd_id"] <> "") {
-				$this->kegd_id->setFormValue($_POST["kegd_id"]);
-				$this->RecKey["kegd_id"] = $this->kegd_id->FormValue;
+			if (@$_GET["lembur_id"] <> "") {
+				$this->lembur_id->setQueryStringValue($_GET["lembur_id"]);
+				$this->RecKey["lembur_id"] = $this->lembur_id->QueryStringValue;
+			} elseif (@$_POST["lembur_id"] <> "") {
+				$this->lembur_id->setFormValue($_POST["lembur_id"]);
+				$this->RecKey["lembur_id"] = $this->lembur_id->FormValue;
 			} else {
 				$bLoadCurrentRecord = TRUE;
 			}
@@ -513,7 +513,7 @@ class ct_keg_detail_view extends ct_keg_detail {
 					if ($this->TotalRecs <= 0) { // No record found
 						if ($this->getSuccessMessage() == "" && $this->getFailureMessage() == "")
 							$this->setFailureMessage($Language->Phrase("NoRecord")); // Set no record message
-						$this->Page_Terminate("t_keg_detaillist.php"); // Return to list page
+						$this->Page_Terminate("t_lembur2list.php"); // Return to list page
 					} elseif ($bLoadCurrentRecord) { // Load current record position
 						$this->SetUpStartRec(); // Set up start record position
 
@@ -524,7 +524,7 @@ class ct_keg_detail_view extends ct_keg_detail {
 						}
 					} else { // Match key values
 						while (!$this->Recordset->EOF) {
-							if (strval($this->kegd_id->CurrentValue) == strval($this->Recordset->fields('kegd_id'))) {
+							if (strval($this->lembur_id->CurrentValue) == strval($this->Recordset->fields('lembur_id'))) {
 								$this->setStartRecordNumber($this->StartRec); // Save record position
 								$bMatchRecord = TRUE;
 								break;
@@ -537,7 +537,7 @@ class ct_keg_detail_view extends ct_keg_detail {
 					if (!$bMatchRecord) {
 						if ($this->getSuccessMessage() == "" && $this->getFailureMessage() == "")
 							$this->setFailureMessage($Language->Phrase("NoRecord")); // Set no record message
-						$sReturnUrl = "t_keg_detaillist.php"; // No matching record, return to list
+						$sReturnUrl = "t_lembur2list.php"; // No matching record, return to list
 					} else {
 						$this->LoadRowValues($this->Recordset); // Load row values
 					}
@@ -550,7 +550,7 @@ class ct_keg_detail_view extends ct_keg_detail {
 				exit();
 			}
 		} else {
-			$sReturnUrl = "t_keg_detaillist.php"; // Not page request, return to list
+			$sReturnUrl = "t_lembur2list.php"; // Not page request, return to list
 		}
 		if ($sReturnUrl <> "")
 			$this->Page_Terminate($sReturnUrl);
@@ -665,7 +665,7 @@ class ct_keg_detail_view extends ct_keg_detail {
 		if ($this->UseSelectLimit) {
 			$conn->raiseErrorFn = $GLOBALS["EW_ERROR_FN"];
 			if ($dbtype == "MSSQL") {
-				$rs = $conn->SelectLimit($sSql, $rowcnt, $offset, array("_hasOrderBy" => trim($this->getOrderBy()) || trim($this->getSessionOrderByList())));
+				$rs = $conn->SelectLimit($sSql, $rowcnt, $offset, array("_hasOrderBy" => trim($this->getOrderBy()) || trim($this->getSessionOrderBy())));
 			} else {
 				$rs = $conn->SelectLimit($sSql, $rowcnt, $offset);
 			}
@@ -709,27 +709,20 @@ class ct_keg_detail_view extends ct_keg_detail {
 		$row = &$rs->fields;
 		$this->Row_Selected($row);
 		if ($this->AuditTrailOnView) $this->WriteAuditTrailOnView($row);
-		$this->kegd_id->setDbValue($rs->fields('kegd_id'));
+		$this->lembur_id->setDbValue($rs->fields('lembur_id'));
 		$this->pegawai_id->setDbValue($rs->fields('pegawai_id'));
-		if (array_key_exists('EV__pegawai_id', $rs->fields)) {
-			$this->pegawai_id->VirtualValue = $rs->fields('EV__pegawai_id'); // Set up virtual field value
-		} else {
-			$this->pegawai_id->VirtualValue = ""; // Clear value
-		}
-		$this->kegm_id->setDbValue($rs->fields('kegm_id'));
-		$this->scan_masuk->setDbValue($rs->fields('scan_masuk'));
-		$this->scan_keluar->setDbValue($rs->fields('scan_keluar'));
+		$this->tgl->setDbValue($rs->fields('tgl'));
+		$this->lama_lembur->setDbValue($rs->fields('lama_lembur'));
 	}
 
 	// Load DbValue from recordset
 	function LoadDbValues(&$rs) {
 		if (!$rs || !is_array($rs) && $rs->EOF) return;
 		$row = is_array($rs) ? $rs : $rs->fields;
-		$this->kegd_id->DbValue = $row['kegd_id'];
+		$this->lembur_id->DbValue = $row['lembur_id'];
 		$this->pegawai_id->DbValue = $row['pegawai_id'];
-		$this->kegm_id->DbValue = $row['kegm_id'];
-		$this->scan_masuk->DbValue = $row['scan_masuk'];
-		$this->scan_keluar->DbValue = $row['scan_keluar'];
+		$this->tgl->DbValue = $row['tgl'];
+		$this->lama_lembur->DbValue = $row['lama_lembur'];
 	}
 
 	// Render row values based on field settings
@@ -744,77 +737,52 @@ class ct_keg_detail_view extends ct_keg_detail {
 		$this->ListUrl = $this->GetListUrl();
 		$this->SetupOtherOptions();
 
+		// Convert decimal values if posted back
+		if ($this->lama_lembur->FormValue == $this->lama_lembur->CurrentValue && is_numeric(ew_StrToFloat($this->lama_lembur->CurrentValue)))
+			$this->lama_lembur->CurrentValue = ew_StrToFloat($this->lama_lembur->CurrentValue);
+
 		// Call Row_Rendering event
 		$this->Row_Rendering();
 
 		// Common render codes for all row types
-		// kegd_id
+		// lembur_id
 		// pegawai_id
-		// kegm_id
-		// scan_masuk
-		// scan_keluar
+		// tgl
+		// lama_lembur
 
 		if ($this->RowType == EW_ROWTYPE_VIEW) { // View row
 
-		// kegd_id
-		$this->kegd_id->ViewValue = $this->kegd_id->CurrentValue;
-		$this->kegd_id->ViewCustomAttributes = "";
+		// lembur_id
+		$this->lembur_id->ViewValue = $this->lembur_id->CurrentValue;
+		$this->lembur_id->ViewCustomAttributes = "";
 
 		// pegawai_id
-		if ($this->pegawai_id->VirtualValue <> "") {
-			$this->pegawai_id->ViewValue = $this->pegawai_id->VirtualValue;
-		} else {
-		if (strval($this->pegawai_id->CurrentValue) <> "") {
-			$sFilterWrk = "`pegawai_id`" . ew_SearchString("=", $this->pegawai_id->CurrentValue, EW_DATATYPE_NUMBER, "");
-		$sSqlWrk = "SELECT `pegawai_id`, `pegawai_nama` AS `DispFld`, '' AS `Disp2Fld`, '' AS `Disp3Fld`, '' AS `Disp4Fld` FROM `pegawai`";
-		$sWhereWrk = "";
-		$this->pegawai_id->LookupFilters = array("dx1" => '`pegawai_nama`');
-		ew_AddFilter($sWhereWrk, $sFilterWrk);
-		$this->Lookup_Selecting($this->pegawai_id, $sWhereWrk); // Call Lookup selecting
-		if ($sWhereWrk <> "") $sSqlWrk .= " WHERE " . $sWhereWrk;
-			$rswrk = Conn()->Execute($sSqlWrk);
-			if ($rswrk && !$rswrk->EOF) { // Lookup values found
-				$arwrk = array();
-				$arwrk[1] = $rswrk->fields('DispFld');
-				$this->pegawai_id->ViewValue = $this->pegawai_id->DisplayValue($arwrk);
-				$rswrk->Close();
-			} else {
-				$this->pegawai_id->ViewValue = $this->pegawai_id->CurrentValue;
-			}
-		} else {
-			$this->pegawai_id->ViewValue = NULL;
-		}
-		}
+		$this->pegawai_id->ViewValue = $this->pegawai_id->CurrentValue;
 		$this->pegawai_id->ViewCustomAttributes = "";
 
-		// kegm_id
-		$this->kegm_id->ViewValue = $this->kegm_id->CurrentValue;
-		$this->kegm_id->ViewCustomAttributes = "";
+		// tgl
+		$this->tgl->ViewValue = $this->tgl->CurrentValue;
+		$this->tgl->ViewValue = ew_FormatDateTime($this->tgl->ViewValue, 0);
+		$this->tgl->ViewCustomAttributes = "";
 
-		// scan_masuk
-		$this->scan_masuk->ViewValue = $this->scan_masuk->CurrentValue;
-		$this->scan_masuk->ViewValue = ew_FormatDateTime($this->scan_masuk->ViewValue, 17);
-		$this->scan_masuk->ViewCustomAttributes = "";
-
-		// scan_keluar
-		$this->scan_keluar->ViewValue = $this->scan_keluar->CurrentValue;
-		$this->scan_keluar->ViewValue = ew_FormatDateTime($this->scan_keluar->ViewValue, 17);
-		$this->scan_keluar->ViewCustomAttributes = "";
+		// lama_lembur
+		$this->lama_lembur->ViewValue = $this->lama_lembur->CurrentValue;
+		$this->lama_lembur->ViewCustomAttributes = "";
 
 			// pegawai_id
 			$this->pegawai_id->LinkCustomAttributes = "";
 			$this->pegawai_id->HrefValue = "";
 			$this->pegawai_id->TooltipValue = "";
 
-			// scan_masuk
-			$this->scan_masuk->LinkCustomAttributes = "";
-			$this->scan_masuk->HrefValue = "";
-			$this->scan_masuk->TooltipValue = "";
+			// tgl
+			$this->tgl->LinkCustomAttributes = "";
+			$this->tgl->HrefValue = "";
+			$this->tgl->TooltipValue = "";
 
-			// scan_keluar
-			$this->scan_keluar->LinkCustomAttributes = "";
-			$this->scan_keluar->HrefValue = "";
-			$this->scan_keluar->TooltipValue = "";
+			// lama_lembur
+			$this->lama_lembur->LinkCustomAttributes = "";
+			$this->lama_lembur->HrefValue = "";
+			$this->lama_lembur->TooltipValue = "";
 		}
 
 		// Call Row Rendered event
@@ -864,7 +832,7 @@ class ct_keg_detail_view extends ct_keg_detail {
 		// Export to Email
 		$item = &$this->ExportOptions->Add("email");
 		$url = "";
-		$item->Body = "<button id=\"emf_t_keg_detail\" class=\"ewExportLink ewEmail\" title=\"" . $Language->Phrase("ExportToEmailText") . "\" data-caption=\"" . $Language->Phrase("ExportToEmailText") . "\" onclick=\"ew_EmailDialogShow({lnk:'emf_t_keg_detail',hdr:ewLanguage.Phrase('ExportToEmailText'),f:document.ft_keg_detailview,key:" . ew_ArrayToJsonAttr($this->RecKey) . ",sel:false" . $url . "});\">" . $Language->Phrase("ExportToEmail") . "</button>";
+		$item->Body = "<button id=\"emf_t_lembur2\" class=\"ewExportLink ewEmail\" title=\"" . $Language->Phrase("ExportToEmailText") . "\" data-caption=\"" . $Language->Phrase("ExportToEmailText") . "\" onclick=\"ew_EmailDialogShow({lnk:'emf_t_lembur2',hdr:ewLanguage.Phrase('ExportToEmailText'),f:document.ft_lembur2view,key:" . ew_ArrayToJsonAttr($this->RecKey) . ",sel:false" . $url . "});\">" . $Language->Phrase("ExportToEmail") . "</button>";
 		$item->Visible = TRUE;
 
 		// Drop down button for export
@@ -1081,13 +1049,13 @@ class ct_keg_detail_view extends ct_keg_detail {
 				$this->DbMasterFilter = "";
 				$this->DbDetailFilter = "";
 			}
-			if ($sMasterTblVar == "t_keg_master") {
+			if ($sMasterTblVar == "pegawai") {
 				$bValidMaster = TRUE;
-				if (@$_GET["fk_kegm_id"] <> "") {
-					$GLOBALS["t_keg_master"]->kegm_id->setQueryStringValue($_GET["fk_kegm_id"]);
-					$this->kegm_id->setQueryStringValue($GLOBALS["t_keg_master"]->kegm_id->QueryStringValue);
-					$this->kegm_id->setSessionValue($this->kegm_id->QueryStringValue);
-					if (!is_numeric($GLOBALS["t_keg_master"]->kegm_id->QueryStringValue)) $bValidMaster = FALSE;
+				if (@$_GET["fk_pegawai_id"] <> "") {
+					$GLOBALS["pegawai"]->pegawai_id->setQueryStringValue($_GET["fk_pegawai_id"]);
+					$this->pegawai_id->setQueryStringValue($GLOBALS["pegawai"]->pegawai_id->QueryStringValue);
+					$this->pegawai_id->setSessionValue($this->pegawai_id->QueryStringValue);
+					if (!is_numeric($GLOBALS["pegawai"]->pegawai_id->QueryStringValue)) $bValidMaster = FALSE;
 				} else {
 					$bValidMaster = FALSE;
 				}
@@ -1099,13 +1067,13 @@ class ct_keg_detail_view extends ct_keg_detail {
 				$this->DbMasterFilter = "";
 				$this->DbDetailFilter = "";
 			}
-			if ($sMasterTblVar == "t_keg_master") {
+			if ($sMasterTblVar == "pegawai") {
 				$bValidMaster = TRUE;
-				if (@$_POST["fk_kegm_id"] <> "") {
-					$GLOBALS["t_keg_master"]->kegm_id->setFormValue($_POST["fk_kegm_id"]);
-					$this->kegm_id->setFormValue($GLOBALS["t_keg_master"]->kegm_id->FormValue);
-					$this->kegm_id->setSessionValue($this->kegm_id->FormValue);
-					if (!is_numeric($GLOBALS["t_keg_master"]->kegm_id->FormValue)) $bValidMaster = FALSE;
+				if (@$_POST["fk_pegawai_id"] <> "") {
+					$GLOBALS["pegawai"]->pegawai_id->setFormValue($_POST["fk_pegawai_id"]);
+					$this->pegawai_id->setFormValue($GLOBALS["pegawai"]->pegawai_id->FormValue);
+					$this->pegawai_id->setSessionValue($this->pegawai_id->FormValue);
+					if (!is_numeric($GLOBALS["pegawai"]->pegawai_id->FormValue)) $bValidMaster = FALSE;
 				} else {
 					$bValidMaster = FALSE;
 				}
@@ -1122,8 +1090,8 @@ class ct_keg_detail_view extends ct_keg_detail {
 			$this->setStartRecordNumber($this->StartRec);
 
 			// Clear previous master key from Session
-			if ($sMasterTblVar <> "t_keg_master") {
-				if ($this->kegm_id->CurrentValue == "") $this->kegm_id->setSessionValue("");
+			if ($sMasterTblVar <> "pegawai") {
+				if ($this->pegawai_id->CurrentValue == "") $this->pegawai_id->setSessionValue("");
 			}
 		}
 		$this->DbMasterFilter = $this->GetMasterFilter(); // Get master filter
@@ -1135,7 +1103,7 @@ class ct_keg_detail_view extends ct_keg_detail {
 		global $Breadcrumb, $Language;
 		$Breadcrumb = new cBreadcrumb();
 		$url = substr(ew_CurrentUrl(), strrpos(ew_CurrentUrl(), "/")+1);
-		$Breadcrumb->Add("list", $this->TableVar, $this->AddMasterUrl("t_keg_detaillist.php"), "", $this->TableVar, TRUE);
+		$Breadcrumb->Add("list", $this->TableVar, $this->AddMasterUrl("t_lembur2list.php"), "", $this->TableVar, TRUE);
 		$PageId = "view";
 		$Breadcrumb->Add("view", $PageId, $url);
 	}
@@ -1247,30 +1215,30 @@ class ct_keg_detail_view extends ct_keg_detail {
 <?php
 
 // Create page object
-if (!isset($t_keg_detail_view)) $t_keg_detail_view = new ct_keg_detail_view();
+if (!isset($t_lembur2_view)) $t_lembur2_view = new ct_lembur2_view();
 
 // Page init
-$t_keg_detail_view->Page_Init();
+$t_lembur2_view->Page_Init();
 
 // Page main
-$t_keg_detail_view->Page_Main();
+$t_lembur2_view->Page_Main();
 
 // Global Page Rendering event (in userfn*.php)
 Page_Rendering();
 
 // Page Rendering event
-$t_keg_detail_view->Page_Render();
+$t_lembur2_view->Page_Render();
 ?>
 <?php include_once "header.php" ?>
-<?php if ($t_keg_detail->Export == "") { ?>
+<?php if ($t_lembur2->Export == "") { ?>
 <script type="text/javascript">
 
 // Form object
 var CurrentPageID = EW_PAGE_ID = "view";
-var CurrentForm = ft_keg_detailview = new ew_Form("ft_keg_detailview", "view");
+var CurrentForm = ft_lembur2view = new ew_Form("ft_lembur2view", "view");
 
 // Form_CustomValidate event
-ft_keg_detailview.Form_CustomValidate = 
+ft_lembur2view.Form_CustomValidate = 
  function(fobj) { // DO NOT CHANGE THIS LINE!
 
  	// Your custom validation code here, return false if invalid. 
@@ -1279,192 +1247,191 @@ ft_keg_detailview.Form_CustomValidate =
 
 // Use JavaScript validation or not
 <?php if (EW_CLIENT_VALIDATE) { ?>
-ft_keg_detailview.ValidateRequired = true;
+ft_lembur2view.ValidateRequired = true;
 <?php } else { ?>
-ft_keg_detailview.ValidateRequired = false; 
+ft_lembur2view.ValidateRequired = false; 
 <?php } ?>
 
 // Dynamic selection lists
-ft_keg_detailview.Lists["x_pegawai_id"] = {"LinkField":"x_pegawai_id","Ajax":true,"AutoFill":false,"DisplayFields":["x_pegawai_nama","","",""],"ParentFields":[],"ChildFields":[],"FilterFields":[],"Options":[],"Template":"","LinkTable":"pegawai"};
-
 // Form object for search
+
 </script>
 <script type="text/javascript">
 
 // Write your client script here, no need to add script tags.
 </script>
 <?php } ?>
-<?php if ($t_keg_detail->Export == "") { ?>
+<?php if ($t_lembur2->Export == "") { ?>
 <div class="ewToolbar">
-<?php if (!$t_keg_detail_view->IsModal) { ?>
-<?php if ($t_keg_detail->Export == "") { ?>
+<?php if (!$t_lembur2_view->IsModal) { ?>
+<?php if ($t_lembur2->Export == "") { ?>
 <?php $Breadcrumb->Render(); ?>
 <?php } ?>
 <?php } ?>
-<?php $t_keg_detail_view->ExportOptions->Render("body") ?>
+<?php $t_lembur2_view->ExportOptions->Render("body") ?>
 <?php
-	foreach ($t_keg_detail_view->OtherOptions as &$option)
+	foreach ($t_lembur2_view->OtherOptions as &$option)
 		$option->Render("body");
 ?>
-<?php if (!$t_keg_detail_view->IsModal) { ?>
-<?php if ($t_keg_detail->Export == "") { ?>
+<?php if (!$t_lembur2_view->IsModal) { ?>
+<?php if ($t_lembur2->Export == "") { ?>
 <?php echo $Language->SelectionForm(); ?>
 <?php } ?>
 <?php } ?>
 <div class="clearfix"></div>
 </div>
 <?php } ?>
-<?php $t_keg_detail_view->ShowPageHeader(); ?>
+<?php $t_lembur2_view->ShowPageHeader(); ?>
 <?php
-$t_keg_detail_view->ShowMessage();
+$t_lembur2_view->ShowMessage();
 ?>
-<?php if (!$t_keg_detail_view->IsModal) { ?>
-<?php if ($t_keg_detail->Export == "") { ?>
+<?php if (!$t_lembur2_view->IsModal) { ?>
+<?php if ($t_lembur2->Export == "") { ?>
 <form name="ewPagerForm" class="form-inline ewForm ewPagerForm" action="<?php echo ew_CurrentPage() ?>">
-<?php if (!isset($t_keg_detail_view->Pager)) $t_keg_detail_view->Pager = new cPrevNextPager($t_keg_detail_view->StartRec, $t_keg_detail_view->DisplayRecs, $t_keg_detail_view->TotalRecs) ?>
-<?php if ($t_keg_detail_view->Pager->RecordCount > 0 && $t_keg_detail_view->Pager->Visible) { ?>
+<?php if (!isset($t_lembur2_view->Pager)) $t_lembur2_view->Pager = new cPrevNextPager($t_lembur2_view->StartRec, $t_lembur2_view->DisplayRecs, $t_lembur2_view->TotalRecs) ?>
+<?php if ($t_lembur2_view->Pager->RecordCount > 0 && $t_lembur2_view->Pager->Visible) { ?>
 <div class="ewPager">
 <span><?php echo $Language->Phrase("Page") ?>&nbsp;</span>
 <div class="ewPrevNext"><div class="input-group">
 <div class="input-group-btn">
 <!--first page button-->
-	<?php if ($t_keg_detail_view->Pager->FirstButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerFirst") ?>" href="<?php echo $t_keg_detail_view->PageUrl() ?>start=<?php echo $t_keg_detail_view->Pager->FirstButton->Start ?>"><span class="icon-first ewIcon"></span></a>
+	<?php if ($t_lembur2_view->Pager->FirstButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerFirst") ?>" href="<?php echo $t_lembur2_view->PageUrl() ?>start=<?php echo $t_lembur2_view->Pager->FirstButton->Start ?>"><span class="icon-first ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerFirst") ?>"><span class="icon-first ewIcon"></span></a>
 	<?php } ?>
 <!--previous page button-->
-	<?php if ($t_keg_detail_view->Pager->PrevButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerPrevious") ?>" href="<?php echo $t_keg_detail_view->PageUrl() ?>start=<?php echo $t_keg_detail_view->Pager->PrevButton->Start ?>"><span class="icon-prev ewIcon"></span></a>
+	<?php if ($t_lembur2_view->Pager->PrevButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerPrevious") ?>" href="<?php echo $t_lembur2_view->PageUrl() ?>start=<?php echo $t_lembur2_view->Pager->PrevButton->Start ?>"><span class="icon-prev ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerPrevious") ?>"><span class="icon-prev ewIcon"></span></a>
 	<?php } ?>
 </div>
 <!--current page number-->
-	<input class="form-control input-sm" type="text" name="<?php echo EW_TABLE_PAGE_NO ?>" value="<?php echo $t_keg_detail_view->Pager->CurrentPage ?>">
+	<input class="form-control input-sm" type="text" name="<?php echo EW_TABLE_PAGE_NO ?>" value="<?php echo $t_lembur2_view->Pager->CurrentPage ?>">
 <div class="input-group-btn">
 <!--next page button-->
-	<?php if ($t_keg_detail_view->Pager->NextButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerNext") ?>" href="<?php echo $t_keg_detail_view->PageUrl() ?>start=<?php echo $t_keg_detail_view->Pager->NextButton->Start ?>"><span class="icon-next ewIcon"></span></a>
+	<?php if ($t_lembur2_view->Pager->NextButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerNext") ?>" href="<?php echo $t_lembur2_view->PageUrl() ?>start=<?php echo $t_lembur2_view->Pager->NextButton->Start ?>"><span class="icon-next ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerNext") ?>"><span class="icon-next ewIcon"></span></a>
 	<?php } ?>
 <!--last page button-->
-	<?php if ($t_keg_detail_view->Pager->LastButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerLast") ?>" href="<?php echo $t_keg_detail_view->PageUrl() ?>start=<?php echo $t_keg_detail_view->Pager->LastButton->Start ?>"><span class="icon-last ewIcon"></span></a>
+	<?php if ($t_lembur2_view->Pager->LastButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerLast") ?>" href="<?php echo $t_lembur2_view->PageUrl() ?>start=<?php echo $t_lembur2_view->Pager->LastButton->Start ?>"><span class="icon-last ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerLast") ?>"><span class="icon-last ewIcon"></span></a>
 	<?php } ?>
 </div>
 </div>
 </div>
-<span>&nbsp;<?php echo $Language->Phrase("of") ?>&nbsp;<?php echo $t_keg_detail_view->Pager->PageCount ?></span>
+<span>&nbsp;<?php echo $Language->Phrase("of") ?>&nbsp;<?php echo $t_lembur2_view->Pager->PageCount ?></span>
 </div>
 <?php } ?>
 <div class="clearfix"></div>
 </form>
 <?php } ?>
 <?php } ?>
-<form name="ft_keg_detailview" id="ft_keg_detailview" class="form-inline ewForm ewViewForm" action="<?php echo ew_CurrentPage() ?>" method="post">
-<?php if ($t_keg_detail_view->CheckToken) { ?>
-<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $t_keg_detail_view->Token ?>">
+<form name="ft_lembur2view" id="ft_lembur2view" class="form-inline ewForm ewViewForm" action="<?php echo ew_CurrentPage() ?>" method="post">
+<?php if ($t_lembur2_view->CheckToken) { ?>
+<input type="hidden" name="<?php echo EW_TOKEN_NAME ?>" value="<?php echo $t_lembur2_view->Token ?>">
 <?php } ?>
-<input type="hidden" name="t" value="t_keg_detail">
-<?php if ($t_keg_detail_view->IsModal) { ?>
+<input type="hidden" name="t" value="t_lembur2">
+<?php if ($t_lembur2_view->IsModal) { ?>
 <input type="hidden" name="modal" value="1">
 <?php } ?>
 <table class="table table-bordered table-striped ewViewTable">
-<?php if ($t_keg_detail->pegawai_id->Visible) { // pegawai_id ?>
+<?php if ($t_lembur2->pegawai_id->Visible) { // pegawai_id ?>
 	<tr id="r_pegawai_id">
-		<td><span id="elh_t_keg_detail_pegawai_id"><?php echo $t_keg_detail->pegawai_id->FldCaption() ?></span></td>
-		<td data-name="pegawai_id"<?php echo $t_keg_detail->pegawai_id->CellAttributes() ?>>
-<span id="el_t_keg_detail_pegawai_id">
-<span<?php echo $t_keg_detail->pegawai_id->ViewAttributes() ?>>
-<?php echo $t_keg_detail->pegawai_id->ViewValue ?></span>
+		<td><span id="elh_t_lembur2_pegawai_id"><?php echo $t_lembur2->pegawai_id->FldCaption() ?></span></td>
+		<td data-name="pegawai_id"<?php echo $t_lembur2->pegawai_id->CellAttributes() ?>>
+<span id="el_t_lembur2_pegawai_id">
+<span<?php echo $t_lembur2->pegawai_id->ViewAttributes() ?>>
+<?php echo $t_lembur2->pegawai_id->ViewValue ?></span>
 </span>
 </td>
 	</tr>
 <?php } ?>
-<?php if ($t_keg_detail->scan_masuk->Visible) { // scan_masuk ?>
-	<tr id="r_scan_masuk">
-		<td><span id="elh_t_keg_detail_scan_masuk"><?php echo $t_keg_detail->scan_masuk->FldCaption() ?></span></td>
-		<td data-name="scan_masuk"<?php echo $t_keg_detail->scan_masuk->CellAttributes() ?>>
-<span id="el_t_keg_detail_scan_masuk">
-<span<?php echo $t_keg_detail->scan_masuk->ViewAttributes() ?>>
-<?php echo $t_keg_detail->scan_masuk->ViewValue ?></span>
+<?php if ($t_lembur2->tgl->Visible) { // tgl ?>
+	<tr id="r_tgl">
+		<td><span id="elh_t_lembur2_tgl"><?php echo $t_lembur2->tgl->FldCaption() ?></span></td>
+		<td data-name="tgl"<?php echo $t_lembur2->tgl->CellAttributes() ?>>
+<span id="el_t_lembur2_tgl">
+<span<?php echo $t_lembur2->tgl->ViewAttributes() ?>>
+<?php echo $t_lembur2->tgl->ViewValue ?></span>
 </span>
 </td>
 	</tr>
 <?php } ?>
-<?php if ($t_keg_detail->scan_keluar->Visible) { // scan_keluar ?>
-	<tr id="r_scan_keluar">
-		<td><span id="elh_t_keg_detail_scan_keluar"><?php echo $t_keg_detail->scan_keluar->FldCaption() ?></span></td>
-		<td data-name="scan_keluar"<?php echo $t_keg_detail->scan_keluar->CellAttributes() ?>>
-<span id="el_t_keg_detail_scan_keluar">
-<span<?php echo $t_keg_detail->scan_keluar->ViewAttributes() ?>>
-<?php echo $t_keg_detail->scan_keluar->ViewValue ?></span>
+<?php if ($t_lembur2->lama_lembur->Visible) { // lama_lembur ?>
+	<tr id="r_lama_lembur">
+		<td><span id="elh_t_lembur2_lama_lembur"><?php echo $t_lembur2->lama_lembur->FldCaption() ?></span></td>
+		<td data-name="lama_lembur"<?php echo $t_lembur2->lama_lembur->CellAttributes() ?>>
+<span id="el_t_lembur2_lama_lembur">
+<span<?php echo $t_lembur2->lama_lembur->ViewAttributes() ?>>
+<?php echo $t_lembur2->lama_lembur->ViewValue ?></span>
 </span>
 </td>
 	</tr>
 <?php } ?>
 </table>
-<?php if (!$t_keg_detail_view->IsModal) { ?>
-<?php if ($t_keg_detail->Export == "") { ?>
-<?php if (!isset($t_keg_detail_view->Pager)) $t_keg_detail_view->Pager = new cPrevNextPager($t_keg_detail_view->StartRec, $t_keg_detail_view->DisplayRecs, $t_keg_detail_view->TotalRecs) ?>
-<?php if ($t_keg_detail_view->Pager->RecordCount > 0 && $t_keg_detail_view->Pager->Visible) { ?>
+<?php if (!$t_lembur2_view->IsModal) { ?>
+<?php if ($t_lembur2->Export == "") { ?>
+<?php if (!isset($t_lembur2_view->Pager)) $t_lembur2_view->Pager = new cPrevNextPager($t_lembur2_view->StartRec, $t_lembur2_view->DisplayRecs, $t_lembur2_view->TotalRecs) ?>
+<?php if ($t_lembur2_view->Pager->RecordCount > 0 && $t_lembur2_view->Pager->Visible) { ?>
 <div class="ewPager">
 <span><?php echo $Language->Phrase("Page") ?>&nbsp;</span>
 <div class="ewPrevNext"><div class="input-group">
 <div class="input-group-btn">
 <!--first page button-->
-	<?php if ($t_keg_detail_view->Pager->FirstButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerFirst") ?>" href="<?php echo $t_keg_detail_view->PageUrl() ?>start=<?php echo $t_keg_detail_view->Pager->FirstButton->Start ?>"><span class="icon-first ewIcon"></span></a>
+	<?php if ($t_lembur2_view->Pager->FirstButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerFirst") ?>" href="<?php echo $t_lembur2_view->PageUrl() ?>start=<?php echo $t_lembur2_view->Pager->FirstButton->Start ?>"><span class="icon-first ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerFirst") ?>"><span class="icon-first ewIcon"></span></a>
 	<?php } ?>
 <!--previous page button-->
-	<?php if ($t_keg_detail_view->Pager->PrevButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerPrevious") ?>" href="<?php echo $t_keg_detail_view->PageUrl() ?>start=<?php echo $t_keg_detail_view->Pager->PrevButton->Start ?>"><span class="icon-prev ewIcon"></span></a>
+	<?php if ($t_lembur2_view->Pager->PrevButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerPrevious") ?>" href="<?php echo $t_lembur2_view->PageUrl() ?>start=<?php echo $t_lembur2_view->Pager->PrevButton->Start ?>"><span class="icon-prev ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerPrevious") ?>"><span class="icon-prev ewIcon"></span></a>
 	<?php } ?>
 </div>
 <!--current page number-->
-	<input class="form-control input-sm" type="text" name="<?php echo EW_TABLE_PAGE_NO ?>" value="<?php echo $t_keg_detail_view->Pager->CurrentPage ?>">
+	<input class="form-control input-sm" type="text" name="<?php echo EW_TABLE_PAGE_NO ?>" value="<?php echo $t_lembur2_view->Pager->CurrentPage ?>">
 <div class="input-group-btn">
 <!--next page button-->
-	<?php if ($t_keg_detail_view->Pager->NextButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerNext") ?>" href="<?php echo $t_keg_detail_view->PageUrl() ?>start=<?php echo $t_keg_detail_view->Pager->NextButton->Start ?>"><span class="icon-next ewIcon"></span></a>
+	<?php if ($t_lembur2_view->Pager->NextButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerNext") ?>" href="<?php echo $t_lembur2_view->PageUrl() ?>start=<?php echo $t_lembur2_view->Pager->NextButton->Start ?>"><span class="icon-next ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerNext") ?>"><span class="icon-next ewIcon"></span></a>
 	<?php } ?>
 <!--last page button-->
-	<?php if ($t_keg_detail_view->Pager->LastButton->Enabled) { ?>
-	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerLast") ?>" href="<?php echo $t_keg_detail_view->PageUrl() ?>start=<?php echo $t_keg_detail_view->Pager->LastButton->Start ?>"><span class="icon-last ewIcon"></span></a>
+	<?php if ($t_lembur2_view->Pager->LastButton->Enabled) { ?>
+	<a class="btn btn-default btn-sm" title="<?php echo $Language->Phrase("PagerLast") ?>" href="<?php echo $t_lembur2_view->PageUrl() ?>start=<?php echo $t_lembur2_view->Pager->LastButton->Start ?>"><span class="icon-last ewIcon"></span></a>
 	<?php } else { ?>
 	<a class="btn btn-default btn-sm disabled" title="<?php echo $Language->Phrase("PagerLast") ?>"><span class="icon-last ewIcon"></span></a>
 	<?php } ?>
 </div>
 </div>
 </div>
-<span>&nbsp;<?php echo $Language->Phrase("of") ?>&nbsp;<?php echo $t_keg_detail_view->Pager->PageCount ?></span>
+<span>&nbsp;<?php echo $Language->Phrase("of") ?>&nbsp;<?php echo $t_lembur2_view->Pager->PageCount ?></span>
 </div>
 <?php } ?>
 <div class="clearfix"></div>
 <?php } ?>
 <?php } ?>
 </form>
-<?php if ($t_keg_detail->Export == "") { ?>
+<?php if ($t_lembur2->Export == "") { ?>
 <script type="text/javascript">
-ft_keg_detailview.Init();
+ft_lembur2view.Init();
 </script>
 <?php } ?>
 <?php
-$t_keg_detail_view->ShowPageFooter();
+$t_lembur2_view->ShowPageFooter();
 if (EW_DEBUG_ENABLED)
 	echo ew_DebugMsg();
 ?>
-<?php if ($t_keg_detail->Export == "") { ?>
+<?php if ($t_lembur2->Export == "") { ?>
 <script type="text/javascript">
 
 // Write your table-specific startup script here
@@ -1474,5 +1441,5 @@ if (EW_DEBUG_ENABLED)
 <?php } ?>
 <?php include_once "footer.php" ?>
 <?php
-$t_keg_detail_view->Page_Terminate();
+$t_lembur2_view->Page_Terminate();
 ?>
