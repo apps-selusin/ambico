@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<ew-language date="2018/8/14" version="13.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
+<ew-language date="2018/8/15" version="13.0.0" id="en" name="English" desc="English" author="e.World Technology Ltd.">
   <!-- 
 	*** Important Notes:
 	1. Language ID should follow: https://developers.google.com/recaptcha/docs/language,
@@ -637,23 +637,20 @@
     <menu id="10230">
       <phrase id="menutext" value="Pengecualian" />
     </menu>
-    <menu id="10425">
-      <phrase id="menutext" value="audittrail" />
-    </menu>
     <menu id="10411">
       <phrase id="menutext" value="Input" />
     </menu>
     <menu id="10239">
       <phrase id="menutext" value="Kegiatan (Borongan)" />
     </menu>
+    <menu id="10425">
+      <phrase id="menutext" value="audittrail" />
+    </menu>
     <menu id="10224">
       <phrase id="menutext" value="Proses" />
     </menu>
     <menu id="10227">
       <phrase id="menutext" value="Generate Jadwal Kerja" />
-    </menu>
-    <menu id="10426">
-      <phrase id="menutext" value="Lembur 2" />
     </menu>
     <menu id="10077">
       <phrase id="menutext" value="Laporan" />
@@ -687,6 +684,12 @@
     </menu>
     <menu id="10419">
       <phrase id="menutext" value="Lembur (Harian)" />
+    </menu>
+    <menu id="10428">
+      <phrase id="menutext" value="Lembur #2 (Harian)" />
+    </menu>
+    <menu id="10426">
+      <phrase id="menutext" value="Lembur 2" />
     </menu>
     <menu id="10422">
       <phrase id="menutext" value="v keg hasil" />
@@ -3632,6 +3635,9 @@
     </table>
     <table id="lap_lembur2__php">
       <phrase id="tblcaption" value="Lembur #2 (Bulanan)" />
+    </table>
+    <table id="lap_lemburh2__php">
+      <phrase id="tblcaption" value="Lembur #2 (Harian)" />
     </table>
   </project>
 </ew-language>
