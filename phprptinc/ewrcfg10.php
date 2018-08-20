@@ -79,7 +79,7 @@ define("EWR_SESSION_TIMEOUT_COUNTDOWN", 60, TRUE); // Session timeout count down
 // General
 $EWR_ROOT_RELATIVE_PATH = "."; // Relative path of app root
 define("EWR_UNFORMAT_YEAR", 50, TRUE); // Unformat year
-define("EWR_RANDOM_KEY", 'nhi0Oesz3ZPbL2b7', TRUE); // Random key for encryption
+define("EWR_RANDOM_KEY", 'LIDcPo1t2hhXGW60', TRUE); // Random key for encryption
 define("EWR_PROJECT_STYLESHEET_FILENAME", "phprptcss/ambico.css", TRUE); // Project stylesheet file name
 define("EWR_CHART_WIDTH", 550, TRUE);
 define("EWR_CHART_HEIGHT", 440, TRUE);
@@ -856,7 +856,7 @@ define("EWR_PDF_MEMORY_LIMIT", "128M", TRUE); // Memory limit
 define("EWR_PDF_TIME_LIMIT", 120, TRUE); // Time limit
 
 // Include dompdf
-include_once "dompdf080/src/Autoloader.php";
+include_once "dompdf070/src/Autoloader.php";
 $DompdfAutoloader = new \Dompdf\Autoloader();
 $DompdfAutoloader->register();
 ?>

@@ -1140,7 +1140,7 @@ class crr_laplemburh_summary extends crr_laplemburh {
 
 			// total_lembur
 			$this->total_lembur->SumViewValue = $this->total_lembur->SumValue;
-			$this->total_lembur->SumViewValue = ewr_FormatNumber($this->total_lembur->SumViewValue, 0, -2, -2, -2);
+			$this->total_lembur->SumViewValue = ewr_FormatNumber($this->total_lembur->SumViewValue, 2, -2, -2, -2);
 			$this->total_lembur->CellAttrs["style"] = "text-align:right;";
 			$this->total_lembur->CellAttrs["class"] = ($this->RowTotalType == EWR_ROWTOTAL_PAGE || $this->RowTotalType == EWR_ROWTOTAL_GRAND) ? "ewRptGrpAggregate" : "ewRptGrpSummary" . $this->RowGroupLevel;
 
@@ -1216,19 +1216,19 @@ class crr_laplemburh_summary extends crr_laplemburh {
 
 			// jml_jam
 			$this->jml_jam->ViewValue = $this->jml_jam->CurrentValue;
-			$this->jml_jam->ViewValue = ewr_FormatNumber($this->jml_jam->ViewValue, 0, -2, -2, -2);
+			$this->jml_jam->ViewValue = ewr_FormatNumber($this->jml_jam->ViewValue, 2, -2, -2, -2);
 			$this->jml_jam->CellAttrs["class"] = ($this->RecCount % 2 <> 1) ? "ewTableAltRow" : "ewTableRow";
 			$this->jml_jam->CellAttrs["style"] = "text-align:right;";
 
 			// tarif
 			$this->tarif->ViewValue = $this->tarif->CurrentValue;
-			$this->tarif->ViewValue = ewr_FormatNumber($this->tarif->ViewValue, 0, -2, -2, -2);
+			$this->tarif->ViewValue = ewr_FormatNumber($this->tarif->ViewValue, 2, -2, -2, -2);
 			$this->tarif->CellAttrs["class"] = ($this->RecCount % 2 <> 1) ? "ewTableAltRow" : "ewTableRow";
 			$this->tarif->CellAttrs["style"] = "text-align:right;";
 
 			// total_lembur
 			$this->total_lembur->ViewValue = $this->total_lembur->CurrentValue;
-			$this->total_lembur->ViewValue = ewr_FormatNumber($this->total_lembur->ViewValue, 0, -2, -2, -2);
+			$this->total_lembur->ViewValue = ewr_FormatNumber($this->total_lembur->ViewValue, 2, -2, -2, -2);
 			$this->total_lembur->CellAttrs["class"] = ($this->RecCount % 2 <> 1) ? "ewTableAltRow" : "ewTableRow";
 			$this->total_lembur->CellAttrs["style"] = "text-align:right;";
 
