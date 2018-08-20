@@ -67,7 +67,7 @@ class ct_lembur2 extends cTable {
 		$this->fields['tgl'] = &$this->tgl;
 
 		// lama_lembur
-		$this->lama_lembur = new cField('t_lembur2', 't_lembur2', 'x_lama_lembur', 'lama_lembur', '`lama_lembur`', '`lama_lembur`', 131, -1, FALSE, '`lama_lembur`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
+		$this->lama_lembur = new cField('t_lembur2', 't_lembur2', 'x_lama_lembur', 'lama_lembur', '`lama_lembur`', '`lama_lembur`', 4, -1, FALSE, '`lama_lembur`', FALSE, FALSE, FALSE, 'FORMATTED TEXT', 'TEXT');
 		$this->lama_lembur->Sortable = TRUE; // Allow sort
 		$this->lama_lembur->FldDefaultErrMsg = $Language->Phrase("IncorrectFloat");
 		$this->fields['lama_lembur'] = &$this->lama_lembur;
