@@ -210,6 +210,38 @@ $query = "
 		b.pegawai_nip
 		
 	"; //echo $query; exit; //a.pegawai_id
+	
+$query = "
+	select
+		f.lapgroup_nama
+		, f.lapgroup_index
+		, g.pembagian2_nama
+		, a.pegawai_id
+		, b.pegawai_nama
+		, b.pegawai_nip
+		, d.lembur
+		
+	from
+		t_lembur2 a
+		left join pegawai b on a.pegawai_id = b.pegawai_id
+		left join t_rumus_peg c on a.pegawai_id = c.pegawai_id
+		left join t_rumus d on c.rumus_id = d.rumus_id
+		left join t_lapsubgroup e on b.pembagian2_id = e.pembagian2_id
+		left join t_lapgroup f on e.lapgroup_id = f.lapgroup_id
+		left join pembagian2 g on b.pembagian2_id = g.pembagian2_id
+	where
+		a.pegawai_id in (select pegawai_id from t_rumus_peg)
+		and a.tgl between '".$_POST["start"]."' and '".$_POST["end"]."'
+	group by
+		f.lapgroup_index,
+		e.lapsubgroup_index,
+		a.pegawai_id
+	order by
+		f.lapgroup_index,
+		e.lapsubgroup_index,
+		b.pegawai_nip
+		
+	"; //echo $query; exit; //a.pegawai_id	
 $rs = $conn->Execute($query);
 
 while (!$rs->EOF) {
