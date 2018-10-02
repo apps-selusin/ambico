@@ -1743,6 +1743,7 @@ class crr_laplembur_summary extends crr_laplembur {
 		// Example:
 		//$footer = "your footer";
 
+		echo "<p><a href='kitir_lembur_bln.php'><button>Cetak Slip Lembur</button></a></p>";
 	}
 
 	// Form Custom Validate event
