@@ -132,7 +132,7 @@ $baris  = 1; //Ini untuk dimulai baris datanya, karena di baris 3 itu digunakan 
 $i      = 0;
 
 //$query = "select * from t_gjbln";
-$query = "select * from t_laplembur";
+$query = "select * from t_laplemburh";
 $rs = $conn->Execute($query);
 
 while (!$rs->EOF) {
@@ -140,13 +140,13 @@ while (!$rs->EOF) {
 	$a[ 0][$i] = $rs->fields["nama"];
 	$a[ 1][$i] = $rs->fields["nip"];
 	$a[ 2][$i] = $rs->fields["divisi"];
-	$a[ 3][$i] = "BULANAN";
+	$a[ 3][$i] = "HARIAN";
 	$a[ 4][$i] = tgl_indo($rs->fields["start"]) . " - " . tgl_indo($rs->fields["end"]); //date("F - Y", strtotime($rs->fields["end"]));
 	$a[ 6][$i] = $rs->fields["jml_jam"]; 
 	$a[ 7][$i] = $rs->fields["total_lembur"];
 	$a[ 9][$i] = $rs->fields["total_lembur"];
 	
-	$mnama_file = "KTR LEMBUR BULANAN PERIODE ".tgl_indo($rs->fields["start"]) . " - " . tgl_indo($rs->fields["end"]);
+	$mnama_file = "KTR LEMBUR HARIAN PERIODE ".tgl_indo($rs->fields["start"]) . " - " . tgl_indo($rs->fields["end"]);
 	
 	$i++;
 	if ($i % 3 == 0) {
@@ -433,7 +433,7 @@ while (!$rs->EOF) {
 $rs->Close();
 
 //Memberi nama sheet
-$excelku->getActiveSheet()->setTitle('Slip Lembur Bulanan');
+$excelku->getActiveSheet()->setTitle('Slip Lembur Harian');
 
 $excelku->setActiveSheetIndex(0);
 
